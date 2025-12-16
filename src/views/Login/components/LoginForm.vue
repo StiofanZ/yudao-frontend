@@ -55,7 +55,7 @@
                 {{ t('login.remember') }}
               </el-checkbox>
             </el-col>
-            <el-col :offset="6" :span="12">
+            <el-col :offset="6" :span="12" v-if="loginData.forgetEnable==='true'">
               <el-link
                 class="float-right"
                 type="primary"
@@ -86,24 +86,24 @@
         mode="pop"
         @success="handleLogin"
       />
-      <el-col :span="24" class="px-10px">
+      <el-col :span="24" class="px-10px" v-if="loginData.mobileLoginEnable===loginData.qrLoginEnable===loginData.registerEnable==='true'">
         <el-form-item>
           <el-row :gutter="5" justify="space-between" style="width: 100%">
-            <el-col :span="8">
+            <el-col :span="8" v-if="loginData.mobileLoginEnable==='true'">
               <XButton
                 :title="t('login.btnMobile')"
                 class="w-full"
                 @click="setLoginState(LoginStateEnum.MOBILE)"
               />
             </el-col>
-            <el-col :span="8">
+            <el-col :span="8" v-if="loginData.qrLoginEnable==='true'">
               <XButton
                 :title="t('login.btnQRCode')"
                 class="w-full"
                 @click="setLoginState(LoginStateEnum.QR_CODE)"
               />
             </el-col>
-            <el-col :span="8">
+            <el-col :span="8" v-if="loginData.registerEnable==='true'">
               <XButton
                 :title="t('login.btnRegister')"
                 class="w-full"
@@ -113,8 +113,8 @@
           </el-row>
         </el-form-item>
       </el-col>
-      <el-divider content-position="center">{{ t('login.otherLogin') }}</el-divider>
-      <el-col :span="24" class="px-10px">
+      <el-divider content-position="center" v-if="loginData.ssoLoginEnable==='true'">{{ t('login.otherLogin') }}</el-divider>
+      <el-col :span="24" class="px-10px" v-if="loginData.ssoLoginEnable==='true'">
         <el-form-item>
           <div class="w-full flex justify-between">
             <Icon
@@ -129,8 +129,8 @@
           </div>
         </el-form-item>
       </el-col>
-      <el-divider content-position="center">萌新必读</el-divider>
-      <el-col :span="24" class="px-10px">
+      <el-divider content-position="center" v-if="loginData.readmeEnable==='true'">萌新必读</el-divider>
+      <el-col :span="24" class="px-10px" v-if="loginData.readmeEnable==='true'">
         <el-form-item>
           <div class="w-full flex justify-between">
             <el-link href="https://doc.iocoder.cn/" target="_blank">📚开发指南</el-link>
@@ -187,6 +187,12 @@ const loginData = reactive({
   isShowPassword: false,
   captchaEnable: import.meta.env.VITE_APP_CAPTCHA_ENABLE,
   tenantEnable: import.meta.env.VITE_APP_TENANT_ENABLE,
+  mobileLoginEnable: import.meta.env.VITE_APP_MOBILE_LOGIN_ENABLE,
+  qrLoginEnable: import.meta.env.VITE_APP_QR_LOGIN_ENABLE,
+  registerEnable: import.meta.env.VITE_APP_REGISTER_ENABLE,
+  ssoLoginEnable: import.meta.env.VITE_APP_SSO_LOGIN_ENABLE,
+  readmeEnable: import.meta.env.VITE_APP_README_ENABLE,
+  forgetEnable: import.meta.env.VITE_APP_FORGET_ENABLE,
   loginForm: {
     tenantName: import.meta.env.VITE_APP_DEFAULT_LOGIN_TENANT || '',
     username: import.meta.env.VITE_APP_DEFAULT_LOGIN_USERNAME || '',
