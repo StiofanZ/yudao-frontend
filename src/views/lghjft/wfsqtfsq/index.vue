@@ -1,256 +1,144 @@
 <template>
   <ContentWrap>
     <!-- 搜索工作栏 -->
-    <el-form
-      class="-mb-15px"
-      :model="queryParams"
-      ref="queryFormRef"
-      :inline="true"
-      label-width="68px"
-    >
-      <el-form-item label="退费申请明细ID" prop="tfsqmxId">
-        <el-input
-          v-model="queryParams.tfsqmxId"
-          placeholder="请输入退费申请明细ID"
-          clearable
-          @keyup.enter="handleQuery"
-          class="!w-240px"
-        />
-      </el-form-item>
-      <el-form-item label="申请退费类型代码" prop="sqtflxDm">
-        <el-input
-          v-model="queryParams.sqtflxDm"
-          placeholder="请输入申请退费类型代码"
-          clearable
-          @keyup.enter="handleQuery"
-          class="!w-240px"
-        />
-      </el-form-item>
-      <el-form-item label="流程实例的编号" prop="processInstanceId">
-        <el-input
-          v-model="queryParams.processInstanceId"
-          placeholder="请输入流程实例的编号"
-          clearable
-          @keyup.enter="handleQuery"
-          class="!w-240px"
-        />
-      </el-form-item>
-      <el-form-item label="审批结果" prop="status">
-        <el-select
-          v-model="queryParams.status"
-          placeholder="请选择审批结果"
-          clearable
-          class="!w-240px"
-        >
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="创建时间" prop="createTime">
-        <el-date-picker
-          v-model="queryParams.createTime"
-          value-format="YYYY-MM-DD HH:mm:ss"
-          type="daterange"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          :default-time="[new Date('1 00:00:00'), new Date('1 23:59:59')]"
-          class="!w-220px"
-        />
-      </el-form-item>
-      <el-form-item>
-        <el-button @click="handleQuery"><Icon icon="ep:search" class="mr-5px" /> 搜索</el-button>
-        <el-button @click="resetQuery"><Icon icon="ep:refresh" class="mr-5px" /> 重置</el-button>
-        <el-button
-          type="primary"
-          plain
-          @click="openForm('create')"
-          v-hasPermi="['lghjft:wf-sq-tfsq:create']"
-        >
-          <Icon icon="ep:plus" class="mr-5px" /> 新增
-        </el-button>
-        <el-button
-          type="success"
-          plain
-          @click="handleExport"
-          :loading="exportLoading"
-          v-hasPermi="['lghjft:wf-sq-tfsq:export']"
-        >
-          <Icon icon="ep:download" class="mr-5px" /> 导出
-        </el-button>
-        <el-button
-            type="danger"
-            plain
-            :disabled="isEmpty(checkedIds)"
-            @click="handleDeleteBatch"
-            v-hasPermi="['lghjft:wf-sq-tfsq:delete']"
-        >
-          <Icon icon="ep:delete" class="mr-5px" /> 批量删除
-        </el-button>
-      </el-form-item>
-    </el-form>
+    <nsrxx-query @success="handleNsrxxSuccess" />
   </ContentWrap>
 
-  <!-- 列表 -->
-  <ContentWrap>
-    <el-table
-        row-key="id"
-        v-loading="loading"
-        :data="list"
-        :stripe="true"
-        :show-overflow-tooltip="true"
-        @selection-change="handleRowCheckboxChange"
-    >
-    <el-table-column type="selection" width="55" />
-      <el-table-column label="退费申请ID" align="center" prop="id" />
-      <el-table-column label="退费申请明细ID" align="center" prop="tfsqmxId" />
-      <el-table-column label="申请退费类型代码" align="center" prop="sqtflxDm" />
-      <el-table-column label="流程实例的编号" align="center" prop="processInstanceId" />
-      <el-table-column label="审批结果" align="center" prop="status" />
+  <!-- 可退费信息列表弹窗 -->
+  <WfSqTfsqKtfxxDialog ref="ktfxxDialogRef" @success="handleKtfxxSelect" />
+
+  <!-- 申请-退费申请列表（展示选中的可退费信息） -->
+  <ContentWrap v-if="list.length > 0">
+    <div class="mb-4 font-bold text-lg">退费信息</div>
+    <el-table :data="list" :show-overflow-tooltip="true" :stripe="true">
+      <el-table-column align="center" label="税票UUID" prop="spuuid" />
+      <el-table-column align="center" label="社会信用代码" prop="shxydm" />
+      <el-table-column align="center" label="纳税人名称" prop="nsrmc" />
       <el-table-column
-        label="创建时间"
+        :formatter="dateFormatter2"
         align="center"
-        prop="createTime"
-        :formatter="dateFormatter"
-        width="180px"
+        label="税款所属期起"
+        prop="skssqq"
       />
-      <el-table-column label="操作" align="center" min-width="120px">
+      <el-table-column
+        :formatter="dateFormatter2"
+        align="center"
+        label="税款所属期止"
+        prop="skssqz"
+      />
+      <el-table-column align="center" label="可退费金额" prop="ktfje" />
+      <el-table-column align="center" label="退费金额" min-width="150">
+        <template #default="{ row }">
+          <el-input-number
+            v-model="row.tfje"
+            :max="row.ktfje"
+            :min="0"
+            :precision="2"
+            :step="0.01"
+            class="w-full"
+            controls-position="right"
+            placeholder="请输入退费金额"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="操作">
         <template #default="scope">
-          <el-button
-            link
-            type="primary"
-            @click="openForm('update', scope.row.id)"
-            v-hasPermi="['lghjft:wf-sq-tfsq:update']"
-          >
-            编辑
-          </el-button>
-          <el-button
-            link
-            type="danger"
-            @click="handleDelete(scope.row.id)"
-            v-hasPermi="['lghjft:wf-sq-tfsq:delete']"
-          >
-            删除
-          </el-button>
+          <el-button link type="danger" @click="handleRemove(scope.$index)">移除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <!-- 分页 -->
-    <Pagination
-      :total="total"
-      v-model:page="queryParams.pageNo"
-      v-model:limit="queryParams.pageSize"
-      @pagination="getList"
-    />
+    <el-row class="mt-4" justify="center">
+      <el-button
+        :disabled="isSaved"
+        :loading="submitLoading"
+        type="primary"
+        @click="handleApplyRefund"
+      >
+        {{ isSaved ? '已申请' : '申请退费' }}
+      </el-button>
+    </el-row>
   </ContentWrap>
-
-  <!-- 表单弹窗：添加/修改 -->
-  <WfSqTfsqForm ref="formRef" @success="getList" />
 </template>
 
 <script setup lang="ts">
-import { isEmpty } from '@/utils/is'
-import { dateFormatter } from '@/utils/formatTime'
-import download from '@/utils/download'
-import { WfSqTfsqApi, WfSqTfsq } from '@/api/lghjft/wfsqtfsq'
-import WfSqTfsqForm from './WfSqTfsqForm.vue'
+import { ref } from 'vue'
+import { WfSqTfsqApi, WfSqTfsqKtfxx } from '@/api/lghjft/wfsqtfsq'
+import WfSqTfsqKtfxxDialog from './WfSqTfsqKtfxxDialog.vue'
+import { dateFormatter2 } from '@/utils/formatTime'
+import { ElMessage } from 'element-plus'
 
 /** 申请-退费申请 列表 */
 defineOptions({ name: 'WfSqTfsq' })
 
 const message = useMessage() // 消息弹窗
-const { t } = useI18n() // 国际化
 
-const loading = ref(true) // 列表的加载中
-const list = ref<WfSqTfsq[]>([]) // 列表的数据
-const total = ref(0) // 列表的总页数
-const queryParams = reactive({
-  pageNo: 1,
-  pageSize: 10,
-  tfsqmxId: undefined,
-  sqtflxDm: undefined,
-  processInstanceId: undefined,
-  status: undefined,
-  createTime: []
-})
-const queryFormRef = ref() // 搜索的表单
-const exportLoading = ref(false) // 导出的加载中
+const ktfxxDialogRef = ref()
+const submitLoading = ref(false)
+const isSaved = ref(false) // 是否已保存
+// 扩展类型以包含 tfje
+interface WfSqTfsqKtfxxWithAmount extends WfSqTfsqKtfxx {
+  tfje: number
+}
+const list = ref<WfSqTfsqKtfxxWithAmount[]>([]) // 选中的退费申请列表
 
-/** 查询列表 */
-const getList = async () => {
-  loading.value = true
+/** 纳税人查询成功回调 */
+const handleNsrxxSuccess = async (nsrxx: any) => {
+  if (!nsrxx.djxh) {
+    message.warning('该纳税人缺少登记序号，无法查询可退费信息')
+    return
+  }
+  // 清空已选的退费列表及保存状态
+  list.value = []
+  isSaved.value = false
+  ktfxxDialogRef.value.open(nsrxx.djxh)
+}
+
+/** 可退费信息选择回调 */
+const handleKtfxxSelect = (row: WfSqTfsqKtfxx, callback?: (isAdded: boolean) => void) => {
+  if (isSaved.value) {
+    ElMessage.warning('当前已申请退费，请重新查询以发起新申请')
+    callback && callback(false)
+    return
+  }
+
+  // 检查是否已存在
+  const exists = list.value.some((item) => item.spuuid === row.spuuid)
+  if (exists) {
+    ElMessage.warning('该记录已在列表中')
+    callback && callback(false)
+    return
+  }
+
+  // 添加并初始化退费金额为可退费金额
+  list.value.push({
+    ...row,
+    tfje: row.ktfje
+  })
+  callback && callback(true)
+}
+
+/** 移除操作 */
+const handleRemove = (index: number) => {
+  if (isSaved.value) {
+    return // 已保存状态下禁止移除
+  }
+  list.value.splice(index, 1)
+}
+
+/** 申请退费操作 */
+const handleApplyRefund = async () => {
+  if (list.value.length === 0) {
+    message.warning('请至少选择一条退费信息')
+    return
+  }
   try {
-    const data = await WfSqTfsqApi.getWfSqTfsqPage(queryParams)
-    list.value = data.list
-    total.value = data.total
+    submitLoading.value = true
+    await WfSqTfsqApi.save(list.value)
+    message.success('申请退费成功')
+    isSaved.value = true // 标记为已保存
+    // list.value = [] // 不再清空列表
   } finally {
-    loading.value = false
+    submitLoading.value = false
   }
 }
-
-/** 搜索按钮操作 */
-const handleQuery = () => {
-  queryParams.pageNo = 1
-  getList()
-}
-
-/** 重置按钮操作 */
-const resetQuery = () => {
-  queryFormRef.value.resetFields()
-  handleQuery()
-}
-
-/** 添加/修改操作 */
-const formRef = ref()
-const openForm = (type: string, id?: number) => {
-  formRef.value.open(type, id)
-}
-
-/** 删除按钮操作 */
-const handleDelete = async (id: number) => {
-  try {
-    // 删除的二次确认
-    await message.delConfirm()
-    // 发起删除
-    await WfSqTfsqApi.deleteWfSqTfsq(id)
-    message.success(t('common.delSuccess'))
-    // 刷新列表
-    await getList()
-  } catch {}
-}
-
-/** 批量删除申请-退费申请 */
-const handleDeleteBatch = async () => {
-  try {
-    // 删除的二次确认
-    await message.delConfirm()
-    await WfSqTfsqApi.deleteWfSqTfsqList(checkedIds.value);
-    checkedIds.value = [];
-    message.success(t('common.delSuccess'))
-    await getList();
-  } catch {}
-}
-
-const checkedIds = ref<number[]>([])
-const handleRowCheckboxChange = (records: WfSqTfsq[]) => {
-  checkedIds.value = records.map((item) => item.id!);
-}
-
-/** 导出按钮操作 */
-const handleExport = async () => {
-  try {
-    // 导出的二次确认
-    await message.exportConfirm()
-    // 发起导出
-    exportLoading.value = true
-    const data = await WfSqTfsqApi.exportWfSqTfsq(queryParams)
-    download.excel(data, '申请-退费申请.xls')
-  } catch {
-  } finally {
-    exportLoading.value = false
-  }
-}
-
-/** 初始化 **/
-onMounted(() => {
-  getList()
-})
 </script>
