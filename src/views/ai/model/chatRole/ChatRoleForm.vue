@@ -136,7 +136,7 @@ const isUser = computed(() => {
 
 const formRules = reactive<FormRules>({
   name: [{ required: true, message: '角色名称不能为空', trigger: 'blur' }],
-  avatar: [{ required: true, message: '角色头像不能为空', trigger: 'blur' }],
+  avatar: [{ required: false, message: '角色头像不能为空', trigger: 'blur' }],
   category: [{ required: true, message: '角色类别不能为空', trigger: 'blur' }],
   sort: [{ required: true, message: '角色排序不能为空', trigger: 'blur' }],
   description: [{ required: true, message: '角色描述不能为空', trigger: 'blur' }],
