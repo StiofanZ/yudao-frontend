@@ -24,7 +24,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { WfSqTfsqApi } from '@/api/lghjft/wfsqtfsq'
+import { WfSqTfsqApi } from '@/api/lghjft/workflow/wfsqtfsq'
 import { propTypes } from '@/utils/propTypes'
 import { dateFormatter2 } from '@/utils/formatTime'
 

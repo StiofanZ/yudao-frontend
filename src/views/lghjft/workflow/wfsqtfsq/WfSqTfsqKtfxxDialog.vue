@@ -49,7 +49,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
-import { WfSqTfsqApi, WfSqTfsqKtfxx } from '@/api/lghjft/wfsqtfsq'
+import { WfSqTfsqApi, WfSqTfsqKtfxx } from '@/api/lghjft/workflow/wfsqtfsq'
 import { dateFormatter2 } from '@/utils/formatTime'
 import { ElMessage } from 'element-plus'
 import dayjs from 'dayjs'

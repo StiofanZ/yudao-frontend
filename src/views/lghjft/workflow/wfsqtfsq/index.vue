@@ -62,7 +62,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { WfSqTfsqApi, WfSqTfsqKtfxx } from '@/api/lghjft/wfsqtfsq'
+import { WfSqTfsqApi, WfSqTfsqKtfxx } from '@/api/lghjft/workflow/wfsqtfsq'
 import WfSqTfsqKtfxxDialog from './WfSqTfsqKtfxxDialog.vue'
 import { dateFormatter2 } from '@/utils/formatTime'
 import { ElMessage } from 'element-plus'

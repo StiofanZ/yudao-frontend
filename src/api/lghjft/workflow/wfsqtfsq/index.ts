@@ -14,16 +14,19 @@ export interface WfSqTfsqKtfxx {
 export const WfSqTfsqApi = {
   // 获得可退费信息列表
   getKtfxxList: async (djxh: string, skssqq?: string, skssqz?: string) => {
-    return await request.get({ url: `/lghjft/wf-sq-tfsq/ktfxx`, params: { djxh, skssqq, skssqz } })
+    return await request.get({
+      url: `/lghjft/workflow/wfsqtfsq/ktfxx`,
+      params: { djxh, skssqq, skssqz }
+    })
   },
 
   // 申请退费
   save: async (data: any[]) => {
-    return await request.post({ url: `/lghjft/wf-sq-tfsq/save`, data })
+    return await request.post({ url: `/lghjft/workflow/wfsqtfsq/save`, data })
   },
 
   // 获得申请退费信息
   getWfSqTfsq: async (id: number) => {
-    return await request.get({ url: `/lghjft/wf-sq-tfsq/get?id=` + id })
+    return await request.get({ url: `/lghjft/workflow/wfsqtfsq/get?id=` + id })
   }
 }
