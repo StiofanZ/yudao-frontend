@@ -6,13 +6,13 @@
       <el-table-column align="center" label="标签代码" prop="bqDm" />
       <el-table-column align="center" label="标签名称" prop="bqMc" />
       <el-table-column align="center" label="部门名称" prop="deptMc" />
-      <el-table-column align="center" label="层级" prop="level" />
       <el-table-column align="center" label="操作">
         <template #default="scope">
           <el-button
             link
             type="danger"
             @click="handleDelete(scope.row.bqDm)"
+            :disabled="scope.row.level === 1"
           >
             作废
           </el-button>
