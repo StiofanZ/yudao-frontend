@@ -88,6 +88,16 @@
         <el-table-column align="center" label="社会信用代码" prop="shxydm" />
         <el-table-column align="center" label="纳税人名称" prop="nsrmc" />
         <el-table-column align="center" label="标签名称" prop="bqMc" />
+        <el-table-column align="center" label="有效期起" prop="yxqq" width="120">
+          <template #default="scope">
+            <span>{{ formatDate(scope.row.yxqq, 'YYYY-MM-DD') }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="有效期止" prop="yxqz" width="120">
+          <template #default="scope">
+            <span>{{ formatDate(scope.row.yxqz, 'YYYY-MM-DD') }}</span>
+          </template>
+        </el-table-column>
       </el-table>
       <div class="mt-4 flex justify-end">
         <el-pagination
@@ -110,6 +120,7 @@
 import { ref, reactive, onMounted, nextTick } from 'vue'
 import { BqglApi, BqglRespVO, BqglHjxxRespVO } from '@/api/lghjft/hj/bqgl'
 import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
+import { formatDate } from '@/utils/formatTime'
 
 defineOptions({ name: 'Bqgl' })
 
@@ -175,15 +186,6 @@ const getHjxxList = async () => {
     const data = await BqglApi.getHjxx(hjxxQueryParams)
     hjxxList.value = data.list
     hjxxTotal.value = data.total
-    
-    // 设置选中状态
-    nextTick(() => {
-      hjxxList.value.forEach(row => {
-        if (row.bqDm) {
-          hjxxTableRef.value?.toggleRowSelection(row, true)
-        }
-      })
-    })
   } finally {
     hjxxLoading.value = false
   }

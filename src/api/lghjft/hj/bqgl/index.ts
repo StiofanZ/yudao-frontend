@@ -18,6 +18,8 @@ export interface BqglHjxxRespVO {
   nsrmc: string
   bqDm: string
   bqMc: string
+  yxqq: string
+  yxqz: string
 }
 
 export interface BqglHjxxPageReqVO extends PageParam {
