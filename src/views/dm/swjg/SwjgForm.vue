@@ -1,12 +1,6 @@
 <template>
   <Dialog :title="dialogTitle" v-model="dialogVisible">
-    <el-form
-      ref="formRef"
-      :model="formData"
-      :rules="formRules"
-      label-width="100px"
-      v-loading="formLoading"
-    >
+    <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" v-loading="formLoading">
       <el-form-item label="税务机关名称" prop="swjgmc">
         <el-input v-model="formData.swjgmc" placeholder="请输入税务机关名称" />
       </el-form-item>
@@ -38,16 +32,8 @@
         <el-input v-model="formData.sxfyh" placeholder="请输入银行" />
       </el-form-item>
       <el-form-item label="上级税务机关" prop="sjswjgDm">
-        <el-tree-select
-          v-model="formData.sjswjgDm"
-          :data="swjgTree"
-          :props="treeProps"
-          check-strictly
-          default-expand-all
-          placeholder="请选择上级税务机关"
-          clearable
-          class="w-full"
-        />
+        <el-tree-select v-model="formData.sjswjgDm" :data="swjgTree" :props="treeProps" check-strictly
+          default-expand-all placeholder="请选择上级税务机关" clearable class="w-full" />
       </el-form-item>
 
       <el-form-item label="稽查局标记" prop="jcjbj">
@@ -129,7 +115,7 @@ const swjgTree = ref() // 树形结构
 const open = async (type: string, swjgDm?: string) => {
   // 修改：id? -> swjgDm?
   dialogVisible.value = true
-  dialogTitle.value = t('action.' + type)
+  dialogTitle.value = t('action.' + type) + '税务机关'
   formType.value = type
   resetForm()
   console.log(formData)

@@ -1,26 +1,20 @@
 <template>
-  <Dialog :title="dialogTitle" v-model="dialogVisible" width="70%">
+  <Dialog :title="dialogTitle" v-model="dialogVisible">
     <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" v-loading="formLoading">
       <el-form-item label="类型" prop="lx">
-        <el-select v-model="formData.lx" placeholder="请选择类型" class="!w-240px">
-          <el-option v-for="dict in getStrDictOptions(DICT_TYPE.SYS_BLHF_GH)" :key="dict.value" :label="dict.label"
-            :value="dict.value" />
-        </el-select>
+        <el-input v-model="formData.lx" placeholder="请输入类型" />
       </el-form-item>
       <el-form-item label="描述" prop="ms">
-        <el-input v-model="formData.ms" placeholder="请输入描述" :rows="2" type="textarea" />
+        <el-input v-model="formData.ms" placeholder="请输入描述" />
       </el-form-item>
       <el-form-item label="有效期起" prop="yxqq">
-        <el-date-picker v-model="formData.yxqq" type="date" value-format="x" placeholder="选择有效期起" class="!w-240px" />
+        <el-date-picker v-model="formData.yxqq" type="date" value-format="x" placeholder="选择有效期起" />
       </el-form-item>
       <el-form-item label="有效期止" prop="yxqz">
-        <el-date-picker v-model="formData.yxqz" type="date" value-format="x" placeholder="选择有效期止" class="!w-240px" />
+        <el-date-picker v-model="formData.yxqz" type="date" value-format="x" placeholder="选择有效期止" />
       </el-form-item>
       <el-form-item label="有效标志" prop="xybz">
-        <el-select v-model="formData.xybz" placeholder="请选择有效标志" class="!w-240px">
-          <el-option v-for="dict in getStrDictOptions(DICT_TYPE.SYS_FPBL_GH)" :key="dict.value" :label="dict.label"
-            :value="dict.value" class="!w-240px" />
-        </el-select>
+        <el-input v-model="formData.xybz" placeholder="请输入有效标志" />
       </el-form-item>
       <el-form-item label="基层工会比例" prop="jcghbl">
         <el-input v-model="formData.jcghbl" placeholder="请输入基层工会比例" />
@@ -52,16 +46,16 @@
       <el-form-item label="主管税务机关比例" prop="swjgbl">
         <el-input v-model="formData.swjgbl" placeholder="请输入主管税务机关比例" />
       </el-form-item>
-      <el-form-item label="条件" prop="tj">
-        <el-input v-model="formData.tj" placeholder="请输入TJ" :rows="2" type="textarea" />
+      <el-form-item label="TJ" prop="tj">
+        <el-input v-model="formData.tj" placeholder="请输入TJ" />
       </el-form-item>
-      <el-form-item label="优先级" prop="yxj">
+      <el-form-item label="YXJ" prop="yxj">
         <el-input v-model="formData.yxj" placeholder="请输入YXJ" />
       </el-form-item>
-      <el-form-item label="默认标志" prop="mrbz">
+      <el-form-item label="MRBZ" prop="mrbz">
         <el-input v-model="formData.mrbz" placeholder="请输入MRBZ" />
       </el-form-item>
-      <el-form-item label="校验码" prop="jym">
+      <el-form-item label="JYM" prop="jym">
         <el-input v-model="formData.jym" placeholder="请输入JYM" />
       </el-form-item>
     </el-form>
@@ -72,7 +66,6 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-import { getStrDictOptions, DICT_TYPE } from '@/utils/dict'
 import { FpblCopyApi, FpblCopy } from '@/api/dm/fpblcopy'
 
 /** 分配比例 表单 */
@@ -109,11 +102,11 @@ const formData = ref({
   jym: undefined
 })
 const formRules = reactive({
-  lx: [{ required: true, message: '类型不能为空', trigger: 'change' }],
+  lx: [{ required: true, message: '类型不能为空', trigger: 'blur' }],
   ms: [{ required: true, message: '描述不能为空', trigger: 'blur' }],
   yxqq: [{ required: true, message: '有效期起不能为空', trigger: 'blur' }],
   yxqz: [{ required: true, message: '有效期止不能为空', trigger: 'blur' }],
-  xybz: [{ required: true, message: '有效标志不能为空', trigger: 'change' }],
+  xybz: [{ required: true, message: '有效标志不能为空', trigger: 'blur' }],
   jcghbl: [{ required: true, message: '基层工会比例不能为空', trigger: 'blur' }],
   hyghbl: [{ required: true, message: '行业工会比例不能为空', trigger: 'blur' }],
   sdghbl: [{ required: true, message: '属地工会比例不能为空', trigger: 'blur' }],
@@ -124,7 +117,6 @@ const formRules = reactive({
   sjcjbl: [{ required: true, message: '省稽查局比例不能为空', trigger: 'blur' }],
   sdsjbl: [{ required: true, message: '省税局比例不能为空', trigger: 'blur' }],
   swjgbl: [{ required: true, message: '主管税务机关比例不能为空', trigger: 'blur' }],
-  yxj: [{ required: true, message: '优先级不能为空', trigger: 'change' }],
   tj: [{ required: true, message: 'TJ不能为空', trigger: 'blur' }],
   mrbz: [{ required: true, message: 'MRBZ不能为空', trigger: 'blur' }],
   jym: [{ required: true, message: 'JYM不能为空', trigger: 'blur' }]
@@ -132,16 +124,16 @@ const formRules = reactive({
 const formRef = ref() // 表单 Ref
 
 /** 打开弹窗 */
-const open = async (type: string, blId?: number) => {
+const open = async (type: string, id?: number) => {
   dialogVisible.value = true
   dialogTitle.value = t('action.' + type)
   formType.value = type
   resetForm()
   // 修改时，设置数据
-  if (blId) {
+  if (id) {
     formLoading.value = true
     try {
-      formData.value = await FpblCopyApi.getFpblCopy(blId)
+      formData.value = await FpblCopyApi.getFpblCopy(id)
     } finally {
       formLoading.value = false
     }

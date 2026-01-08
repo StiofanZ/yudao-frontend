@@ -1,61 +1,31 @@
 <template>
   <ContentWrap>
     <!-- 搜索工作栏 -->
-    <el-form
-      class="-mb-15px"
-      :model="queryParams"
-      ref="queryFormRef"
-      :inline="true"
-      label-width="68px"
-    >
+    <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true" label-width="68px">
       <el-form-item label="行政区划名称" prop="xzqhmc">
-        <el-input
-          v-model="queryParams.xzqhmc"
-          placeholder="请输入行政区划名称"
-          clearable
-          @keyup.enter="handleQuery"
-          class="!w-210px"
-        />
+        <el-input v-model="queryParams.xzqhmc" placeholder="请输入行政区划名称" clearable @keyup.enter="handleQuery"
+          class="!w-210px" />
       </el-form-item>
       <el-form-item label="上级行政区划代码" prop="sjxzqhDm">
-        <el-input
-          v-model="queryParams.sjxzqhDm"
-          placeholder="请输入上级行政区划代码"
-          clearable
-          @keyup.enter="handleQuery"
-          class="!w-210px"
-        />
+        <el-input v-model="queryParams.sjxzqhDm" placeholder="请输入上级行政区划代码" clearable @keyup.enter="handleQuery"
+          class="!w-210px" />
       </el-form-item>
       <el-form-item label="行政区划代码" prop="xzqhDm">
-        <el-input
-          v-model="queryParams.xzqhDm"
-          placeholder="请输入行政区划代码"
-          clearable
-          @keyup.enter="handleQuery"
-          class="!w-210px"
-          :maxlength="6"
-        />
+        <el-input v-model="queryParams.xzqhDm" placeholder="请输入行政区划代码" clearable @keyup.enter="handleQuery"
+          class="!w-210px" :maxlength="6" />
       </el-form-item>
       <el-form-item label="行政区划级别" prop="xzqhjb">
-        <el-select
-          v-model="queryParams.xzqhjb"
-          placeholder="请选择行政区划级别"
-          clearable
-          class="!w-210px"
-        >
-          <el-option
-            v-for="item in levelOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
+        <el-select v-model="queryParams.xzqhjb" placeholder="请选择行政区划级别" clearable class="!w-210px">
+          <el-option v-for="item in levelOptions" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </el-form-item>
       <el-form-item style="margin-top: 20px">
-        <el-button type="primary" @click="handleQuery"
-          ><Icon icon="ep:search" class="mr-5px" /> 搜索</el-button
-        >
-        <el-button @click="resetQuery"><Icon icon="ep:refresh" class="mr-5px" /> 重置</el-button>
+        <el-button type="primary" @click="handleQuery">
+          <Icon icon="ep:search" class="mr-5px" /> 搜索
+        </el-button>
+        <el-button @click="resetQuery">
+          <Icon icon="ep:refresh" class="mr-5px" /> 重置
+        </el-button>
 
         <el-button type="danger" plain @click="toggleExpandAll">
           <Icon icon="ep:sort" class="mr-5px" /> 展开/折叠
@@ -66,15 +36,8 @@
 
   <!-- 列表 -->
   <ContentWrap>
-    <el-table
-      v-loading="loading"
-      :data="list"
-      :stripe="true"
-      :show-overflow-tooltip="true"
-      row-key="qhDm"
-      :default-expand-all="isExpandAll"
-      v-if="refreshTable"
-    >
+    <el-table v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true" row-key="xzqhDm"
+      :default-expand-all="isExpandAll" v-if="refreshTable">
       <el-table-column label="行政区划名称" align="center" prop="xzqhmc" />
       <el-table-column label="行政区划代码" align="center" prop="xzqhDm" />
       <el-table-column label="上级行政区划代码" align="center" prop="sjxzqhDm" />
@@ -84,12 +47,8 @@
       </el-table-column>
     </el-table>
     <!-- 分页 -->
-    <Pagination
-      :total="total"
-      v-model:page="queryParams.pageNo"
-      v-model:limit="queryParams.pageSize"
-      @pagination="getList"
-    />
+    <Pagination :total="total" v-model:page="queryParams.pageNo" v-model:limit="queryParams.pageSize"
+      @pagination="getList" />
   </ContentWrap>
 
   <!-- 表单弹窗：添加/修改 -->
@@ -150,39 +109,6 @@ const resetQuery = () => {
   handleQuery()
 }
 
-// /** 添加/修改操作 */
-// const formRef = ref()
-// const openForm = (type: string, id?: number) => {
-//   formRef.value.open(type, id)
-// }
-
-// /** 删除按钮操作 */
-// const handleDelete = async (id: number) => {
-//   try {
-//     // 删除的二次确认
-//     await message.delConfirm()
-//     // 发起删除
-//     await XzqhApi.deleteXzqh(id)
-//     message.success(t('common.delSuccess'))
-//     // 刷新列表
-//     await getList()
-//   } catch {}
-// }
-
-// /** 导出按钮操作 */
-// const handleExport = async () => {
-//   try {
-//     // 导出的二次确认
-//     await message.exportConfirm()
-//     // 发起导出
-//     exportLoading.value = true
-//     const data = await XzqhApi.exportXzqh(queryParams)
-//     download.excel(data, '行政区划.xls')
-//   } catch {
-//   } finally {
-//     exportLoading.value = false
-//   }
-// }
 
 /** 展开/折叠操作 */
 const isExpandAll = ref(true) // 是否展开，默认全部展开
@@ -199,3 +125,33 @@ onMounted(() => {
   getList()
 })
 </script>
+
+<style scoped>
+/* 隐藏区县级节点的展开箭头 */
+:deep(.el-table__row) {
+  --el-table-row-hover-bg-color: var(--el-fill-color-light);
+}
+
+/* 判断是否是区县级节点并隐藏箭头 */
+:deep(.el-table__row) .el-table__expand-icon {
+  display: inline-block;
+}
+
+/* 通过CSS选择器判断：当行数据的行政区划级别为3时隐藏箭头 */
+:deep(.el-table__row) .el-table__expand-icon[style*="padding-left: 16px;"]+.el-table__expand-icon {
+  display: none;
+}
+
+:deep(.el-table__body tr td) {
+  background-color: var(--el-bg-color) !important;
+}
+
+/* 使用框架的背景色变量 */
+:deep(.el-table__body tr:hover td) {
+  background-color: var(--el-color-primary-light-7) !important;
+}
+
+:deep(.word-break-all .cell) {
+  word-break: break-all !important;
+}
+</style>

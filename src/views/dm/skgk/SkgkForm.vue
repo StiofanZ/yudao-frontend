@@ -1,15 +1,17 @@
 <template>
   <Dialog :title="dialogTitle" v-model="dialogVisible">
     <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" v-loading="formLoading">
-      <el-form-item label="行政区划名称" prop="xzqhmc">
-        <el-input v-model="formData.xzqhmc" placeholder="请输入行政区划名称" />
+      <el-form-item label="税款国库代码" prop="skgkDm">
+        <el-input v-model="formData.skgkDm" placeholder="请输入税款国库代码" />
       </el-form-item>
-      <el-form-item label="上级行政区划代码" prop="sjxzqhDm">
-        <el-tree-select v-model="formData.sjxzqhDm" :data="xzqhTree" :props="{ ...defaultProps, label: 'xzqhmc' }"
-          check-strictly default-expand-all placeholder="请选择上级行政区划代码" />
+      <el-form-item label="税款国库名称" prop="skgkmc">
+        <el-input v-model="formData.skgkmc" placeholder="请输入税款国库名称" />
       </el-form-item>
-      <el-form-item label="行政区划级别" prop="xzqhjb">
-        <el-input v-model="formData.xzqhjb" placeholder="请输入行政区划级别" />
+      <el-form-item label="税款国库简称" prop="skgkjc">
+        <el-input v-model="formData.skgkjc" placeholder="请输入税款国库简称" />
+      </el-form-item>
+      <el-form-item label="行政区划代码" prop="xzqhDm">
+        <el-input v-model="formData.xzqhDm" placeholder="请输入行政区划代码" />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -19,11 +21,10 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-import { XzqhApi, Xzqh } from '@/api/dm/xzqh'
-import { defaultProps, handleTree } from '@/utils/tree'
+import { SkgkApi, Skgk } from '@/api/dm/skgk'
 
-/** 行政区划 表单 */
-defineOptions({ name: 'XzqhForm' })
+/** 收款国库 表单 */
+defineOptions({ name: 'SkgkForm' })
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
@@ -33,35 +34,34 @@ const dialogTitle = ref('') // 弹窗的标题
 const formLoading = ref(false) // 表单的加载中：1）修改时的数据加载；2）提交的按钮禁用
 const formType = ref('') // 表单的类型：create - 新增；update - 修改
 const formData = ref({
-  xzqhDm: undefined,
-  xzqhmc: undefined,
-  sjxzqhDm: undefined,
-  xzqhjb: undefined
+  gkId: undefined,
+  skgkDm: undefined,
+  skgkmc: undefined,
+  skgkjc: undefined,
+  xzqhDm: undefined
 })
 const formRules = reactive({
-  xzqhmc: [{ required: true, message: '行政区划名称不能为空', trigger: 'blur' }],
-  sjxzqhDm: [{ required: true, message: '上级行政区划代码不能为空', trigger: 'blur' }],
-  xzqhjb: [{ required: true, message: '行政区划级别不能为空', trigger: 'blur' }]
+  skgkDm: [{ required: true, message: '税款国库代码不能为空', trigger: 'blur' }],
+  skgkmc: [{ required: true, message: '税款国库名称不能为空', trigger: 'blur' }],
+  skgkjc: [{ required: true, message: '税款国库简称不能为空', trigger: 'blur' }]
 })
 const formRef = ref() // 表单 Ref
-const xzqhTree = ref() // 树形结构
 
 /** 打开弹窗 */
 const open = async (type: string, id?: number) => {
   dialogVisible.value = true
-  dialogTitle.value = t('action.' + type)
+  dialogTitle.value = t('action.' + type) + '收款国库'
   formType.value = type
   resetForm()
   // 修改时，设置数据
   if (id) {
     formLoading.value = true
     try {
-      formData.value = await XzqhApi.getXzqh(id)
+      formData.value = await SkgkApi.getSkgk(id)
     } finally {
       formLoading.value = false
     }
   }
-  await getXzqhTree()
 }
 defineExpose({ open }) // 提供 open 方法，用于打开弹窗
 
@@ -73,12 +73,12 @@ const submitForm = async () => {
   // 提交请求
   formLoading.value = true
   try {
-    const data = formData.value as unknown as Xzqh
+    const data = formData.value as unknown as Skgk
     if (formType.value === 'create') {
-      await XzqhApi.createXzqh(data)
+      await SkgkApi.createSkgk(data)
       message.success(t('common.createSuccess'))
     } else {
-      await XzqhApi.updateXzqh(data)
+      await SkgkApi.updateSkgk(data)
       message.success(t('common.updateSuccess'))
     }
     dialogVisible.value = false
@@ -92,20 +92,12 @@ const submitForm = async () => {
 /** 重置表单 */
 const resetForm = () => {
   formData.value = {
-    xzqhDm: undefined,
-    xzqhmc: undefined,
-    sjxzqhDm: undefined,
-    xzqhjb: undefined
+    gkId: undefined,
+    skgkDm: undefined,
+    skgkmc: undefined,
+    skgkjc: undefined,
+    xzqhDm: undefined
   }
   formRef.value?.resetFields()
-}
-
-/** 获得行政区划树 */
-const getXzqhTree = async () => {
-  xzqhTree.value = []
-  const data = await XzqhApi.getXzqhList({})
-  const root: Tree = { id: 0, name: '顶级行政区划', children: [] }
-  root.children = handleTree(data, 'id', 'sjxzqhDm')
-  xzqhTree.value.push(root)
 }
 </script>

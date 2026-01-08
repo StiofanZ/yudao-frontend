@@ -1,128 +1,161 @@
 <template>
   <ContentWrap>
+
     <!-- 搜索工作栏 -->
-    <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true" label-width="68px">
+    <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true" label-width="auto">
+
+      <el-form-item label="类型" prop="lx">
+        <el-input v-model="queryParams.lx" placeholder="请输入类型" clearable @keyup.enter="handleQuery" class="!w-180px" />
+      </el-form-item>
       <el-form-item label="描述" prop="ms">
-        <el-input v-model="queryParams.ms" placeholder="请输入描述" clearable @keyup.enter="handleQuery" class="!w-210px" />
+        <el-input v-model="queryParams.ms" placeholder="请输入描述" clearable @keyup.enter="handleQuery" class="!w-180px" />
       </el-form-item>
       <el-form-item label="有效期起" prop="yxqq">
         <el-date-picker v-model="queryParams.yxqq" value-format="YYYY-MM-DD" type="date" placeholder="选择有效期起" clearable
-          class="!w-210px" />
+          class="!w-180px" />
       </el-form-item>
       <el-form-item label="有效期止" prop="yxqz">
         <el-date-picker v-model="queryParams.yxqz" value-format="YYYY-MM-DD" type="date" placeholder="选择有效期止" clearable
-          class="!w-210px" />
+          class="!w-180px" />
       </el-form-item>
       <el-form-item label="有效标志" prop="xybz">
-        <el-select v-model="queryParams.xybz" placeholder="请选择有效标志" clearable class="!w-210px">
-          <el-option v-for="dict in getStrDictOptions(DICT_TYPE.SYS_FPBL_GH)" :key="dict.value" :label="dict.label"
-            :value="dict.value" />
-        </el-select>
+        <el-input v-model="queryParams.xybz" placeholder="请输入有效标志" clearable @keyup.enter="handleQuery"
+          class="!w-180px" />
       </el-form-item>
       <el-form-item label="基层比例" prop="jcghbl">
-        <el-input v-model="queryParams.jcghbl" placeholder="请输入基层工会比例" clearable @keyup.enter="handleQuery"
-          class="!w-210px" />
+        <el-input v-model="queryParams.jcghbl" placeholder="请输入基层比例" clearable @keyup.enter="handleQuery"
+          class="!w-180px" />
       </el-form-item>
       <el-form-item label="行业比例" prop="hyghbl">
         <el-input v-model="queryParams.hyghbl" placeholder="请输入行业工会比例" clearable @keyup.enter="handleQuery"
-          class="!w-210px" />
+          class="!w-180px" />
       </el-form-item>
       <el-form-item label="属地比例" prop="sdghbl">
         <el-input v-model="queryParams.sdghbl" placeholder="请输入属地工会比例" clearable @keyup.enter="handleQuery"
-          class="!w-210px" />
+          class="!w-180px" />
       </el-form-item>
       <el-form-item label="县级比例" prop="xjghbl">
         <el-input v-model="queryParams.xjghbl" placeholder="请输入县级工会比例" clearable @keyup.enter="handleQuery"
-          class="!w-210px" />
+          class="!w-180px" />
       </el-form-item>
       <el-form-item label="市级比例" prop="sjghbl">
-        <el-input v-model="queryParams.sjghbl" placeholder="请输入市级工会比例" clearable @keyup.enter="handleQuery"
-          class="!w-210px" />
+        <el-input v-model="queryParams.sjghbl" placeholder="请输入市级比例" clearable @keyup.enter="handleQuery"
+          class="!w-180px" />
       </el-form-item>
       <el-form-item label="省总比例" prop="szghbl">
         <el-input v-model="queryParams.szghbl" placeholder="请输入省总工会比例" clearable @keyup.enter="handleQuery"
-          class="!w-210px" />
+          class="!w-180px" />
       </el-form-item>
       <el-form-item label="全总比例" prop="qgzghbl">
-        <el-input v-model="queryParams.qgzghbl" placeholder="请输入全总工会比例" clearable @keyup.enter="handleQuery"
-          class="!w-210px" />
+        <el-input v-model="queryParams.qgzghbl" placeholder="请输入全总比例" clearable @keyup.enter="handleQuery"
+          class="!w-180px" />
       </el-form-item>
       <el-form-item label="省稽查局比例" prop="sjcjbl">
         <el-input v-model="queryParams.sjcjbl" placeholder="请输入省稽查局比例" clearable @keyup.enter="handleQuery"
-          class="!w-210px" />
+          class="!w-180px" />
       </el-form-item>
       <el-form-item label="省税局比例" prop="sdsjbl">
         <el-input v-model="queryParams.sdsjbl" placeholder="请输入省税局比例" clearable @keyup.enter="handleQuery"
-          class="!w-220px" />
+          class="!w-180px" />
       </el-form-item>
       <el-form-item label="主管税务机关比例" prop="swjgbl">
         <el-input v-model="queryParams.swjgbl" placeholder="请输入主管税务机关比例" clearable @keyup.enter="handleQuery"
-          class="!w-220px" />
+          class="!w-200180pxpx" />
       </el-form-item>
-      <div class="button-actions"><el-form-item>
-          <el-button @click="handleQuery">
-            <Icon icon="ep:search" class="mr-5px" /> 搜索
-          </el-button>
-          <el-button @click="resetQuery">
-            <Icon icon="ep:refresh" class="mr-5px" /> 重置
-          </el-button>
-          <el-button type="primary" plain @click="openForm('create')" v-hasPermi="['dm:fpbl-copy:create']">
-            <Icon icon="ep:plus" class="mr-5px" /> 新增
-          </el-button>
-          <el-button type="success" plain @click="handleExport" :loading="exportLoading"
-            v-hasPermi="['dm:fpbl-copy:export']">
-            <Icon icon="ep:download" class="mr-5px" /> 导出
-          </el-button>
-          <el-button type="danger" plain :disabled="isEmpty(checkedIds)" @click="handleDeleteBatch"
-            v-hasPermi="['dm:fpbl-copy:delete']">
-            <Icon icon="ep:delete" class="mr-5px" /> 批量删除
-          </el-button>
-        </el-form-item></div>
-
+      <el-form-item>
+        <el-button @click="handleQuery">
+          <Icon icon="ep:search" class="mr-5px" /> 搜索
+        </el-button>
+        <el-button @click="resetQuery">
+          <Icon icon="ep:refresh" class="mr-5px" /> 重置
+        </el-button>
+        <el-button type="primary" plain @click="openForm('create')" v-hasPermi="['dm:fpbl-copy:create']">
+          <Icon icon="ep:plus" class="mr-5px" /> 新增
+        </el-button>
+        <el-button type="success" plain @click="handleExport" :loading="exportLoading"
+          v-hasPermi="['dm:fpbl-copy:export']">
+          <Icon icon="ep:download" class="mr-5px" /> 导出
+        </el-button>
+        <el-button type="danger" plain :disabled="isEmpty(checkedIds)" @click="handleDeleteBatch"
+          v-hasPermi="['dm:fpbl-copy:delete']">
+          <Icon icon="ep:delete" class="mr-5px" /> 批量删除
+        </el-button>
+      </el-form-item>
     </el-form>
   </ContentWrap>
 
-  <!-- 列表 - 修改表格部分 -->
+  <!-- 列表 -->
   <ContentWrap>
-    <el-table row-key="blId" v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="false"
-      @selection-change="handleRowCheckboxChange">
-      <el-table-column type="selection" width="45" />
-      <!-- 描述列放宽，左对齐 -->
-      <el-table-column label="描述" align="center" prop="ms" min-width="350" :show-overflow-tooltip="false" />
-      <!-- 有效期起/止列缩小，只显示日期 -->
-      <el-table-column label="有效期起" align="center" prop="yxqq" width="110" :formatter="formatDateOnly" />
-      <el-table-column label="有效期止" align="center" prop="yxqz" width="110" :formatter="formatDateOnly" />
-      <!-- 其他列缩小 -->
-      <el-table-column label="有效标志" align="center" prop="xybz" width="85">
-        <template #default="scope">
-          <dict-tag :type="DICT_TYPE.SYS_FPBL_GH" :value="scope.row.xybz" />
-        </template>
-      </el-table-column>
-      <el-table-column label="优先级" align="center" prop="yxj" width="80" />
-      <!-- 操作列固定右侧 -->
-      <el-table-column label="操作" align="center" width="120" fixed="right">
-        <template #default="scope">
-          <el-button link type="primary" @click="openForm('update', scope.row.blId)"
-            v-hasPermi="['dm:fpbl-copy:update']">
-            编辑
-          </el-button>
-          <el-button link type="danger" @click="handleDelete(scope.row.blId)" v-hasPermi="['dm:fpbl-copy:delete']">
-            删除
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div style="width: 100%; overflow-x: auto;">
+      <el-table row-key="blId" v-loading="loading" :data="list" :stripe="true" :show-overflow-tooltip="true"
+        max-height="500px" style="width: 100%" @selection-change="handleRowCheckboxChange">
+        <el-table-column type="selection" width="55" />
+
+        <!-- 描述列：宽度适中，内容超出自动换行 -->
+        <el-table-column label="描述" align="center" prop="ms" min-width="250" :show-overflow-tooltip="false">
+          <template #default="{ row }">
+            <div style=" word-break: break-word; white-space: normal; line-height: 1.5; padding: 8px 4px;">
+              {{ row.ms || '--' }}
+            </div>
+          </template>
+        </el-table-column>
+
+        <!-- 日期列：显示标准日期格式 -->
+        <el-table-column label="有效期起" align="center" prop="yxqq" width="115">
+          <template #default="{ row }">
+            <span>{{ formatStandardDate(row.yxqq) }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="有效期止" align="center" prop="yxqz" width="115">
+          <template #default="{ row }">
+            <span>{{ formatStandardDate(row.yxqz) }}</span>
+          </template>
+        </el-table-column>
+
+        <!-- 有效标志：Y显示"是"，N显示"否" -->
+        <el-table-column label="有效标志" align="center" prop="xybz" width="90">
+          <template #default="{ row }">
+            <el-tag :type="row.xybz === 'Y' ? 'success' : row.xybz === 'N' ? 'danger' : 'info'" size="small"
+              effect="plain">
+              {{ row.xybz === 'Y' ? '是' : row.xybz === 'N' ? '否' : row.xybz || '--' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+
+        <!-- YXJ列 -->
+        <el-table-column label="YXJ" align="center" prop="yxj" width="90">
+          <template #default="{ row }">
+            <span>{{ row.yxj || '--' }}</span>
+          </template>
+        </el-table-column>
+
+        <!-- 操作列 -->
+        <el-table-column label="操作" align="center" width="130" fixed="right">
+          <template #default="scope">
+            <el-button link type="primary" size="small" @click="openForm('update', scope.row.blId)"
+              v-hasPermi="['dm:fpbl-copy:update']">
+              编辑
+            </el-button>
+            <el-button link type="danger" size="small" @click="handleDelete(scope.row.blId)"
+              v-hasPermi="['dm:fpbl-copy:delete']">
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+
     <!-- 分页 -->
     <Pagination :total="total" v-model:page="queryParams.pageNo" v-model:limit="queryParams.pageSize"
       @pagination="getList" />
-  </ContentWrap>
 
-  <!-- 表单弹窗：添加/修改 -->
-  <FpblCopyForm ref="formRef" @success="getList" />
+    <!-- 表单弹窗：添加/修改 -->
+    <FpblCopyForm ref="formRef" @success="getList" />
+  </ContentWrap>
 </template>
 
 <script setup lang="ts">
-import { getStrDictOptions, DICT_TYPE } from '@/utils/dict'
 import { isEmpty } from '@/utils/is'
 import { dateFormatter } from '@/utils/formatTime'
 import download from '@/utils/download'
@@ -141,10 +174,13 @@ const total = ref(0) // 列表的总页数
 const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
+  bluuid: undefined,
   lx: undefined,
   ms: undefined,
   yxqq: undefined,
+
   yxqz: undefined,
+
   xybz: undefined,
   jcghbl: undefined,
   hyghbl: undefined,
@@ -156,38 +192,81 @@ const queryParams = reactive({
   sjcjbl: undefined,
   sdsjbl: undefined,
   swjgbl: undefined,
-  yxj: undefined
+  tj: undefined,
+  yxj: undefined,
+  mrbz: undefined,
+  jym: undefined
 })
 const queryFormRef = ref() // 搜索的表单
 const exportLoading = ref(false) // 导出的加载中
+import { ref, reactive, onMounted } from 'vue'
 
-/** 只显示日期的格式化函数 */
-const formatDateOnly = (row: any, column: any, cellValue: any) => {
-  if (!cellValue) return '';
-  // 如果已经有 dateFormatter 函数，先使用它
-  const formatted = dateFormatter(row, column, cellValue);
-  // 然后只取日期部分（去掉时间）
-  if (formatted && typeof formatted === 'string') {
-    // 处理常见日期格式
-    if (formatted.includes(' ')) {
-      // 格式如 "2024-01-01 00:00:00" -> 取前10位
-      return formatted.substring(0, 10);
+
+
+/**
+ * 格式化标准日期（YYYY-MM-DD）
+ */
+const formatStandardDate = (dateValue: any): string => {
+  if (!dateValue) return '--'
+
+  try {
+    let date: Date
+
+    if (typeof dateValue === 'string') {
+      // 处理各种可能的日期字符串格式
+      if (dateValue.includes('T')) {
+        // ISO格式：2023-12-25T08:30:00.000Z
+        date = new Date(dateValue)
+      } else if (dateValue.includes(' ')) {
+        // 空格分隔格式：2023-12-25 08:30:00
+        date = new Date(dateValue.replace(' ', 'T'))
+      } else if (dateValue.includes('/')) {
+        // 斜杠格式：2023/12/25
+        date = new Date(dateValue.replace(/\//g, '-'))
+      } else {
+        // 可能是纯数字时间戳或YYYYMMDD格式
+        if (/^\d{8}$/.test(dateValue)) {
+          // YYYYMMDD格式
+          const year = dateValue.substring(0, 4)
+          const month = dateValue.substring(4, 6)
+          const day = dateValue.substring(6, 8)
+          date = new Date(`${year}-${month}-${day}`)
+        } else {
+          date = new Date(dateValue)
+        }
+      }
+    } else if (typeof dateValue === 'number') {
+      // 时间戳
+      date = new Date(dateValue)
+    } else if (dateValue instanceof Date) {
+      // Date对象
+      date = dateValue
+    } else {
+      return '--'
     }
-    // 如果已经是纯日期格式，直接返回
-    if (formatted.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      return formatted;
+
+    // 检查日期是否有效
+    if (isNaN(date.getTime())) {
+      return '--'
     }
+
+    // 格式化为 YYYY-MM-DD
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+
+    return `${year}-${month}-${day}`
+  } catch (error) {
+    console.error('日期格式化错误:', error, dateValue)
+    return '--'
   }
-  // 如果上述都不匹配，返回原值的前10个字符
-  return cellValue.toString().substring(0, 10);
 }
-
 /** 查询列表 */
 const getList = async () => {
   loading.value = true
   try {
     const data = await FpblCopyApi.getFpblCopyPage(queryParams)
-    console.log(list);
+    console.log(data);
 
     list.value = data.list
     total.value = data.total
@@ -211,7 +290,7 @@ const resetQuery = () => {
 /** 添加/修改操作 */
 const formRef = ref()
 const openForm = (type: string, blId?: number) => {
-  console.log();
+  // console.log(blId);
 
   formRef.value.open(type, blId)
 }
@@ -266,7 +345,6 @@ onMounted(() => {
   getList()
 })
 </script>
-
 <style scoped>
 :deep(.el-table__body tr td) {
   background-color: var(--el-bg-color) !important;
@@ -279,11 +357,5 @@ onMounted(() => {
 
 :deep(.word-break-all .cell) {
   word-break: break-all !important;
-}
-
-.button-actions {
-  width: 100%;
-  margin-top: 20px;
-  text-align: left;
 }
 </style>
