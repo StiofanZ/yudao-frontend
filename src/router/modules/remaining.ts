@@ -185,6 +185,16 @@ const remainingRouter: AppRouteRecordRaw[] = [
     }
   },
   {
+    path: '/lghjft/login-by-lgh',
+    component: () => import('@/views/lghjft/auth/index.vue'),
+    name: 'LoginByLgh',
+    meta: {
+      hidden: true,
+      title: 'LGH Auth',
+      noTagsView: true
+    }
+  },
+  {
     path: '/sso',
     component: () => import('@/views/Login/Login.vue'),
     name: 'SSOLogin',
