@@ -255,5 +255,10 @@ export enum DICT_TYPE {
 
   // 银行代码字典
   SYS_BANK_CODE = 'bank_code', // 银行代码字典类型
-  SYS_BANK_LABEL = 'bank_label' // 银行名称字典类型
+  SYS_BANK_LABEL = 'bank_label', // 银行名称字典类型
+  // 户籍分类
+  SYS_HJFL_GH = 'sys_hjfl_gh', //户籍分类大类标识
+  // 年度任务数
+  SYS_RWLX = 'sys_rwlx', //年度类型
+  SYS_ND = 'sys_nd' //年度
 }
