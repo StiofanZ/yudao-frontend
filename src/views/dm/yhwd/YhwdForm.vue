@@ -2,8 +2,10 @@
   <Dialog :title="dialogTitle" v-model="dialogVisible">
     <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" v-loading="formLoading">
       <el-form-item label="银行行别代码" prop="yhhbDm">
-        <el-tree-select v-model="formData.yhhbDm" :data="yhwdTree" :props="{ ...defaultProps, label: 'yhwdmc' }"
-          check-strictly default-expand-all placeholder="请选择银行行别代码" />
+        <el-select v-model="formData.yhhbDm" placeholder="请选择银行行别代码" clearable class="!w-240px">
+          <el-option v-for="dict in getStrDictOptions(DICT_TYPE.SYS_BANK_CODE)" :key="dict.value" :label="dict.label"
+            :value="dict.value" />
+        </el-select>
       </el-form-item>
       <el-form-item label="网点代码" prop="yhwdDm">
         <el-input v-model="formData.yhwdDm" placeholder="请输入网点代码" />
@@ -46,6 +48,7 @@
 import { YhwdApi, Yhwd } from '@/api/dm/yhwd'
 import { defaultProps, handleTree } from '@/utils/tree'
 import { log } from 'console'
+import { DICT_TYPE, getStrDictOptions } from '@/utils/dict'
 
 /** 银行网点 表单 */
 defineOptions({ name: 'YhwdForm' })
