@@ -28,7 +28,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { loginAuthCode } from '@/api/lghjft/auth'
-import { setToken } from '@/utils/auth'
+import { getAccessToken, setToken } from '@/utils/auth'
 
 const route = useRoute()
 const router = useRouter()
@@ -36,9 +36,35 @@ const router = useRouter()
 const loading = ref(true)
 const errorMsg = ref('')
 
+const resolveRedirect = (): string => {
+  const redirect = route.query.redirect as string | undefined
+  if (!redirect) {
+    return '/lghjft/home'
+  }
+  const decoded = (() => {
+    try {
+      return decodeURIComponent(redirect)
+    } catch {
+      return redirect
+    }
+  })()
+  if (!decoded.startsWith('/')) {
+    return '/lghjft/home'
+  }
+  if (decoded.startsWith('//') || decoded.includes('://')) {
+    return '/lghjft/home'
+  }
+  return decoded.startsWith('/lghjft') ? decoded : '/lghjft/home'
+}
+
 const handleAuthCodeLogin = async () => {
   loading.value = true
   errorMsg.value = ''
+
+  if (getAccessToken()) {
+    await router.replace({ path: '/lghjft/home' })
+    return
+  }
   
   const authCode = route.query.authCode as string
   if (!authCode) {
@@ -51,7 +77,7 @@ const handleAuthCodeLogin = async () => {
     const res = await loginAuthCode({ authCode })
     if (res) {
       setToken(res)
-      await router.push({ path: '/' })
+      await router.replace({ path: resolveRedirect() })
     } else {
       throw new Error('未获取到有效的登录凭证')
     }

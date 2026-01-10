@@ -6,5 +6,5 @@ export interface LoginAuthCodeVO {
 
 // LGH 授权登录
 export const loginAuthCode = (data: LoginAuthCodeVO) => {
-  return request.post({ url: '/lghjft/login-by-lgh', data })
+  return request.post({ url: '/lghjft/login/login-by-lgh', data })
 }

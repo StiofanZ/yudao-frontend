@@ -185,7 +185,17 @@ const remainingRouter: AppRouteRecordRaw[] = [
     }
   },
   {
-    path: '/lghjft/login-by-lgh',
+    path: '/lghjft/login',
+    component: () => import('@/views/lghjft/login/index.vue'),
+    name: 'LghjftLogin',
+    meta: {
+      hidden: true,
+      title: t('router.login'),
+      noTagsView: true
+    }
+  },
+  {
+    path: '/lghjft/login/login-by-lgh',
     component: () => import('@/views/lghjft/auth/index.vue'),
     name: 'LoginByLgh',
     meta: {
@@ -193,6 +203,28 @@ const remainingRouter: AppRouteRecordRaw[] = [
       title: 'LGH Auth',
       noTagsView: true
     }
+  },
+  {
+    path: '/lghjft',
+    component: Layout,
+    redirect: '/lghjft/home',
+    name: 'Lghjft',
+    meta: {
+      hidden: true
+    },
+    children: [
+      {
+        path: 'home',
+        component: () => import('@/views/lghjft/home/index.vue'),
+        name: 'LghjftHome',
+        meta: {
+          hidden: true,
+          title: 'LGH 首页',
+          icon: 'ep:home-filled',
+          noCache: false
+        }
+      }
+    ]
   },
   {
     path: '/sso',

@@ -49,12 +49,13 @@ const parseURL = (
 // 路由不重定向白名单
 const whiteList = [
   '/login',
+  '/lghjft/login',
   '/social-login',
   '/auth-redirect',
   '/bind',
   '/register',
   '/oauthLogin/gitee',
-  '/lghjft/login-by-lgh'
+  '/lghjft/login/login-by-lgh'
 ]
 
 // 路由加载前
@@ -64,6 +65,10 @@ router.beforeEach(async (to, from, next) => {
   if (getAccessToken()) {
     if (to.path === '/login') {
       next({ path: '/' })
+    } else if (to.path === '/lghjft/login') {
+      next({ path: '/lghjft/home' })
+    } else if (to.path === '/lghjft/login/login-by-lgh') {
+      next({ path: '/lghjft/home' })
     } else {
       const dictStore = useDictStoreWithOut()
       const userStore = useUserStoreWithOut()
@@ -93,10 +98,16 @@ router.beforeEach(async (to, from, next) => {
       }
     }
   } else {
+    if (to.path === '/login' && from.path.startsWith('/lghjft')) {
+      next('/lghjft/login?redirect=/lghjft/home')
+      return
+    }
     if (whiteList.indexOf(to.path) !== -1) {
       next()
     } else {
-      next(`/login?redirect=${to.fullPath}`) // 否则全部重定向到登录页
+      next(
+        `${to.path.startsWith('/lghjft') ? '/lghjft/login' : '/login'}?redirect=${to.fullPath}`
+      ) // 否则全部重定向到登录页
     }
   }
 })
