@@ -206,7 +206,7 @@ const remainingRouter: AppRouteRecordRaw[] = [
   },
   {
     path: '/lghjft',
-    component: Layout,
+    component: () => import('@/views/lghjft/layout/Layout.vue'),
     redirect: '/lghjft/home',
     name: 'Lghjft',
     meta: {
@@ -220,7 +220,7 @@ const remainingRouter: AppRouteRecordRaw[] = [
         meta: {
           hidden: true,
           title: 'LGH 首页',
-          icon: 'ep:home-filled',
+          icon: 'svg-icon:lghjft-home-filled',
           noCache: false
         }
       }

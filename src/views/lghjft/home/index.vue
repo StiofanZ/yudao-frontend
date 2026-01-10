@@ -286,37 +286,37 @@ const getShortcut = async () => {
   const data = [
     {
       name: '首页',
-      icon: 'ion:home-outline',
+      icon: 'svg-icon:lghjft-home-outline',
       url: '/lghjft/home',
       color: '#1fdaca'
     },
     {
       name: '商城中心',
-      icon: 'ep:shop',
+      icon: 'svg-icon:lghjft-shop',
       url: '/mall/home',
       color: '#ff6b6b'
     },
     {
       name: 'AI 大模型',
-      icon: 'tabler:ai',
+      icon: 'svg-icon:lghjft-ai',
       url: '/ai/chat',
       color: '#7c3aed'
     },
     {
       name: 'ERP 系统',
-      icon: 'simple-icons:erpnext',
+      icon: 'svg-icon:lghjft-erp',
       url: '/erp/home',
       color: '#3fb27f'
     },
     {
       name: 'CRM 系统',
-      icon: 'simple-icons:civicrm',
+      icon: 'svg-icon:lghjft-crm',
       url: '/crm/backlog',
       color: '#4daf1bc9'
     },
     {
       name: 'IoT 物联网',
-      icon: 'fa-solid:hdd',
+      icon: 'svg-icon:lghjft-iot',
       url: '/iot/home',
       color: '#1a73e8'
     }

@@ -29,7 +29,22 @@ export function createVitePlugins() {
     VueJsx(),
     UnoCSS(),
     progress(),
-    PurgeIcons(),
+    PurgeIcons({
+      included: [
+        'simple-icons:springboot',
+        'ep:element-plus',
+        'icon-park-outline:mall-bag',
+        'material-symbols:cloud-outline',
+        'devicon:antdesign',
+        'ant-design:mobile',
+        'ion:home-outline',
+        'ep:shop',
+        'tabler:ai',
+        'simple-icons:erpnext',
+        'simple-icons:civicrm',
+        'fa-solid:hdd'
+      ]
+    }),
     ElementPlus({}),
     AutoImport({
       include: [
