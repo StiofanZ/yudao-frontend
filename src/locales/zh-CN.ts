@@ -114,8 +114,8 @@ export default {
     small: '小'
   },
   login: {
-    welcome: '欢迎使用本系统',
-    message: '开箱即用的中后台管理系统',
+    welcome: '欢迎使用<陇工惠经费通>',
+	message: ' 收有规 管有矩 用有度 审有据——工会经费 智管无忧 ',
     tenantname: '租户名称',
     username: '用户名',
     password: '密码',
