@@ -285,12 +285,6 @@ let shortcut = reactive<Shortcut[]>([])
 const getShortcut = async () => {
   const data = [
     {
-      name: '首页',
-      icon: 'svg-icon:lghjft-home-outline',
-      url: '/lghjft/home',
-      color: '#1fdaca'
-    },
-    {
       name: '商城中心',
       icon: 'svg-icon:lghjft-shop',
       url: '/mall/home',

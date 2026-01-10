@@ -254,6 +254,7 @@ const handleLogin = async (params: any) => {
       authUtil.removeLoginForm()
     }
     authUtil.setToken(res)
+    localStorage.setItem('APP_LAYOUT_MODE', 'lghjft')
     if (!redirect.value) {
       redirect.value = '/lghjft/home'
     }

@@ -50,10 +50,16 @@ export default defineComponent({
     const uniqueOpened = computed(() => appStore.getUniqueOpened)
 
     const activeMenu = computed(() => {
-      const { meta, path } = unref(currentRoute)
+      const { meta, path, query } = unref(currentRoute)
       // if set path, the sidebar will highlight the path you set
       if (meta.activeMenu) {
         return meta.activeMenu as string
+      }
+      if (path === '/lghjft/internal-link' && query.url) {
+        return query.url as string
+      }
+      if (path === '/lghjft/home') {
+        return '/index'
       }
       return path
     })
@@ -64,10 +70,27 @@ export default defineComponent({
       }
       // 自定义事件
       if (isUrl(index)) {
-        window.open(index)
+        const item = findMenu(unref(routers), index)
+        const title = item?.meta?.title || 'Link'
+        push({ path: '/lghjft/internal-link', query: { url: index, title } })
+      } else if (index === '/index' || index === '/') {
+        push('/lghjft/home')
       } else {
         push(index)
       }
+    }
+
+    const findMenu = (routers: AppRouteRecordRaw[], path: string): AppRouteRecordRaw | undefined => {
+      for (const v of routers) {
+        if (v.path === path) {
+          return v
+        }
+        if (v.children) {
+          const res = findMenu(v.children, path)
+          if (res) return res
+        }
+      }
+      return undefined
     }
 
     const renderMenuWrap = () => {

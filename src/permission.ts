@@ -103,6 +103,9 @@ router.beforeEach(async (to, from, next) => {
       return
     }
     if (whiteList.indexOf(to.path) !== -1) {
+      if (to.path === '/login') {
+        localStorage.removeItem('APP_LAYOUT_MODE')
+      }
       next()
     } else {
       next(

@@ -4,7 +4,7 @@ import { useAppStore } from '@/store/modules/app'
 
 import { ElScrollbar } from 'element-plus'
 import { Icon } from '@/components/Icon'
-import { Menu } from '@/layout/components/Menu'
+import { Menu } from '../../Menu'
 import { pathResolve } from '@/utils/routerHelper'
 import { cloneDeep } from 'lodash-es'
 import { filterMenusPath, initTabMap, tabPathMap } from './helper'
@@ -95,7 +95,8 @@ export default defineComponent({
     // tab点击事件
     const tabClick = (item: AppRouteRecordRaw) => {
       if (isUrl(item.path)) {
-        window.open(item.path)
+        const title = item?.meta?.title || 'Link'
+        push({ path: '/lghjft/internal-link', query: { url: item.path, title } })
         return
       }
       const newPath = item.children ? item.path : item.path.split('/')[0]

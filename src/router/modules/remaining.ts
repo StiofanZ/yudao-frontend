@@ -219,9 +219,20 @@ const remainingRouter: AppRouteRecordRaw[] = [
         name: 'LghjftHome',
         meta: {
           hidden: true,
-          title: 'LGH 首页',
+          title: '首页',
           icon: 'svg-icon:lghjft-home-filled',
-          noCache: false
+          noCache: false,
+          affix: false
+        }
+      },
+      {
+        path: 'internal-link',
+        component: () => import('@/views/lghjft/iframe/index.vue'),
+        name: 'LghjftIFrame',
+        meta: {
+          hidden: true,
+          title: '链接',
+          noCache: true
         }
       }
     ]
