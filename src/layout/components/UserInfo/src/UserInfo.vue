@@ -15,6 +15,8 @@ const { t } = useI18n()
 
 const { push, replace } = useRouter()
 
+const route = useRoute()
+
 const userStore = useUserStore()
 
 const tagsViewStore = useTagsViewStore()
@@ -43,7 +45,7 @@ const loginOut = async () => {
     })
     await userStore.loginOut()
     tagsViewStore.delAllViews()
-    replace('/login?redirect=/index')
+    replace(`/login?redirect=${route.fullPath}`)
   } catch {}
 }
 const toProfile = async () => {
