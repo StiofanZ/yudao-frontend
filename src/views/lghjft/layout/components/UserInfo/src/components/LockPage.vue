@@ -54,7 +54,7 @@ async function goLogin() {
   tagsViewStore.delAllViews()
   // resetRouter() // 重置静态路由表
   lockStore.resetLockInfo()
-  replace('/login')
+  replace('/lghjft/login')
 }
 
 function handleShowForm(show = false) {

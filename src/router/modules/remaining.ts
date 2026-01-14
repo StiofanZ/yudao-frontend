@@ -52,23 +52,12 @@ const remainingRouter: AppRouteRecordRaw[] = [
   },
   {
     path: '/',
-    component: Layout,
-    redirect: '/index',
+    redirect: '/lghjft/home',
     name: 'Home',
-    meta: {},
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/Home/Index.vue'),
-        name: 'Index',
-        meta: {
-          title: t('router.home'),
-          icon: 'ep:home-filled',
-          noCache: false,
-          affix: true
-        }
-      }
-    ]
+    component: Layout,
+    meta: {
+      hidden: true
+    }
   },
   {
     path: '/user',
@@ -175,9 +164,9 @@ const remainingRouter: AppRouteRecordRaw[] = [
     ]
   },
   {
-    path: '/login',
-    component: () => import('@/views/Login/Login.vue'),
-    name: 'Login',
+    path: '/lghjft/login',
+    component: () => import('@/views/lghjft/login/index.vue'),
+    name: 'LghjftLogin',
     meta: {
       hidden: true,
       title: t('router.login'),
@@ -185,9 +174,9 @@ const remainingRouter: AppRouteRecordRaw[] = [
     }
   },
   {
-    path: '/lghjft/login',
-    component: () => import('@/views/lghjft/login/index.vue'),
-    name: 'LghjftLogin',
+    path: '/login',
+    redirect: '/lghjft/login',
+    name: 'Login',
     meta: {
       hidden: true,
       title: t('router.login'),
@@ -232,6 +221,16 @@ const remainingRouter: AppRouteRecordRaw[] = [
         meta: {
           hidden: true,
           title: '链接',
+          noCache: true
+        }
+      },
+      {
+        path: 'workflow/wfsqtfsq',
+        component: () => import('@/views/lghjft/workflow/wfsqtfsq/index.vue'),
+        name: 'WfSqTfsqStatic',
+        meta: {
+          hidden: true,
+          title: '退费申请',
           noCache: true
         }
       }

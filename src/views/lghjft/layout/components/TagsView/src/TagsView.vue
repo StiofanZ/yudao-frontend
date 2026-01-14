@@ -65,6 +65,14 @@ const addTags = () => {
   const { name } = unref(currentRoute)
   if (name) {
     setSelectTag(unref(currentRoute))
+    // 针对 /lghjft/home 做去重处理
+    if (unref(currentRoute).path === '/lghjft/home') {
+      const visitedViews = tagsViewStore.getVisitedViews
+      const existView = visitedViews.find((v) => v.path === '/lghjft/home')
+      if (existView && existView.fullPath !== unref(currentRoute).fullPath) {
+        tagsViewStore.delVisitedView(existView)
+      }
+    }
     tagsViewStore.addView(unref(currentRoute))
   }
 }

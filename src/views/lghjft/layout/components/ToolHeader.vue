@@ -2,7 +2,7 @@
 import { defineComponent, computed } from 'vue'
 import { Message } from '@/layout/components//Message'
 import { Collapse } from '@/layout/components/Collapse'
-import { UserInfo } from '@/layout/components/UserInfo'
+import { UserInfo } from './UserInfo'
 import { Screenfull } from '@/layout/components/Screenfull'
 import { Breadcrumb } from '@/layout/components/Breadcrumb'
 import { SizeDropdown } from '@/layout/components/SizeDropdown'

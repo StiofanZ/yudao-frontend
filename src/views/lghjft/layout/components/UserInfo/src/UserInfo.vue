@@ -43,7 +43,7 @@ const loginOut = async () => {
     })
     await userStore.loginOut()
     tagsViewStore.delAllViews()
-    replace('/login?redirect=/index')
+    replace('/lghjft/login?redirect=/lghjft/home')
   } catch {}
 }
 const toProfile = async () => {

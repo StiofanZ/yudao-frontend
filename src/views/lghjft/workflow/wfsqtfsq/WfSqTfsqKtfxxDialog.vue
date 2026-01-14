@@ -49,6 +49,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
+import { Dialog } from '@/components/Dialog'
 import { WfSqTfsqApi, WfSqTfsqKtfxx } from '@/api/lghjft/workflow/wfsqtfsq'
 import { dateFormatter2 } from '@/utils/formatTime'
 import { ElMessage } from 'element-plus'

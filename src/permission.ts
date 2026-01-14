@@ -64,10 +64,8 @@ router.beforeEach(async (to, from, next) => {
   loadStart()
   if (getAccessToken()) {
     if (to.path === '/login') {
-      next({ path: '/' })
-    } else if (to.path === '/lghjft/login') {
       next({ path: '/lghjft/home' })
-    } else if (to.path === '/lghjft/login/login-by-lgh') {
+    } else if (to.path === '/lghjft/login' || to.path === '/lghjft/login/login-by-lgh') {
       next({ path: '/lghjft/home' })
     } else {
       const dictStore = useDictStoreWithOut()
@@ -108,9 +106,7 @@ router.beforeEach(async (to, from, next) => {
       }
       next()
     } else {
-      next(
-        `${to.path.startsWith('/lghjft') ? '/lghjft/login' : '/login'}?redirect=${to.fullPath}`
-      ) // 否则全部重定向到登录页
+      next(`/lghjft/login?redirect=${to.fullPath}`) // 否则全部重定向到登录页
     }
   }
 })
