@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { formatDate } from '@/utils/formatTime'
-import * as NotifyMessageApi from '@/api/system/notify/message'
+import * as XxtxApi from '@/api/lghjft/xxzx/xxtx/index'
 import { useUserStoreWithOut } from '@/store/modules/user'
 import { propTypes } from '@/utils/propTypes'
 
-defineOptions({ name: 'Message' })
+defineOptions({ name: 'XxtxMessage' })
 
 defineProps({
   color: propTypes.string.def('')
@@ -12,20 +12,20 @@ defineProps({
 
 const { push } = useRouter()
 const userStore = useUserStoreWithOut()
-const activeName = ref('notice')
+const activeName = ref('xxtx')
 const unreadCount = ref(0) // 未读消息数量
 const list = ref<any[]>([]) // 消息列表
 
 // 获得消息列表
 const getList = async () => {
-  list.value = await NotifyMessageApi.getUnreadNotifyMessageList()
+  list.value = await XxtxApi.getUnreadXxtxMessageList()
   // 强制设置 unreadCount 为 0，避免小红点因为轮询太慢，不消除
   unreadCount.value = 0
 }
 
 // 获得未读消息数
 const getUnreadCount = async () => {
-  NotifyMessageApi.getUnreadNotifyMessageCount().then((data) => {
+  XxtxApi.getUnreadXxtxMessageCount().then((data) => {
     unreadCount.value = data
   })
 }
@@ -33,7 +33,7 @@ const getUnreadCount = async () => {
 // 跳转我的站内信
 const goMyList = () => {
   push({
-    name: 'MyNotifyMessage'
+    name: 'MyXxtxMessage'
   })
 }
 
@@ -63,7 +63,7 @@ onMounted(() => {
         </ElBadge>
       </template>
       <ElTabs v-model="activeName">
-        <ElTabPane label="我的站内信" name="notice">
+        <ElTabPane label="我的站内信" name="xxtx">
           <el-scrollbar class="message-list">
             <template v-for="item in list" :key="item.id">
               <div class="message-item">
