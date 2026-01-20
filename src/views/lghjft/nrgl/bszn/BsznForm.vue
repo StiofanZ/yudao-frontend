@@ -13,15 +13,15 @@
             <el-tree-select
               v-model="formData.parentId"
               :data="contentTree"
-              :props="{ label: 'title', value: 'id', children: 'children' }"
+              :props="{ label: 'sxmc', value: 'id', children: 'children' }"
               check-strictly
               placeholder="请选择上级内容"
             />
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="标题" prop="title">
-            <el-input v-model="formData.title" placeholder="请输入标题" />
+          <el-form-item label="事项名称" prop="sxmc">
+            <el-input v-model="formData.sxmc" placeholder="请输入事项名称" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -35,8 +35,8 @@
       </el-row>
       <el-row :gutter="24">
         <el-col :span="12">
-          <el-form-item label="办理窗口" prop="blck">
-            <el-input v-model="formData.blck" placeholder="请输入办理窗口" />
+          <el-form-item label="办理部门" prop="blbm">
+            <el-input v-model="formData.blbm" placeholder="请输入办理部门" />
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -152,7 +152,7 @@ const open = async (type: string, id?: number, parentId?: number) => {
 const getTree = async () => {
   const res = await getBsznfbList({})
   const tree = handleTree(res)
-  const root = { id: 0, title: '顶级内容', children: tree }
+  const root = { id: 0, sxmc: '顶级内容', children: tree }
   contentTree.value = [root]
 }
 
@@ -161,14 +161,18 @@ const resetForm = () => {
   formData.value = {
     id: undefined,
     parentId: 0,
-    title: '',
+    sxmc: '',
     
     content: '',
     sort: 0,
     status: 0,
     kjfw: 1,
     deptId: undefined,
-    deptName: ''
+    deptName: '',
+    blbm: '',
+    ywfl: undefined,
+    blzt: undefined,
+    fbsj: ''
   }
   formRef.value?.resetFields()
 }

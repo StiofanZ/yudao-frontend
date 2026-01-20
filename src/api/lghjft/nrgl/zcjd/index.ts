@@ -58,3 +58,13 @@ export const publishZcjd = (id: number) => {
 export const getPublicZcjdList = (deptId: number) => {
   return request.get({ url: '/lghjft/nrgl/zcjd/public/list?deptId=' + deptId })
 }
+
+// 下架内容
+export const offShelfZcjd = (id: number, reason: string) => {
+  return request.put({ url: '/lghjft/nrgl/zcjd/off-shelf', params: { id, reason } })
+}
+
+// 审核内容
+export const auditZcjd = (id: number, status: number) => {
+  return request.put({ url: '/lghjft/nrgl/zcjd/audit', params: { id, status } })
+}

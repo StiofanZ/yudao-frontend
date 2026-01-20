@@ -35,8 +35,12 @@
       </el-row>
       <el-row :gutter="24">
         <el-col :span="12">
-          <el-form-item label="解读部门" prop="jdbm">
-            <el-input v-model="formData.jdbm" placeholder="请输入解读部门" />
+          <el-form-item label="发布部门" prop="fbbm">
+            <el-select v-model="formData.fbbm" placeholder="请选择发布部门">
+              <el-option label="全总" :value="0" />
+              <el-option label="省总" :value="1" />
+              <el-option label="市州" :value="2" />
+            </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -162,7 +166,9 @@ const resetForm = () => {
     status: 0,
     kjfw: 1,
     deptId: undefined,
-    deptName: ''
+    deptName: '',
+    fbbm: undefined,
+    xjyy: ''
   }
   formRef.value?.resetFields()
 }

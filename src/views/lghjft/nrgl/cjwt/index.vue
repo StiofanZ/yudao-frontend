@@ -1,7 +1,13 @@
 <template>
   <ContentWrap>
     <!-- 搜索工作栏 -->
-    <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true" label-width="68px">
+    <el-form
+      class="-mb-15px"
+      :model="queryParams"
+      ref="queryFormRef"
+      :inline="true"
+      label-width="68px"
+    >
       <el-form-item label="标题" prop="title">
         <el-input
           v-model="queryParams.title"
@@ -25,12 +31,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select
-          v-model="queryParams.status"
-          placeholder="请选择状态"
-          clearable
-          class="!w-240px"
-        >
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable class="!w-240px">
           <el-option label="草稿" :value="0" />
           <el-option label="已发布" :value="1" />
         </el-select>
@@ -38,18 +39,10 @@
       <el-form-item>
         <el-button @click="handleQuery"><Icon icon="ep:search" class="mr-5px" /> 搜索</el-button>
         <el-button @click="resetQuery"><Icon icon="ep:refresh" class="mr-5px" /> 重置</el-button>
-        <el-button
-          type="primary"
-          plain
-          @click="openForm('create')"
-        >
+        <el-button type="primary" plain @click="openForm('create')">
           <Icon icon="ep:plus" class="mr-5px" /> 新增
         </el-button>
-        <el-button
-          type="info"
-          plain
-          @click="handleExpand"
-        >
+        <el-button type="info" plain @click="handleExpand">
           <Icon icon="ep:sort" class="mr-5px" /> 展开/折叠
         </el-button>
       </el-form-item>
@@ -79,12 +72,21 @@
       <el-table-column label="排序" align="center" prop="sort" />
       <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
-          <el-tag v-if="scope.row.status === 1" type="success">已发布</el-tag>
-          <el-tag v-else type="info">草稿</el-tag>
+          <el-tag v-if="scope.row.status === 0" type="info">未审核</el-tag>
+          <el-tag v-else-if="scope.row.status === 1" type="primary">已审核</el-tag>
+          <el-tag v-else-if="scope.row.status === 2" type="success">已发布</el-tag>
+          <el-tag v-else-if="scope.row.status === 3" type="warning">已过期</el-tag>
+          <el-tag v-else-if="scope.row.status === 4" type="danger">已下架</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180" :formatter="dateFormatter" />
-      <el-table-column label="操作" align="center" width="200">
+      <el-table-column
+        label="创建时间"
+        align="center"
+        prop="createTime"
+        width="180"
+        :formatter="dateFormatter"
+      />
+      <el-table-column label="操作" align="center" width="250" fixed="right">
         <template #default="scope">
           <!-- 只有本部门的草稿可以发布 -->
           <el-button
@@ -105,11 +107,7 @@
             修改
           </el-button>
           <!-- 只有本部门的内容可以新增子项（或者都允许？通常允许） -->
-          <el-button
-            link
-            type="primary"
-            @click="openForm('create', undefined, scope.row.id)"
-          >
+          <el-button link type="primary" @click="openForm('create', undefined, scope.row.id)">
             新增
           </el-button>
           <!-- 只有本部门的内容可以删除 -->
@@ -120,6 +118,15 @@
             @click="handleDelete(scope.row.id)"
           >
             删除
+          </el-button>
+          <!-- 下架按钮 -->
+          <el-button
+            link
+            type="danger"
+            :disabled="!(scope.row.status === 2 || scope.row.status === 3)"
+            @click="handleOffShelf(scope.row)"
+          >
+            下架
           </el-button>
         </template>
       </el-table-column>
@@ -132,7 +139,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
-import { getCjwtfbList, deleteCjwt, publishCjwt } from '@/api/lghjft/nrgl/cjwt'
+import { getCjwtfbList, deleteCjwt, publishCjwt, offShelfCjwt } from '@/api/lghjft/nrgl/cjwt'
 import CjwtForm from './CjwtForm.vue'
 import { handleTree } from '@/utils/tree'
 import { dateFormatter } from '@/utils/formatTime'
@@ -144,7 +151,7 @@ const loading = ref(true)
 const list = ref<any[]>([])
 const queryParams = ref({
   title: undefined,
-  
+
   status: undefined,
   kjfw: undefined
 })
@@ -207,6 +214,31 @@ const handlePublish = async (id: number) => {
     await publishCjwt(id)
     await getList()
     ElMessage.success('发布成功')
+  } catch {}
+}
+
+const offShelfVisible = ref(false)
+const offShelfForm = ref({
+  id: undefined,
+  reason: undefined
+})
+
+const handleOffShelf = (row: any) => {
+  offShelfForm.value.id = row.id
+  offShelfForm.value.reason = undefined
+  offShelfVisible.value = true
+}
+
+const submitOffShelf = async () => {
+  if (!offShelfForm.value.reason) {
+    ElMessage.error('请选择下架原因')
+    return
+  }
+  try {
+    await offShelfCjwt(offShelfForm.value.id, offShelfForm.value.reason)
+    ElMessage.success('下架成功')
+    offShelfVisible.value = false
+    getList()
   } catch {}
 }
 

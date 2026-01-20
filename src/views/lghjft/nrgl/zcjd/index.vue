@@ -67,7 +67,13 @@
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
     >
       <el-table-column label="标题" align="left" prop="title" />
-      <el-table-column label="解读部门" align="center" prop="jdbm" />
+      <el-table-column label="发布部门" align="center" prop="fbbm">
+        <template #default="scope">
+          <span v-if="scope.row.fbbm === 0">全总</span>
+          <span v-else-if="scope.row.fbbm === 1">省总</span>
+          <span v-else-if="scope.row.fbbm === 2">市州</span>
+        </template>
+      </el-table-column>
       <el-table-column label="发布日期" align="center" prop="fbrq" width="180" :formatter="dateFormatter" />
       <el-table-column label="发布部门" align="center" prop="deptName" />
       <el-table-column label="可见范围" align="center" prop="kjfw">
@@ -80,12 +86,15 @@
       <el-table-column label="排序" align="center" prop="sort" />
       <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
-          <el-tag v-if="scope.row.status === 1" type="success">已发布</el-tag>
-          <el-tag v-else type="info">草稿</el-tag>
+          <el-tag v-if="scope.row.status === 0" type="info">未审核</el-tag>
+          <el-tag v-else-if="scope.row.status === 1" type="primary">已审核</el-tag>
+          <el-tag v-else-if="scope.row.status === 2" type="success">已发布</el-tag>
+          <el-tag v-else-if="scope.row.status === 3" type="warning">已过期</el-tag>
+          <el-tag v-else-if="scope.row.status === 4" type="danger">已下架</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180" :formatter="dateFormatter" />
-      <el-table-column label="操作" align="center" width="200">
+      <el-table-column label="操作" align="center" width="250" fixed="right">
         <template #default="scope">
           <!-- 只有本部门的草稿可以发布 -->
           <el-button
@@ -122,6 +131,15 @@
           >
             删除
           </el-button>
+          <!-- 下架按钮 -->
+          <el-button
+            link
+            type="danger"
+            :disabled="!(scope.row.status === 2 || scope.row.status === 3)"
+            @click="handleOffShelf(scope.row)"
+          >
+            下架
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -129,11 +147,27 @@
 
   <!-- 表单弹窗 -->
   <ZcjdForm ref="formRef" @success="getList" />
+
+  <!-- 下架原因弹窗 -->
+  <el-dialog v-model="offShelfVisible" title="下架原因" width="30%">
+    <el-form :model="offShelfForm" label-width="80px">
+      <el-form-item label="原因">
+        <el-select v-model="offShelfForm.reason" placeholder="请选择下架原因" style="width: 100%">
+          <el-option label="已失效政策" value="1" />
+          <el-option label="新政策替代" value="2" />
+        </el-select>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="offShelfVisible = false">取消</el-button>
+      <el-button type="primary" @click="submitOffShelf">确定</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
-import { getZcjdfbList, deleteZcjd, publishZcjd } from '@/api/lghjft/nrgl/zcjd'
+import { getZcjdfbList, deleteZcjd, publishZcjd, offShelfZcjd } from '@/api/lghjft/nrgl/zcjd'
 import ZcjdForm from './ZcjdForm.vue'
 import { handleTree } from '@/utils/tree'
 import { dateFormatter } from '@/utils/formatTime'
@@ -208,6 +242,31 @@ const handlePublish = async (id: number) => {
     await publishZcjd(id)
     await getList()
     ElMessage.success('发布成功')
+  } catch {}
+}
+
+const offShelfVisible = ref(false)
+const offShelfForm = ref({
+  id: undefined,
+  reason: undefined
+})
+
+const handleOffShelf = (row: any) => {
+  offShelfForm.value.id = row.id
+  offShelfForm.value.reason = undefined
+  offShelfVisible.value = true
+}
+
+const submitOffShelf = async () => {
+  if (!offShelfForm.value.reason) {
+    ElMessage.error('请选择下架原因')
+    return
+  }
+  try {
+    await offShelfZcjd(offShelfForm.value.id, offShelfForm.value.reason)
+    ElMessage.success('下架成功')
+    offShelfVisible.value = false
+    getList()
   } catch {}
 }
 

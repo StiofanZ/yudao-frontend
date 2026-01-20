@@ -3,7 +3,7 @@ import request from '@/config/axios'
 export interface BsznVO {
   id: number
   parentId: number
-  title: string
+  sxmc: string
   
   content: string
   sort: number
@@ -12,15 +12,19 @@ export interface BsznVO {
   deptId: number
   deptName: string
   kjfw: number
-  blck?: string
+  blbm?: string
   zxdh?: string
   fdsx?: string
   cnsx?: string
   sfbz?: string
+  ywfl?: number
+  blzt?: number
+  fbsj?: string
+  xjyy?: string
 }
 
 export interface BsznPageReqVO {
-  title?: string
+  sxmc?: string
   type?: string
   status?: number
 }
@@ -58,4 +62,14 @@ export const publishBszn = (id: number) => {
 // 查询公开内容列表
 export const getPublicBsznList = (deptId: number) => {
   return request.get({ url: '/lghjft/nrgl/bszn/public/list?deptId=' + deptId })
+}
+
+// 下架内容
+export const offShelfBszn = (id: number, reason: string) => {
+  return request.put({ url: '/lghjft/nrgl/bszn/off-shelf', params: { id, reason } })
+}
+
+// 审核内容
+export const auditBszn = (id: number, status: number) => {
+  return request.put({ url: '/lghjft/nrgl/bszn/audit', params: { id, status } })
 }

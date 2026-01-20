@@ -55,3 +55,13 @@ export const publishCjwt = (id: number) => {
 export const getPublicCjwtList = (deptId: number) => {
   return request.get({ url: '/lghjft/nrgl/cjwt/public/list?deptId=' + deptId })
 }
+
+// 下架内容
+export const offShelfCjwt = (id: number, reason: string) => {
+  return request.put({ url: '/lghjft/nrgl/cjwt/off-shelf', params: { id, reason } })
+}
+
+// 审核内容
+export const auditCjwt = (id: number, status: number) => {
+  return request.put({ url: '/lghjft/nrgl/cjwt/audit', params: { id, status } })
+}
