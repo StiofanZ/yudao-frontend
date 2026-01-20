@@ -11,16 +11,17 @@
           class="!w-240px"
         />
       </el-form-item>
-      <el-form-item label="内容类型" prop="type">
+
+      <el-form-item label="可见范围" prop="kjfw">
         <el-select
-          v-model="queryParams.type"
-          placeholder="请选择内容类型"
+          v-model="queryParams.kjfw"
+          placeholder="请选择可见范围"
           clearable
           class="!w-240px"
         >
-          <el-option label="办事指南" value="guide" />
-          <el-option label="常见问题" value="faq" />
-          <el-option label="专题讲解" value="topic" />
+          <el-option label="完全可见" :value="1" />
+          <el-option label="下级可见" :value="2" />
+          <el-option label="本级可见" :value="3" />
         </el-select>
       </el-form-item>
       <el-form-item label="状态" prop="status">
@@ -30,8 +31,8 @@
           clearable
           class="!w-240px"
         >
-          <el-option label="启用" :value="1" />
-          <el-option label="禁用" :value="0" />
+          <el-option label="草稿" :value="0" />
+          <el-option label="已发布" :value="1" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -66,31 +67,45 @@
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
     >
       <el-table-column label="标题" align="left" prop="title" />
-      <el-table-column label="内容类型" align="center" prop="type">
+      <el-table-column label="解读部门" align="center" prop="jdbm" />
+      <el-table-column label="发布日期" align="center" prop="fbrq" width="180" :formatter="dateFormatter" />
+      <el-table-column label="发布部门" align="center" prop="deptName" />
+      <el-table-column label="可见范围" align="center" prop="kjfw">
         <template #default="scope">
-          <el-tag v-if="scope.row.type === 'guide'">办事指南</el-tag>
-          <el-tag v-else-if="scope.row.type === 'faq'" type="success">常见问题</el-tag>
-          <el-tag v-else-if="scope.row.type === 'topic'" type="warning">专题讲解</el-tag>
-          <el-tag v-else type="info">{{ scope.row.type }}</el-tag>
+          <el-tag v-if="scope.row.kjfw === 1" type="success">完全可见</el-tag>
+          <el-tag v-else-if="scope.row.kjfw === 2" type="warning">下级可见</el-tag>
+          <el-tag v-else-if="scope.row.kjfw === 3" type="info">本级可见</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="排序" align="center" prop="sort" />
       <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
-          <el-tag v-if="scope.row.status === 1" type="success">启用</el-tag>
-          <el-tag v-else type="danger">禁用</el-tag>
+          <el-tag v-if="scope.row.status === 1" type="success">已发布</el-tag>
+          <el-tag v-else type="info">草稿</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180" :formatter="dateFormatter" />
-      <el-table-column label="操作" align="center">
+      <el-table-column label="操作" align="center" width="200">
         <template #default="scope">
+          <!-- 只有本部门的草稿可以发布 -->
+          <el-button
+            link
+            type="success"
+            :disabled="!(scope.row.status === 0 && scope.row.deptId === userStore.getUser.deptId)"
+            @click="handlePublish(scope.row.id)"
+          >
+            发布
+          </el-button>
+          <!-- 只有本部门的内容可以修改 -->
           <el-button
             link
             type="primary"
+            :disabled="!(scope.row.status === 0 && scope.row.deptId === userStore.getUser.deptId)"
             @click="openForm('update', scope.row.id)"
           >
             修改
           </el-button>
+          <!-- 只有本部门的内容可以新增子项（或者都允许？通常允许） -->
           <el-button
             link
             type="primary"
@@ -98,9 +113,11 @@
           >
             新增
           </el-button>
+          <!-- 只有本部门的内容可以删除 -->
           <el-button
             link
             type="danger"
+            :disabled="scope.row.deptId !== userStore.getUser.deptId"
             @click="handleDelete(scope.row.id)"
           >
             删除
@@ -111,23 +128,26 @@
   </ContentWrap>
 
   <!-- 表单弹窗 -->
-  <NrxxForm ref="formRef" @success="getList" />
+  <ZcjdForm ref="formRef" @success="getList" />
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
-import { getNrxxfbList, deleteNrxx } from '@/api/lghjft/nrgl/nrxx'
-import NrxxForm from './NrxxForm.vue'
+import { getZcjdfbList, deleteZcjd, publishZcjd } from '@/api/lghjft/nrgl/zcjd'
+import ZcjdForm from './ZcjdForm.vue'
 import { handleTree } from '@/utils/tree'
 import { dateFormatter } from '@/utils/formatTime'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useUserStore } from '@/store/modules/user'
 
+const userStore = useUserStore()
 const loading = ref(true)
-const list = ref([])
+const list = ref<any[]>([])
 const queryParams = ref({
   title: undefined,
-  type: undefined,
-  status: undefined
+  
+  status: undefined,
+  kjfw: undefined
 })
 const queryFormRef = ref()
 const isExpandAll = ref(false)
@@ -139,7 +159,7 @@ const formRef = ref()
 const getList = async () => {
   loading.value = true
   try {
-    const data = await getNrxxfbList(queryParams.value)
+    const data = await getZcjdfbList(queryParams.value)
     list.value = handleTree(data)
   } finally {
     loading.value = false
@@ -175,9 +195,19 @@ const openForm = (type: string, id?: number, parentId?: number) => {
 const handleDelete = async (id: number) => {
   try {
     await ElMessageBox.confirm('是否确认删除编号为"' + id + '"的数据项?')
-    await deleteNrxx(id)
+    await deleteZcjd(id)
     await getList()
     ElMessage.success('删除成功')
+  } catch {}
+}
+
+/** 发布按钮操作 */
+const handlePublish = async (id: number) => {
+  try {
+    await ElMessageBox.confirm('是否确认发布编号为"' + id + '"的数据项? 发布后下级部门可见。')
+    await publishZcjd(id)
+    await getList()
+    ElMessage.success('发布成功')
   } catch {}
 }
 

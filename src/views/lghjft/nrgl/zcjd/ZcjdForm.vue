@@ -26,15 +26,7 @@
         </el-col>
       </el-row>
       <el-row :gutter="24">
-        <el-col :span="12">
-          <el-form-item label="内容类型" prop="type">
-            <el-select v-model="formData.type" placeholder="请选择内容类型" :disabled="isTypeDisabled">
-              <el-option label="办事指南" value="guide" />
-              <el-option label="常见问题" value="faq" />
-              <el-option label="专题讲解" value="topic" />
-            </el-select>
-          </el-form-item>
-        </el-col>
+
         <el-col :span="12">
           <el-form-item label="排序" prop="sort">
             <el-input-number v-model="formData.sort" :min="0" controls-position="right" />
@@ -43,11 +35,37 @@
       </el-row>
       <el-row :gutter="24">
         <el-col :span="12">
-          <el-form-item label="状态" prop="status">
-            <el-radio-group v-model="formData.status">
-              <el-radio :label="1">启用</el-radio>
-              <el-radio :label="0">禁用</el-radio>
-            </el-radio-group>
+          <el-form-item label="解读部门" prop="jdbm">
+            <el-input v-model="formData.jdbm" placeholder="请输入解读部门" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="发布日期" prop="fbrq">
+            <el-date-picker
+              v-model="formData.fbrq"
+              type="datetime"
+              value-format="YYYY-MM-DD HH:mm:ss"
+              placeholder="选择发布日期"
+              style="width: 100%"
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row :gutter="24">
+        <el-col :span="24">
+          <el-form-item label="附件链接" prop="fjlj">
+             <el-input v-model="formData.fjlj" placeholder="请输入附件链接或上传附件" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row :gutter="24">
+        <el-col :span="12">
+          <el-form-item label="可见范围" prop="kjfw">
+            <el-select v-model="formData.kjfw" placeholder="请选择可见范围">
+              <el-option label="完全可见" :value="1" />
+              <el-option label="下级可见" :value="2" />
+              <el-option label="本级可见" :value="3" />
+            </el-select>
           </el-form-item>
         </el-col>
       </el-row>
@@ -64,12 +82,12 @@
 <script setup lang="ts">
 import { ref, defineExpose, watch } from 'vue'
 import {
-  createNrxx,
-  updateNrxx,
-  getNrxx,
-  getNrxxfbList,
-  NrxxVO
-} from '@/api/lghjft/nrgl/nrxx'
+  createZcjd,
+  updateZcjd,
+  getZcjd,
+  getZcjdfbList,
+  ZcjdVO
+} from '@/api/lghjft/nrgl/zcjd'
 import { handleTree } from '@/utils/tree'
 import { ElMessage } from 'element-plus'
 import Editor from '@/components/Editor/src/Editor.vue'
@@ -79,24 +97,27 @@ const dialogTitle = ref('')
 const formLoading = ref(false)
 const formRef = ref()
 const contentTree = ref([])
-const isTypeDisabled = ref(false)
 
-const formData = ref<NrxxVO>({
+
+const formData = ref<ZcjdVO>({
   id: undefined,
   parentId: 0,
   title: '',
-  type: '',
+  
   content: '',
   sort: 0,
-  status: 1
+  status: 0, // 默认草稿
+  kjfw: 1, // 默认公开
+  deptId: undefined,
+  deptName: ''
 })
 
 const formRules = {
   parentId: [{ required: true, message: '上级内容不能为空', trigger: 'blur' }],
   title: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
-  type: [{ required: true, message: '内容类型不能为空', trigger: 'change' }],
-  status: [{ required: true, message: '状态不能为空', trigger: 'blur' }],
-  sort: [{ required: true, message: '排序不能为空', trigger: 'blur' }]
+
+  sort: [{ required: true, message: '排序不能为空', trigger: 'blur' }],
+  kjfw: [{ required: true, message: '可见范围不能为空', trigger: 'blur' }]
 }
 
 /** 打开弹窗 */
@@ -111,7 +132,7 @@ const open = async (type: string, id?: number, parentId?: number) => {
   }
   if (id) {
     try {
-      const res = await getNrxx(id)
+      const res = await getZcjd(id)
       formData.value = res
     } finally {
       formLoading.value = false
@@ -123,7 +144,7 @@ const open = async (type: string, id?: number, parentId?: number) => {
 
 /** 获取上级内容树 */
 const getTree = async () => {
-  const res = await getNrxxfbList({})
+  const res = await getZcjdfbList({})
   const tree = handleTree(res)
   const root = { id: 0, title: '顶级内容', children: tree }
   contentTree.value = [root]
@@ -135,10 +156,13 @@ const resetForm = () => {
     id: undefined,
     parentId: 0,
     title: '',
-    type: '',
+    
     content: '',
     sort: 0,
-    status: 1
+    status: 0,
+    kjfw: 1,
+    deptId: undefined,
+    deptName: ''
   }
   formRef.value?.resetFields()
 }
@@ -149,11 +173,13 @@ const submitForm = async () => {
   formLoading.value = true
   try {
     const data = formData.value
+    // 创建时后端会强制覆盖 status 为 0，更新时 status 保持不变 (但后端逻辑中不应该允许通过 update 修改 status 为 published, publish 必须走 publish 接口)
+    // 这里前端传递 status 主要是为了 update 时带上原 status
     if (data.id) {
-      await updateNrxx(data)
+      await updateZcjd(data)
       ElMessage.success('修改成功')
     } else {
-      await createNrxx(data)
+      await createZcjd(data)
       ElMessage.success('新增成功')
     }
     dialogVisible.value = false
@@ -166,33 +192,5 @@ const submitForm = async () => {
 const emit = defineEmits(['success'])
 defineExpose({ open })
 
-/** 监听上级内容的变化 */
-watch(
-  () => formData.value.parentId,
-  (val) => {
-    if (val === 0) {
-      isTypeDisabled.value = false
-    } else {
-      // 查找对应的树节点
-      const findNode = (nodes: any[], id: number): any => {
-        for (const node of nodes) {
-          if (node.id === id) {
-            return node
-          }
-          if (node.children) {
-            const found = findNode(node.children, id)
-            if (found) return found
-          }
-        }
-        return null
-      }
-      
-      const node = findNode(contentTree.value, val)
-      if (node) {
-        formData.value.type = node.type
-        isTypeDisabled.value = true
-      }
-    }
-  }
-)
+
 </script>

@@ -1,0 +1,57 @@
+import request from '@/config/axios'
+
+export interface CjwtVO {
+  id: number
+  parentId: number
+  title: string
+  
+  content: string
+  sort: number
+  status: number
+  createTime: string
+  deptId: number
+  deptName: string
+  kjfw: number
+  wtfl?: string
+}
+
+export interface CjwtPageReqVO {
+  title?: string
+  type?: string
+  status?: number
+}
+
+// 查询内容发布列表
+export const getCjwtfbList = (params: CjwtPageReqVO) => {
+  return request.get({ url: '/lghjft/nrgl/cjwt/list', params })
+}
+
+// 查询内容发布详情
+export const getCjwt = (id: number) => {
+  return request.get({ url: '/lghjft/nrgl/cjwt/get?id=' + id })
+}
+
+// 新增内容发布
+export const createCjwt = (data: CjwtVO) => {
+  return request.post({ url: '/lghjft/nrgl/cjwt/create', data })
+}
+
+// 修改内容发布
+export const updateCjwt = (data: CjwtVO) => {
+  return request.put({ url: '/lghjft/nrgl/cjwt/update', data })
+}
+
+// 删除内容发布
+export const deleteCjwt = (id: number) => {
+  return request.delete({ url: '/lghjft/nrgl/cjwt/delete?id=' + id })
+}
+
+// 发布内容
+export const publishCjwt = (id: number) => {
+  return request.put({ url: '/lghjft/nrgl/cjwt/publish?id=' + id })
+}
+
+// 查询公开内容列表
+export const getPublicCjwtList = (deptId: number) => {
+  return request.get({ url: '/lghjft/nrgl/cjwt/public/list?deptId=' + deptId })
+}

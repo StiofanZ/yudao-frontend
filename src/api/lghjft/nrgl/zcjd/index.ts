@@ -1,0 +1,60 @@
+import request from '@/config/axios'
+
+export interface ZcjdVO {
+  id: number
+  parentId: number
+  title: string
+  
+  content: string
+  sort: number
+  status: number
+  createTime: string
+  deptId: number
+  deptName: string
+  kjfw: number
+  fjlj?: string
+  jdbm?: string
+  fbrq?: string
+  glzcId?: number
+}
+
+export interface ZcjdPageReqVO {
+  title?: string
+  type?: string
+  status?: number
+}
+
+// 查询内容发布列表
+export const getZcjdfbList = (params: ZcjdPageReqVO) => {
+  return request.get({ url: '/lghjft/nrgl/zcjd/list', params })
+}
+
+// 查询内容发布详情
+export const getZcjd = (id: number) => {
+  return request.get({ url: '/lghjft/nrgl/zcjd/get?id=' + id })
+}
+
+// 新增内容发布
+export const createZcjd = (data: ZcjdVO) => {
+  return request.post({ url: '/lghjft/nrgl/zcjd/create', data })
+}
+
+// 修改内容发布
+export const updateZcjd = (data: ZcjdVO) => {
+  return request.put({ url: '/lghjft/nrgl/zcjd/update', data })
+}
+
+// 删除内容发布
+export const deleteZcjd = (id: number) => {
+  return request.delete({ url: '/lghjft/nrgl/zcjd/delete?id=' + id })
+}
+
+// 发布内容
+export const publishZcjd = (id: number) => {
+  return request.put({ url: '/lghjft/nrgl/zcjd/publish?id=' + id })
+}
+
+// 查询公开内容列表
+export const getPublicZcjdList = (deptId: number) => {
+  return request.get({ url: '/lghjft/nrgl/zcjd/public/list?deptId=' + deptId })
+}
