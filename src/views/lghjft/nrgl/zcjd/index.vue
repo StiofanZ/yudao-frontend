@@ -1,7 +1,13 @@
 <template>
   <ContentWrap>
     <!-- 搜索工作栏 -->
-    <el-form class="-mb-15px" :model="queryParams" ref="queryFormRef" :inline="true" label-width="68px">
+    <el-form
+      class="-mb-15px"
+      :model="queryParams"
+      ref="queryFormRef"
+      :inline="true"
+      label-width="68px"
+    >
       <el-form-item label="标题" prop="title">
         <el-input
           v-model="queryParams.title"
@@ -25,12 +31,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select
-          v-model="queryParams.status"
-          placeholder="请选择状态"
-          clearable
-          class="!w-240px"
-        >
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable class="!w-240px">
           <el-option label="草稿" :value="0" />
           <el-option label="已发布" :value="1" />
         </el-select>
@@ -38,18 +39,10 @@
       <el-form-item>
         <el-button @click="handleQuery"><Icon icon="ep:search" class="mr-5px" /> 搜索</el-button>
         <el-button @click="resetQuery"><Icon icon="ep:refresh" class="mr-5px" /> 重置</el-button>
-        <el-button
-          type="primary"
-          plain
-          @click="openForm('create')"
-        >
+        <el-button type="primary" plain @click="openForm('create')">
           <Icon icon="ep:plus" class="mr-5px" /> 新增
         </el-button>
-        <el-button
-          type="info"
-          plain
-          @click="handleExpand"
-        >
+        <el-button type="info" plain @click="handleExpand">
           <Icon icon="ep:sort" class="mr-5px" /> 展开/折叠
         </el-button>
       </el-form-item>
@@ -74,7 +67,13 @@
           <span v-else-if="scope.row.fbbm === 2">市州</span>
         </template>
       </el-table-column>
-      <el-table-column label="发布日期" align="center" prop="fbrq" width="180" :formatter="dateFormatter" />
+      <el-table-column
+        :formatter="dateFormatter2"
+        align="center"
+        label="发布日期"
+        prop="fbrq"
+        width="180"
+      />
       <el-table-column label="发布部门" align="center" prop="deptName" />
       <el-table-column label="可见范围" align="center" prop="kjfw">
         <template #default="scope">
@@ -93,7 +92,13 @@
           <el-tag v-else-if="scope.row.status === 4" type="danger">已下架</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180" :formatter="dateFormatter" />
+      <el-table-column
+        label="创建时间"
+        align="center"
+        prop="createTime"
+        width="180"
+        :formatter="dateFormatter"
+      />
       <el-table-column label="操作" align="center" width="250" fixed="right">
         <template #default="scope">
           <!-- 只有本部门的草稿可以发布 -->
@@ -115,11 +120,7 @@
             修改
           </el-button>
           <!-- 只有本部门的内容可以新增子项（或者都允许？通常允许） -->
-          <el-button
-            link
-            type="primary"
-            @click="openForm('create', undefined, scope.row.id)"
-          >
+          <el-button link type="primary" @click="openForm('create', undefined, scope.row.id)">
             新增
           </el-button>
           <!-- 只有本部门的内容可以删除 -->
@@ -166,11 +167,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
-import { getZcjdfbList, deleteZcjd, publishZcjd, offShelfZcjd } from '@/api/lghjft/nrgl/zcjd'
+import { nextTick, onMounted, ref } from 'vue'
+import { deleteZcjd, getZcjdfbList, offShelfZcjd, publishZcjd } from '@/api/lghjft/nrgl/zcjd'
 import ZcjdForm from './ZcjdForm.vue'
 import { handleTree } from '@/utils/tree'
-import { dateFormatter } from '@/utils/formatTime'
+import { dateFormatter, dateFormatter2 } from '@/utils/formatTime'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/store/modules/user'
 
@@ -179,7 +180,7 @@ const loading = ref(true)
 const list = ref<any[]>([])
 const queryParams = ref({
   title: undefined,
-  
+
   status: undefined,
   kjfw: undefined
 })

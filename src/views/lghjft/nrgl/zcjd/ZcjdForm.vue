@@ -26,7 +26,6 @@
         </el-col>
       </el-row>
       <el-row :gutter="24">
-
         <el-col :span="12">
           <el-form-item label="排序" prop="sort">
             <el-input-number v-model="formData.sort" :min="0" controls-position="right" />
@@ -47,8 +46,8 @@
           <el-form-item label="发布日期" prop="fbrq">
             <el-date-picker
               v-model="formData.fbrq"
-              type="datetime"
-              value-format="YYYY-MM-DD HH:mm:ss"
+              type="date"
+              value-format="YYYY-MM-DD"
               placeholder="选择发布日期"
               style="width: 100%"
             />
@@ -58,7 +57,7 @@
       <el-row :gutter="24">
         <el-col :span="24">
           <el-form-item label="附件链接" prop="fjlj">
-             <el-input v-model="formData.fjlj" placeholder="请输入附件链接或上传附件" />
+            <el-input v-model="formData.fjlj" placeholder="请输入附件链接或上传附件" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -84,14 +83,8 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-import { ref, defineExpose, watch } from 'vue'
-import {
-  createZcjd,
-  updateZcjd,
-  getZcjd,
-  getZcjdfbList,
-  ZcjdVO
-} from '@/api/lghjft/nrgl/zcjd'
+import { defineExpose, ref } from 'vue'
+import { createZcjd, getZcjd, getZcjdfbList, updateZcjd, ZcjdVO } from '@/api/lghjft/nrgl/zcjd'
 import { handleTree } from '@/utils/tree'
 import { ElMessage } from 'element-plus'
 import Editor from '@/components/Editor/src/Editor.vue'
@@ -102,12 +95,11 @@ const formLoading = ref(false)
 const formRef = ref()
 const contentTree = ref([])
 
-
 const formData = ref<ZcjdVO>({
   id: undefined,
   parentId: 0,
   title: '',
-  
+
   content: '',
   sort: 0,
   status: 0, // 默认草稿
@@ -160,7 +152,7 @@ const resetForm = () => {
     id: undefined,
     parentId: 0,
     title: '',
-    
+
     content: '',
     sort: 0,
     status: 0,
@@ -197,6 +189,4 @@ const submitForm = async () => {
 
 const emit = defineEmits(['success'])
 defineExpose({ open })
-
-
 </script>
