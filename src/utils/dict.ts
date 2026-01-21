@@ -260,5 +260,15 @@ export enum DICT_TYPE {
   SYS_HJFL_GH = 'sys_hjfl_gh', //户籍分类大类标识
   // 年度任务数
   SYS_RWLX = 'sys_rwlx', //年度类型
-  SYS_ND = 'sys_nd' //年度
+  SYS_ND = 'sys_nd', //年度
+  //应代收单位
+  SYS_NSRZT = 'sys_nsrzt',
+  SYS_GHLX = 'sys_ghlx',
+  SYS_JHBZ = 'sys_jhbz',
+  SYS_JDXZ = 'sys_jdxz',
+  SYS_GHZT = 'sys_ghzt',
+  SYS_SWGJ_TYPE = 'sys_swjg_dict_type',
+
+  // 工会级别
+  GH_MARKER_TYPE = 'gh_marker_type'
 }
