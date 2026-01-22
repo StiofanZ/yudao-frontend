@@ -270,5 +270,9 @@ export enum DICT_TYPE {
   SYS_SWGJ_TYPE = 'sys_swjg_dict_type',
 
   // 工会级别
-  GH_MARKER_TYPE = 'gh_marker_type'
+  GH_MARKER_TYPE = 'gh_marker_type',
+
+  //===================问题反馈=====================
+  LG_WTFK_STATUS = 'lg_wtfk_status'
+
 }

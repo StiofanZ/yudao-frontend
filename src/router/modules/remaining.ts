@@ -796,6 +796,17 @@ const remainingRouter: AppRouteRecordRaw[] = [
           activeMenu: '/iot/operation/ota/firmware'
         },
         component: () => import('@/views/iot/ota/firmware/detail/index.vue')
+      },
+      {
+        path: '/lghjft/wtfk/detail',
+        component: () => import('@/views/lghjft/wtfk/detail.vue'),
+        name: 'WtfkDetail',
+        meta: {
+          title: '反馈详情',
+          activeMenu: '/lghjft/wtfk',
+          hidden: true,
+          noCache: false // 根据需要决定是否缓存详情页
+        }
       }
     ]
   }
