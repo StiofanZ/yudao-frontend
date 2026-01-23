@@ -13,7 +13,7 @@
     <!-- 标记点名称列表 -->
     <div class="marker-list">
       <el-scrollbar height="700px">
-        <el-card shadow="hover" style="width: 200px; border: none;">
+        <el-card shadow="hover">
           <div class="marker-names-container">
             <div v-for="marker in markerListForDisplay" :key="marker.id"
               @click="navigateToMarker(marker.name, marker.id)" class="marker-name-item">
@@ -335,7 +335,7 @@ const handleDelete = async (id) => {
 
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('删除失败:', error);
+
       ElMessage.error('删除失败');
     }
   }
@@ -355,6 +355,8 @@ const handleEdit = async (id) => {
     // 如果统一存储中没有，从接口获取
     if (!marker) {
       const response = await MarkerInfoApi.getMarkerInfo(id);
+      console.log(response);
+
       marker = response;
     }
 
@@ -387,7 +389,7 @@ const submitForm = async () => {
   try {
     await formRef.value.validate();
   } catch (error) {
-    console.log('表单验证失败:', error);
+
     return;
   }
 
@@ -450,7 +452,7 @@ const submitForm = async () => {
     resetForm();
 
   } catch (error) {
-    console.error('操作失败:', error);
+
     ElMessage.error('操作失败');
   } finally {
     formLoading.value = false;
@@ -555,71 +557,42 @@ const updateMarkerDisplayList = () => {
 // ========== 加载标注数据 ==========
 const loadMarkers = async () => {
   try {
+    // 1. 调用接口获取分页数据（直接返回 {list: [...], total: xx}）
     const response = await MarkerInfoApi.getMarkerInfoPage({
       pageNo: 1,
       pageSize: 100
     });
+    console.log(response);
 
-    // 解析数据
-    let markerList = [];
-    if (response.data) {
-      if (Array.isArray(response.data)) {
-        markerList = response.data;
-      } else if (response.data.list && Array.isArray(response.data.list)) {
-        markerList = response.data.list;
-      } else if (response.data.records && Array.isArray(response.data.records)) {
-        markerList = response.data.records;
-      } else if (response.data.data && Array.isArray(response.data.data)) {
-        markerList = response.data.data;
-      }
-    } else if (Array.isArray(response)) {
-      markerList = response;
-    } else if (response.list && Array.isArray(response.list)) {
-      markerList = response.list;
-    }
+    // 2. 精简解析逻辑：优先提取list/records/data，兜底数组
+    const markerList = (() => {
+      if (response?.list && Array.isArray(response.list)) return response.list;
+      if (response?.records && Array.isArray(response.records)) return response.records;
+      if (response?.data && Array.isArray(response.data)) return response.data;
+      return Array.isArray(response) ? response : [];
+    })();
 
-    // 清空现有数据
-    markers.forEach(marker => {
-      if (marker && marker.setMap) {
-        marker.setMap(null);
-      }
-    });
+    // 3. 清空现有标注
+    markers.forEach(marker => marker?.setMap?.(null));
     markers.clear();
     allMarkersData.value.clear();
 
-    // 处理每个标记
+    // 4. 遍历处理标注点（精简判空和类型转换）
     markerList.forEach(marker => {
-      if (marker.lng && marker.lat) {
-        const lng = parseFloat(marker.lng);
-        const lat = parseFloat(marker.lat);
-
-        if (!isNaN(lng) && !isNaN(lat)) {
-          // 存入统一存储
-          allMarkersData.value.set(marker.id, {
-            ...marker,
-            lng: lng,
-            lat: lat
-          });
-
-          // 添加到地图
-          addMarkerToMap({
-            ...marker,
-            lng: lng,
-            lat: lat
-          });
-        }
+      const lng = parseFloat(marker.lng);
+      const lat = parseFloat(marker.lat);
+      if (!isNaN(lng) && !isNaN(lat)) {
+        allMarkersData.value.set(marker.id, { ...marker, lng, lat });
+        addMarkerToMap({ ...marker, lng, lat });
       }
     });
 
-    // 更新显示列表
+    // 5. 更新显示列表
     updateMarkerDisplayList();
-
   } catch (error) {
-    console.error('加载标注点失败:', error);
     ElMessage.error('加载标注点失败');
   }
-}
-
+};
 // ========== 图标变色相关方法 ==========
 const setMarkerGreen = (marker) => {
   if (!marker || !window.AMap) return;
@@ -697,7 +670,7 @@ const searchLocation = async () => {
     highlightAndShowMarker(markerData);
 
   } catch (error) {
-    console.error('搜索定位失败:', error);
+
     ElMessage.error('搜索定位失败，请稍后重试！');
   }
 }
@@ -746,38 +719,93 @@ onMounted(async () => {
     await loadMarkers();
 
   } catch (error) {
-    console.error('地图加载失败:', error);
+
     ElMessage.error("地图加载失败");
   }
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+// 标记点列表容器基础样式
 .marker-list {
+  width: 200px;
   position: absolute;
   top: 50px;
-  left: 10px;
   z-index: 1000;
+  height: 100%;
+  box-sizing: border-box;
 }
 
+// 滚动容器适配
+::v-deep .el-scrollbar {
+  width: 100%;
+
+  .el-scrollbar__view {}
+}
+
+// 标记点卡片美化
+::v-deep .el-card {
+  width: 100% !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.06) !important;
+
+  .el-card__body {
+    padding: 16px !important;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+// 标记点名称容器间距
+.marker-names-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+// 核心：标记点项样式（合并重复，保留最终hover/点击交互）
 .marker-name-item {
   padding: 6px 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
   border-radius: 4px;
   margin: 1px 0;
+  cursor: pointer;
   font-size: 14px;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #e5e6eb;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #f0f9ff;
+    border-color: #409eff;
+    color: #1989fa;
+  }
+
+  &:active {
+    background-color: #e6f4ff;
+  }
 }
 
-.marker-name-item:hover {
-  background-color: #f0f9ff;
-  color: #1989fa;
+// 响应式适配
+@media (max-width: 1200px) {
+  .marker-list {
+    width: 220px;
+  }
 }
 
+@media (max-width: 992px) {
+  .marker-list {
+    width: 200px;
+  }
+}
+
+// 地图容器及布局
 .map-wrapper {
   position: relative;
   width: 100%;
-  height: 600px;
+  height: 700px;
 }
 
 #container {
@@ -785,11 +813,11 @@ onMounted(async () => {
   height: 100%;
 }
 
+// 搜索框+添加按钮定位
 .drawer_search {
   z-index: 1000;
   position: absolute;
   top: 10px;
-  left: 10px;
 }
 
 .drawer-btn {
@@ -799,20 +827,28 @@ onMounted(async () => {
   z-index: 1000;
 }
 
+// 弹窗相关样式（合并重复，整合所有弹窗效果）
 .marker-info {
   line-height: 1.8;
   color: #333;
+
+  strong {
+    font-weight: bold;
+    display: inline-block;
+    width: 80px;
+    text-align: right;
+    margin-right: 5px;
+  }
 }
 
 .dialog-footer {
   text-align: right;
 }
 
-.reset-dict-tag:deep(.el-tag) {
-  all: unset !important;
-  display: inline !important;
-  font-size: inherit !important;
-  color: inherit !important;
-  line-height: inherit !important;
+// 弹窗标题加粗居中
+:deep(.el-dialog__title) {
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
 }
 </style>
