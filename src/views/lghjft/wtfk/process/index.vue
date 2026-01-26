@@ -10,7 +10,7 @@
         />
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
+        <el-select style="width: 150px" v-model="queryParams.status" placeholder="请选择状态" clearable>
           <el-option label="待处理" :value="1" />
           <el-option label="跟进中" :value="2" />
           <el-option label="已处理" :value="3" />

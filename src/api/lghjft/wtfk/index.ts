@@ -19,6 +19,7 @@ export interface WtfkVO {
   platformName?: string
   createTime?: string
   operatorName?: string
+  fileUrls?: string[] //上传文件URL
 }
 
 /** 处理日志记录信息 */

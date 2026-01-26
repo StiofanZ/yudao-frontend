@@ -7,27 +7,7 @@
       label-width="100px"
     >
       <el-row :gutter="20">
-        <el-col :span="6">
-          <el-form-item label="用户ID" prop="userId">
-            <el-input
-              v-model="queryParams.userId"
-              placeholder="请输入关联系统用户ID"
-              clearable
-              @keyup.enter="handleQuery"
-            />
-          </el-form-item>
-        </el-col>
-        <el-col :span="6">
-          <el-form-item label="用户名" prop="userName">
-            <el-input
-              v-model="queryParams.userName"
-              placeholder="请输入用户名"
-              clearable
-              @keyup.enter="handleQuery"
-            />
-          </el-form-item>
-        </el-col>
-        <el-col :span="6">
+        <el-col :span="8">
           <el-form-item label="反馈类型" prop="type">
             <el-select
               v-model="queryParams.type"
@@ -42,7 +22,8 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="6">
+
+        <el-col :span="8">
           <el-form-item label="处理状态" prop="status">
             <el-select
               v-model="queryParams.status"
@@ -53,36 +34,11 @@
               <el-option label="未处理" value="1" />
               <el-option label="跟进中" value="2" />
               <el-option label="已处理" value="3" />
-
             </el-select>
           </el-form-item>
         </el-col>
 
-        <el-col :span="6">
-          <el-form-item label="联系电话" prop="contactPhone">
-            <el-input
-              v-model="queryParams.contactPhone"
-              placeholder="请输入联系电话"
-              clearable
-              @keyup.enter="handleQuery"
-            />
-          </el-form-item>
-        </el-col>
-        <el-col :span="10">
-          <el-form-item label="创建时间" prop="createTime">
-            <el-date-picker
-              v-model="queryParams.createTime"
-              value-format="YYYY-MM-DD HH:mm:ss"
-              type="daterange"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              :default-time="[new Date('2024-01-01 00:00:00'), new Date('2024-01-01 23:59:59')]"
-              class="!w-100%"
-            />
-          </el-form-item>
-        </el-col>
-
-        <el-col :span="8" class="flex items-center justify-end mb-18px">
+        <el-col :span="8" class="flex items-center justify-start mb-18px">
           <el-button @click="handleQuery">
             <Icon icon="ep:search" class="mr-5px" /> 搜索
           </el-button>

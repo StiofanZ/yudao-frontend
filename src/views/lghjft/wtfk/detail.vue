@@ -37,6 +37,35 @@
             <el-descriptions-item label="反馈内容" :span="2">
               <div v-html="formData.content" class="editor-content"></div>
             </el-descriptions-item>
+            <el-descriptions-item label="附件" :span="2">
+              <div v-if="formData.fileUrls && formData.fileUrls.length > 0" class="flex flex-wrap gap-10px">
+                <template v-for="(url, index) in formData.fileUrls" :key="index">
+                  <el-image
+                    v-if="isImage(url)"
+                    style="width: 80px; height: 80px; border-radius: 4px; border: 1px solid #eee"
+                    :src="url"
+                    :preview-src-list="formData.fileUrls.filter(u => isImage(u))"
+                    :initial-index="formData.fileUrls.filter(u => isImage(u)).indexOf(url)"
+                    fit="cover"
+                    preview-teleported
+                  />
+
+                  <el-link
+                    v-else
+                    type="primary"
+                    :underline="false"
+                    @click="downloadFile(url)"
+                    class="file-link-item"
+                  >
+                    <div class="flex items-center p-5px border-1 border-blue-200 rounded bg-blue-50">
+                      <Icon icon="ep:document" class="mr-5px" />
+                      <span class="text-12px">{{ getFileName(url) }}</span>
+                    </div>
+                  </el-link>
+                </template>
+              </div>
+              <span v-else class="text-gray-400">无附件</span>
+            </el-descriptions-item>
           </el-descriptions>
         </el-card>
 
@@ -101,6 +130,7 @@ const formData = ref<WtfkVO>({
   feedbackId: '',
   type: '1',
   content: '',
+  fileUrls: [], //上传文件Url
   contactPhone: '',
   platformName: '', // 初始化字段，解决“未解析”错误
   status: 1,
@@ -147,6 +177,22 @@ const getDetail = async () => {
     loading.value = false
   }
 }
+/** 判断是否为图片 */
+const isImage = (url: string) => {
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']
+  const ext = url.split('.').pop()?.toLowerCase() || ''
+  return imageExtensions.includes(ext)
+}
+
+/** 获取文件名 */
+const getFileName = (url: string) => {
+  return url.substring(url.lastIndexOf('/') + 1)
+}
+
+/** 下载/打开文件 */
+const downloadFile = (url: string) => {
+  window.open(url, '_blank')
+}
 
 const goBack = () => {
   back()
@@ -163,4 +209,16 @@ onMounted(() => {
 }
 .bg-gray-50 { background-color: #f9fafb; }
 .bg-blue-50 { background-color: #f0f7ff; }
+
+.file-link-item {
+  transition: all 0.3s;
+}
+.file-link-item:hover {
+  transform: translateY(-2px);
+  opacity: 0.8;
+}
+.gap-10px {
+  display: flex;
+  gap: 10px;
+}
 </style>

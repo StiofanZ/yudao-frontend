@@ -18,6 +18,23 @@
           </el-descriptions-item>
 
           <el-descriptions-item label="平台名称">{{ formData?.platformName || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="附件">
+            <div v-if="formData.fileUrls?.length" class="flex flex-wrap gap-10px">
+              <template v-for="url in formData.fileUrls" :key="url">
+                <el-image
+                  v-if="isImage(url)"
+                  :src="url"
+                  :preview-src-list="formData.fileUrls"
+                  class="w-60px h-60px rounded border"
+                  preview-teleported
+                />
+                <el-link v-else type="primary" :underline="false" @click="loadFile(url)">
+                  <Icon icon="ep:document" /> 附件查看
+                </el-link>
+              </template>
+            </div>
+            <span v-else style="color: #999;">无附件</span>
+          </el-descriptions-item>
           <el-descriptions-item label="描述">
             <div v-html="formData?.content" class="editor-content"></div>
           </el-descriptions-item>
@@ -83,6 +100,7 @@ interface WtfkDetail {
   platformName: string
   content: string
   createTime?: any
+  fileUrls?: string[] //文件上传URL
 }
 interface WtfkLog {
   id?: number
@@ -106,7 +124,8 @@ const formData = ref<WtfkDetail>({
   contactPhone: '',
   type: '',
   platformName: '',
-  createTime: undefined
+  createTime: undefined,
+  fileUrls: [] //文件上传URL
 })
 
 const processData = ref<{
@@ -123,6 +142,20 @@ const formRef = ref()
 
 const rules = {
   processNotes: [{ required: true, message: '必须填写处理备注', trigger: 'blur' }]
+}
+// 1. 判断是否为图片（支持主流图片格式）
+const isImage = (url: string) => {
+  return /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(url)
+}
+
+// 2. 截取文件名（从 URL 中提取最后一段）
+const getFileName = (url: string) => {
+  return url ? url.substring(url.lastIndexOf('/') + 1) : '未知附件'
+}
+/** 查看/下载附件 */
+const loadFile = (url: string) => {
+  if (!url) return
+  window.open(url, '_blank')
 }
 
 /** 打开弹窗 */

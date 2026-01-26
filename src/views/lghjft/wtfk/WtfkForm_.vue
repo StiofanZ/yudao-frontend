@@ -45,6 +45,26 @@
             <Editor v-model="formData.content" height="200px" />
           </el-form-item>
         </el-col>
+
+        <el-col :span="24">
+          <el-form-item label="附件上传"> <el-upload
+            v-model:file-list="fileList"
+            :action="uploadUrl"
+            :headers="uploadHeaders"
+            :on-success="handleUploadSuccess"
+            :on-remove="handleRemove"
+            :on-exceed="handleExceed"  :limit="3"
+            multiple
+          >
+            <el-button type="primary">
+              <Icon icon="ep:upload" class="mr-1" /> 点击上传
+            </el-button>
+            <template #tip>
+              <div class="el-upload__tip">单个文件不超过 10MB</div>
+            </template>
+          </el-upload>
+          </el-form-item>
+        </el-col>
       </el-row>
     </el-form>
 
@@ -55,20 +75,21 @@
   </Dialog>
 </template>
 
-
 <script setup lang="ts">
 import { WtfkApi, type WtfkVO } from '@/api/lghjft/wtfk'
+import { getAccessToken } from '@/utils/auth' // 导入获取Token的方法
+import type { UploadUserFile, UploadProps } from 'element-plus'
 
 /** 工会经费通-问题反馈 表单 */
 defineOptions({ name: 'WtfkForm' })
 
-const { t } = useI18n() // 国际化
-const message = useMessage() // 消息弹窗
+const { t } = useI18n()
+const message = useMessage()
 
-const dialogVisible = ref(false) // 弹窗的是否展示
-const dialogTitle = ref('') // 弹窗的标题
-const formLoading = ref(false) // 表单的加载中：1）修改时的数据加载；2）提交的按钮禁用
-const formType = ref('') // 表单的类型：create - 新增；update - 修改
+const dialogVisible = ref(false)
+const dialogTitle = ref('')
+const formLoading = ref(false)
+const formType = ref('')
 const formData = ref<Partial<WtfkVO>>({
   id: undefined,
   type: undefined,
@@ -76,15 +97,68 @@ const formData = ref<Partial<WtfkVO>>({
   platformName: undefined,
   contactPhone: undefined,
   contactEmail: undefined,
-  status: 0, //默认0 未处理
+  status: 0,
   processorId: undefined,
-  processTime: undefined
+  processTime: undefined,
+  fileUrls: [] //上传文件的URL
 })
+
+// ================== 上传相关逻辑 ==================
+// 1. 上传地址 (使用框架通用的基础设施文件上传接口)
+const uploadUrl = import.meta.env.VITE_BASE_URL + '/admin-api/infra/file/upload'
+// 2. 请求头 (必须携带 Token，否则后端会报 401)
+const uploadHeaders = ref({ Authorization: 'Bearer ' + getAccessToken() })
+// 3. 文件列表
+const fileList = ref<UploadUserFile[]>([])
+// 上传成功回调
+const handleUploadSuccess = (response: any) => {
+  if (response.code !== 0) {
+    message.error('上传失败：' + response.msg)
+    return
+  }
+  // response.data 通常是上传成功后的文件 URL
+  if (response.data) {
+    formData.value.fileUrls.push(response.data)
+    message.success('上传成功！')
+  }
+}
+
+// 移除文件回调
+const handleRemove = (uploadFile: any) => {
+  const url = uploadFile.response?.data
+  if (url) {
+    const index = formData.value.fileUrls.indexOf(url)
+    if (index > -1) {
+      formData.value.fileUrls.splice(index, 1)
+    }
+  }
+}
+
+// 上传前校验 (可选)
+const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
+  if (rawFile.size / 1024 / 1024 > 10) {
+    message.error('文件大小不能超过 10MB!')
+    return false
+  }
+  return true
+}
+const handleExceed = () => {
+  message.error('最多只能上传 3 个文件！')
+}
+//=====================
+
 const formRules = reactive({
-  type: [{ required: true, message: '反馈类型：功能异常 体验建议 其他问题不能为空', trigger: 'change' }],
-  content: [{ required: true, message: '反馈内容不能为空', trigger: 'blur' }]
+  type: [{ required: true, message: '反馈类型不能为空', trigger: 'change' }],
+  content: [{ required: true, message: '反馈内容不能为空', trigger: 'blur' }],
+  contactPhone: [
+    {
+      pattern: /^1[3-9]\d{9}$/,
+      message: '请输入正确的手机号码',
+      trigger: 'blur'
+    }
+  ]
 })
-const formRef = ref() // 表单 Ref
+const formRef = ref()
 
 /** 打开弹窗 */
 const open = async (type: string, id?: number) => {
@@ -102,17 +176,20 @@ const open = async (type: string, id?: number) => {
     }
   }
 }
-defineExpose({ open }) // 提供 open 方法，用于打开弹窗
+defineExpose({ open })
 
 /** 提交表单 */
-const emit = defineEmits(['success']) // 定义 success 事件，用于操作成功后的回调
+const emit = defineEmits(['success'])
 const submitForm = async () => {
-  // 校验表单
   await formRef.value.validate()
-  // 提交请求
   formLoading.value = true
   try {
-    formData.value.platformName = '网页端' //手动改动平台名
+    formData.value.platformName = '网页端'
+
+    if (formType.value === 'create') {
+      formData.value.status = 1
+    }
+
     const data = formData.value as unknown as WtfkVO
     if (formType.value === 'create') {
       await WtfkApi.createWtfk(data)
@@ -122,7 +199,6 @@ const submitForm = async () => {
       message.success(t('common.updateSuccess'))
     }
     dialogVisible.value = false
-    // 发送操作成功的事件
     emit('success')
   } finally {
     formLoading.value = false
@@ -131,6 +207,7 @@ const submitForm = async () => {
 
 /** 重置表单 */
 const resetForm = () => {
+  fileList.value = [] // 清空文件列表
   formData.value = {
     id: undefined,
     userId: undefined,
@@ -139,13 +216,13 @@ const resetForm = () => {
     content: undefined,
     contactPhone: undefined,
     contactEmail: undefined,
-    status:0,
+    status: 1,
     processorId: undefined,
     processTime: undefined,
     processNotes: undefined,
-    platformName: '网页端'  //健壮性
+    platformName: '网页端',
+    fileUrls: []
   }
   formRef.value?.resetFields()
 }
 </script>
-
