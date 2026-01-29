@@ -51,6 +51,7 @@
             v-model:file-list="fileList"
             :action="uploadUrl"
             :headers="uploadHeaders"
+            :data="{ tableName: 'lghjft_wtfk' }"
             :on-success="handleUploadSuccess"
             :on-remove="handleRemove"
             :on-exceed="handleExceed"  :limit="3"
