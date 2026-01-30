@@ -4,7 +4,7 @@ export interface ZcjdVO {
   id: number
   parentId: number
   title: string
-  
+
   content: string
   sort: number
   status: number
@@ -16,17 +16,20 @@ export interface ZcjdVO {
   jdbm?: string
   fbrq?: string
   glzcId?: number
+  readCount?: number
+  rank?: number
 }
 
-export interface ZcjdPageReqVO {
+export interface ZcjdPageReqVO extends PageParam {
   title?: string
   type?: string
   status?: number
+  deptId?: number
 }
 
 // 查询内容发布列表
 export const getZcjdfbList = (params: ZcjdPageReqVO) => {
-  return request.get({ url: '/lghjft/nrgl/zcjd/list', params })
+  return request.get({ url: '/lghjft/nrgl/zcjd/list-page', params })
 }
 
 // 查询内容发布详情
@@ -52,11 +55,6 @@ export const deleteZcjd = (id: number) => {
 // 发布内容
 export const publishZcjd = (id: number) => {
   return request.put({ url: '/lghjft/nrgl/zcjd/publish?id=' + id })
-}
-
-// 查询公开内容列表
-export const getPublicZcjdList = (deptId: number) => {
-  return request.get({ url: '/lghjft/nrgl/zcjd/public/list?deptId=' + deptId })
 }
 
 // 下架内容

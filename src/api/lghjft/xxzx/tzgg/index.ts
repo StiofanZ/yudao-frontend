@@ -9,6 +9,8 @@ export interface TzggVO {
   remark: string
   creator: string
   createTime: Date
+  readCount?: number
+  rank?: number
 }
 
 // 查询公告列表

@@ -9,19 +9,19 @@ export interface BbfbVO {
   fbsj?: string
   deptId?: number
   createTime?: string
+  readCount?: number
+  rank?: number
 }
 
-export interface BbfbPageReqVO {
+export interface BbfbPageReqVO extends PageParam {
   title?: string
   version?: string
   status?: number
-  pageNo?: number
-  pageSize?: number
 }
 
 // 查询列表
 export const getBbfbList = (params: BbfbPageReqVO) => {
-  return request.get({ url: '/lghjft/nrgl/bbfb/list', params })
+  return request.get({ url: '/lghjft/nrgl/bbfb/list-page', params })
 }
 
 // 查询详情
@@ -47,9 +47,4 @@ export const deleteBbfb = (id: number) => {
 // 发布
 export const publishBbfb = (id: number) => {
   return request.put({ url: '/lghjft/nrgl/bbfb/publish?id=' + id })
-}
-
-// 查询公开列表
-export const getPublicBbfbList = () => {
-  return request.get({ url: '/lghjft/nrgl/bbfb/public/list' })
 }

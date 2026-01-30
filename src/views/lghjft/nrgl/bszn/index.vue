@@ -42,27 +42,25 @@
         <el-button type="primary" plain @click="openForm('create')">
           <Icon icon="ep:plus" class="mr-5px" /> 新增
         </el-button>
-        <el-button type="info" plain @click="handleExpand">
-          <Icon icon="ep:sort" class="mr-5px" /> 展开/折叠
-        </el-button>
       </el-form-item>
     </el-form>
   </ContentWrap>
 
   <!-- 列表 -->
   <ContentWrap>
-    <el-table
-      v-loading="loading"
-      :data="list"
-      row-key="id"
-      :default-expand-all="isExpandAll"
-      v-if="refreshTable"
-      :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
-    >
-      <el-table-column label="标题" align="left" prop="title" />
-      <el-table-column label="办理窗口" align="center" prop="blck" />
+    <el-table v-if="refreshTable" v-loading="loading" :data="list" row-key="id">
+      <el-table-column align="left" label="事项名称" prop="sxmc" />
+      <el-table-column align="center" label="办理部门" prop="blbm" />
       <el-table-column label="咨询电话" align="center" prop="zxdh" />
       <el-table-column label="发布部门" align="center" prop="deptName" />
+      <el-table-column align="center" label="阅读量" prop="readCount" />
+      <el-table-column align="center" label="热度">
+        <template #default="scope">
+          <el-tag v-if="scope.row.rank && scope.row.rank <= 10" type="danger">🔥</el-tag>
+          <el-tag v-else-if="scope.row.rank && scope.row.rank <= 20" type="warning">⚡</el-tag>
+          <el-tag v-else-if="scope.row.rank && scope.row.rank <= 30" type="info">❄️</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="可见范围" align="center" prop="kjfw">
         <template #default="scope">
           <el-tag v-if="scope.row.kjfw === 1" type="success">完全可见</el-tag>
@@ -135,6 +133,13 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页 -->
+    <Pagination
+      v-model:limit="queryParams.pageSize"
+      v-model:page="queryParams.pageNo"
+      :total="total"
+      @pagination="getList"
+    />
   </ContentWrap>
 
   <!-- 表单弹窗 -->
@@ -142,10 +147,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
-import { getBsznfbList, deleteBszn, publishBszn, offShelfBszn } from '@/api/lghjft/nrgl/bszn'
+import { onMounted, ref } from 'vue'
+import { deleteBszn, getBsznfbList, offShelfBszn, publishBszn } from '@/api/lghjft/nrgl/bszn'
 import BsznForm from './BsznForm.vue'
-import { handleTree } from '@/utils/tree'
 import { dateFormatter } from '@/utils/formatTime'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/store/modules/user'
@@ -153,14 +157,15 @@ import { useUserStore } from '@/store/modules/user'
 const userStore = useUserStore()
 const loading = ref(true)
 const list = ref<any[]>([])
+const total = ref(0)
 const queryParams = ref({
+  pageNo: 1,
+  pageSize: 10,
   sxmc: undefined,
-
   status: undefined,
   kjfw: undefined
 })
 const queryFormRef = ref()
-const isExpandAll = ref(false)
 const refreshTable = ref(true)
 
 const formRef = ref()
@@ -170,7 +175,8 @@ const getList = async () => {
   loading.value = true
   try {
     const data = await getBsznfbList(queryParams.value)
-    list.value = handleTree(data)
+    list.value = data.list
+    total.value = data.total
   } finally {
     loading.value = false
   }
@@ -178,6 +184,7 @@ const getList = async () => {
 
 /** 搜索按钮操作 */
 const handleQuery = () => {
+  queryParams.value.pageNo = 1
   getList()
 }
 
@@ -185,15 +192,6 @@ const handleQuery = () => {
 const resetQuery = () => {
   queryFormRef.value.resetFields()
   handleQuery()
-}
-
-/** 展开/折叠操作 */
-const handleExpand = () => {
-  refreshTable.value = false
-  isExpandAll.value = !isExpandAll.value
-  nextTick(() => {
-    refreshTable.value = true
-  })
 }
 
 /** 添加/修改操作 */

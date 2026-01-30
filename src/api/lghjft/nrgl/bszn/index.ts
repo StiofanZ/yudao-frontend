@@ -4,7 +4,7 @@ export interface BsznVO {
   id: number
   parentId: number
   sxmc: string
-  
+
   content: string
   sort: number
   status: number
@@ -21,17 +21,21 @@ export interface BsznVO {
   blzt?: number
   fbsj?: string
   xjyy?: string
+  readCount?: number
+  rank?: number
 }
 
-export interface BsznPageReqVO {
+export interface BsznPageReqVO extends PageParam {
   sxmc?: string
   type?: string
   status?: number
+  deptId?: number
+  ywfl?: number
 }
 
 // 查询内容发布列表
 export const getBsznfbList = (params: BsznPageReqVO) => {
-  return request.get({ url: '/lghjft/nrgl/bszn/list', params })
+  return request.get({ url: '/lghjft/nrgl/bszn/list-page', params })
 }
 
 // 查询内容发布详情
@@ -61,7 +65,7 @@ export const publishBszn = (id: number) => {
 
 // 查询公开内容列表
 export const getPublicBsznList = (deptId: number) => {
-  return request.get({ url: '/lghjft/nrgl/bszn/public/list?deptId=' + deptId })
+  return request.get({ url: '/lghjft/nrgl/bszn/list-page', params: { deptId } })
 }
 
 // 下架内容

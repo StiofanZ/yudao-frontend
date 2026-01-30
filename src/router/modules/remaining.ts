@@ -207,6 +207,46 @@ const remainingRouter: AppRouteRecordRaw[] = [
         }
       },
       {
+        path: '/nrgl/bszn/detail',
+        component: () => import('@/views/lghjft/nrgl/bszn/detail.vue'),
+        name: 'BsznDetail',
+        meta: {
+          hidden: true,
+          title: '办事指南详情',
+          noCache: true
+        }
+      },
+      {
+        path: '/xxzx/tzgg/detail',
+        component: () => import('@/views/lghjft/xxzx/tzgg/detail.vue'),
+        name: 'TzggDetail',
+        meta: {
+          hidden: true,
+          title: '通知公告详情',
+          noCache: true
+        }
+      },
+      {
+        path: '/nrgl/zcjd/detail',
+        component: () => import('@/views/lghjft/nrgl/zcjd/detail.vue'),
+        name: 'ZcjdDetail',
+        meta: {
+          hidden: true,
+          title: '政策法规详情',
+          noCache: true
+        }
+      },
+      {
+        path: '/nrgl/bbfb/detail',
+        component: () => import('@/views/lghjft/nrgl/bbfb/detail.vue'),
+        name: 'BbfbDetail',
+        meta: {
+          hidden: true,
+          title: '版本发布详情',
+          noCache: true
+        }
+      },
+      {
         path: 'workflow/wfsqtfsq',
         component: () => import('@/views/lghjft/workflow/wfsqtfsq/index.vue'),
         name: 'WfSqTfsqStatic',

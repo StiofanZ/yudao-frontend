@@ -42,8 +42,12 @@
                 v-for="item in tzggList"
                 :key="item.id"
                 class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
+                @click="router.push(`/xxzx/tzgg/detail?id=${item.id}`)"
               >
                 <div :title="item.title" class="truncate flex-1 text-14px text-gray-700">
+                  <el-tag v-if="item.rank && item.rank <= 10" type="danger">🔥</el-tag>
+                  <el-tag v-else-if="item.rank && item.rank <= 20" type="warning">⚡</el-tag>
+                  <el-tag v-else-if="item.rank && item.rank <= 30" type="info">❄️</el-tag>
                   {{ item.title }}
                 </div>
                 <div class="text-12px text-gray-400 ml-4 w-80px text-right">
@@ -73,8 +77,12 @@
                 v-for="item in zcjdList"
                 :key="item.id"
                 class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
+                @click="router.push(`/nrgl/zcjd/detail?id=${item.id}`)"
               >
                 <div :title="item.title" class="truncate flex-1 text-14px text-gray-700">
+                  <el-tag v-if="item.rank && item.rank <= 10" type="danger">🔥</el-tag>
+                  <el-tag v-else-if="item.rank && item.rank <= 20" type="warning">⚡</el-tag>
+                  <el-tag v-else-if="item.rank && item.rank <= 30" type="info">❄️</el-tag>
                   {{ item.title }}
                 </div>
                 <div class="text-12px text-gray-400 ml-4 w-80px text-right">
@@ -104,8 +112,12 @@
                 v-for="item in bsznList"
                 :key="item.id"
                 class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
+                @click="router.push(`/nrgl/bszn/detail?id=${item.id}`)"
               >
                 <div :title="item.sxmc" class="truncate flex-1 text-14px text-gray-700">
+                  <el-tag v-if="item.rank && item.rank <= 10" type="danger">🔥</el-tag>
+                  <el-tag v-else-if="item.rank && item.rank <= 20" type="warning">⚡</el-tag>
+                  <el-tag v-else-if="item.rank && item.rank <= 30" type="info">❄️</el-tag>
                   {{ item.sxmc }}
                 </div>
                 <div class="text-12px text-gray-400 ml-4 w-80px text-right">
@@ -135,8 +147,12 @@
                 v-for="item in bbfbList"
                 :key="item.id"
                 class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
+                @click="router.push(`/nrgl/bbfb/detail?id=${item.id}`)"
               >
                 <div :title="item.title" class="truncate flex-1 text-14px text-gray-700">
+                  <el-tag v-if="item.rank && item.rank <= 10" type="danger">🔥</el-tag>
+                  <el-tag v-else-if="item.rank && item.rank <= 20" type="warning">⚡</el-tag>
+                  <el-tag v-else-if="item.rank && item.rank <= 30" type="info">❄️</el-tag>
                   <el-tag class="mr-2" size="small" type="primary">{{ item.version }}</el-tag>
                   {{ item.title }}
                 </div>
@@ -162,7 +178,7 @@ import { useRouter } from 'vue-router'
 import { getTzggPage, TzggVO } from '@/api/lghjft/xxzx/tzgg'
 import { BsznVO, getBsznfbList } from '@/api/lghjft/nrgl/bszn'
 import { getZcjdfbList, ZcjdVO } from '@/api/lghjft/nrgl/zcjd'
-import { BbfbVO, getPublicBbfbList } from '@/api/lghjft/nrgl/bbfb'
+import { BbfbVO, getBbfbList } from '@/api/lghjft/nrgl/bbfb'
 
 defineOptions({ name: 'LghjftHome' })
 
@@ -191,9 +207,8 @@ const getTzgg = async () => {
 
 const getZcjd = async () => {
   try {
-    const res = await getZcjdfbList({})
-    // Take top 6
-    zcjdList.value = res.slice(0, 6)
+    const res = await getZcjdfbList({ pageNo: 1, pageSize: 6 })
+    zcjdList.value = res.list
   } catch (e) {
     console.error('Failed to fetch zcjd', e)
   }
@@ -201,9 +216,26 @@ const getZcjd = async () => {
 
 const getBszn = async () => {
   try {
-    const res = await getBsznfbList({})
+    // 首页展示公共内容，传入 deptId (例如 620000 临港环境)
+    // 注意：这里需要根据实际业务需求传入 deptId，假设为 620000
+    // 如果不传 deptId，getBsznfbList 会调用 /list-page。
+    // 如果当前用户登录，则返回用户管理列表；如果未登录，则返回空（因为没有 deptId）
+    // 但首页通常是展示给登录用户的，或者展示特定部门的公共信息
+    // 原逻辑使用的是 getBsznfbList({})，这在原 /list 接口是查询管理列表
+    // 但这里看起来像是展示公共信息？
+    // 原代码中使用的是 getBsznfbList({})，这其实是调用 /list 接口。
+    // 如果是首页展示，可能是展示当前用户能看到的，或者是展示公共的。
+    // 根据之前的逻辑，首页展示的是 "办事指南"，并且有 "更多" 链接。
+    // 如果想展示公共排名，应该传入 deptId。
+    // 但如果不传，且用户已登录，则返回管理列表。
+    // 为了保持一致性，如果这是公共门户首页，应该传 deptId。
+    // 如果是管理后台首页，则保持不传（默认使用登录用户上下文）。
+    const res = await getBsznfbList({
+      pageNo: 1,
+      pageSize: 6
+    })
     // Take top 6
-    bsznList.value = res.slice(0, 6)
+    bsznList.value = res.list
   } catch (e) {
     console.error('Failed to fetch bszn', e)
   }
@@ -211,9 +243,8 @@ const getBszn = async () => {
 
 const getBbfb = async () => {
   try {
-    const res = await getPublicBbfbList()
-    // Take top 6
-    bbfbList.value = res.slice(0, 6)
+    const res = await getBbfbList({ pageNo: 1, pageSize: 6 })
+    bbfbList.value = res.list
   } catch (e) {
     console.error('Failed to fetch bbfb', e)
   }
