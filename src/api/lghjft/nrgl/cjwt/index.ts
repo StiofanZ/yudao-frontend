@@ -9,21 +9,31 @@ export interface CjwtVO {
   sort: number
   status: number
   createTime: string
+  updateTime?: string
+  creator?: string
+  updater?: string
+  deleted?: boolean
   deptId: number
   deptName: string
   kjfw: number
   wtfl?: string
+  xjyy?: string
+  readCount?: number
+  rank?: number
 }
 
-export interface CjwtPageReqVO {
+export type CjwtResVO = CjwtVO
+
+export interface CjwtReqVO extends PageParam {
   title?: string
   type?: string
   status?: number
+  deptId?: number
 }
 
 // 查询内容发布列表
-export const getCjwtfbList = (params: CjwtPageReqVO) => {
-  return request.get({ url: '/lghjft/nrgl/cjwt/list', params })
+export const getCjwtfbList = (params: CjwtReqVO) => {
+  return request.get({ url: '/lghjft/nrgl/cjwt/list-page', params })
 }
 
 // 查询内容发布详情
@@ -51,10 +61,7 @@ export const publishCjwt = (id: number) => {
   return request.put({ url: '/lghjft/nrgl/cjwt/publish?id=' + id })
 }
 
-// 查询公开内容列表
-export const getPublicCjwtList = (deptId: number) => {
-  return request.get({ url: '/lghjft/nrgl/cjwt/public/list?deptId=' + deptId })
-}
+
 
 // 下架内容
 export const offShelfCjwt = (id: number, reason: string) => {

@@ -9,18 +9,24 @@ export interface BbfbVO {
   fbsj?: string
   deptId?: number
   createTime?: string
+  updateTime?: string
+  creator?: string
+  updater?: string
+  deleted?: boolean
   readCount?: number
   rank?: number
 }
 
-export interface BbfbPageReqVO extends PageParam {
+export type BbfbResVO = BbfbVO
+
+export interface BbfbReqVO extends PageParam {
   title?: string
   version?: string
   status?: number
 }
 
 // 查询列表
-export const getBbfbList = (params: BbfbPageReqVO) => {
+export const getBbfbList = (params: BbfbReqVO) => {
   return request.get({ url: '/lghjft/nrgl/bbfb/list-page', params })
 }
 

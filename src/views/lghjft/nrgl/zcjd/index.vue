@@ -75,6 +75,14 @@
         width="180"
       />
       <el-table-column label="发布部门" align="center" prop="deptName" />
+      <el-table-column align="center" label="阅读量" prop="readCount" />
+      <el-table-column align="center" label="热度">
+        <template #default="scope">
+          <el-tag v-if="scope.row.rank && scope.row.rank <= 10" type="danger">🔥</el-tag>
+          <el-tag v-else-if="scope.row.rank && scope.row.rank <= 20" type="warning">⚡</el-tag>
+          <el-tag v-else-if="scope.row.rank && scope.row.rank <= 30" type="info">❄️</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="可见范围" align="center" prop="kjfw">
         <template #default="scope">
           <el-tag v-if="scope.row.kjfw === 1" type="success">完全可见</el-tag>
@@ -144,6 +152,13 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页 -->
+    <Pagination
+      :total="total"
+      v-model:page="queryParams.pageNo"
+      v-model:limit="queryParams.pageSize"
+      @pagination="getList"
+    />
   </ContentWrap>
 
   <!-- 表单弹窗 -->
@@ -178,7 +193,10 @@ import { useUserStore } from '@/store/modules/user'
 const userStore = useUserStore()
 const loading = ref(true)
 const list = ref<any[]>([])
+const total = ref(0)
 const queryParams = ref({
+  pageNo: 1,
+  pageSize: 10,
   title: undefined,
 
   status: undefined,
@@ -195,7 +213,8 @@ const getList = async () => {
   loading.value = true
   try {
     const data = await getZcjdfbList(queryParams.value)
-    list.value = handleTree(data)
+    list.value = handleTree(data.list)
+    total.value = data.total
   } finally {
     loading.value = false
   }
@@ -203,12 +222,14 @@ const getList = async () => {
 
 /** 搜索按钮操作 */
 const handleQuery = () => {
+  queryParams.value.pageNo = 1
   getList()
 }
 
 /** 重置按钮操作 */
 const resetQuery = () => {
   queryFormRef.value.resetFields()
+  queryParams.value.pageNo = 1
   handleQuery()
 }
 
@@ -247,8 +268,8 @@ const handlePublish = async (id: number) => {
 }
 
 const offShelfVisible = ref(false)
-const offShelfForm = ref({
-  id: undefined,
+const offShelfForm = ref<{ id: number; reason: string | undefined }>({
+  id: 0,
   reason: undefined
 })
 

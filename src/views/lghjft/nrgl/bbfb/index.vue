@@ -47,6 +47,14 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column align="center" label="版本号" prop="version" />
       <el-table-column align="center" label="标题" prop="title" />
+      <el-table-column align="center" label="阅读量" prop="readCount" />
+      <el-table-column align="center" label="热度">
+        <template #default="scope">
+          <el-tag v-if="scope.row.rank && scope.row.rank <= 10" type="danger">🔥</el-tag>
+          <el-tag v-else-if="scope.row.rank && scope.row.rank <= 20" type="warning">⚡</el-tag>
+          <el-tag v-else-if="scope.row.rank && scope.row.rank <= 30" type="info">❄️</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="状态" prop="status">
         <template #default="scope">
           <el-tag v-if="scope.row.status === 0" type="info">草稿</el-tag>
@@ -89,6 +97,13 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页 -->
+    <Pagination
+      :total="total"
+      v-model:page="queryParams.pageNo"
+      v-model:limit="queryParams.pageSize"
+      @pagination="getList"
+    />
   </ContentWrap>
 
   <!-- 表单弹窗 -->
@@ -104,7 +119,10 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 
 const loading = ref(true)
 const list = ref([])
+const total = ref(0)
 const queryParams = ref({
+  pageNo: 1,
+  pageSize: 10,
   title: undefined,
   version: undefined,
   status: undefined
@@ -117,7 +135,8 @@ const getList = async () => {
   loading.value = true
   try {
     const data = await getBbfbList(queryParams.value)
-    list.value = data
+    list.value = data.list
+    total.value = data.total
   } finally {
     loading.value = false
   }
@@ -125,12 +144,14 @@ const getList = async () => {
 
 /** 搜索按钮操作 */
 const handleQuery = () => {
+  queryParams.value.pageNo = 1
   getList()
 }
 
 /** 重置按钮操作 */
 const resetQuery = () => {
   queryFormRef.value.resetFields()
+  queryParams.value.pageNo = 1
   handleQuery()
 }
 

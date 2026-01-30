@@ -57,11 +57,18 @@
       row-key="id"
       :default-expand-all="isExpandAll"
       v-if="refreshTable"
-      :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
     >
       <el-table-column label="标题" align="left" prop="title" />
       <el-table-column label="问题分类" align="center" prop="wtfl" />
       <el-table-column label="发布部门" align="center" prop="deptName" />
+      <el-table-column align="center" label="阅读量" prop="readCount" />
+      <el-table-column align="center" label="热度">
+        <template #default="scope">
+          <el-tag v-if="scope.row.rank && scope.row.rank <= 10" type="danger">🔥</el-tag>
+          <el-tag v-else-if="scope.row.rank && scope.row.rank <= 20" type="warning">⚡</el-tag>
+          <el-tag v-else-if="scope.row.rank && scope.row.rank <= 30" type="info">❄️</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="可见范围" align="center" prop="kjfw">
         <template #default="scope">
           <el-tag v-if="scope.row.kjfw === 1" type="success">完全可见</el-tag>
@@ -131,6 +138,13 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页 -->
+    <Pagination
+      :total="total"
+      v-model:page="queryParams.pageNo"
+      v-model:limit="queryParams.pageSize"
+      @pagination="getList"
+    />
   </ContentWrap>
 
   <!-- 表单弹窗 -->
@@ -141,7 +155,6 @@
 import { ref, onMounted, nextTick } from 'vue'
 import { getCjwtfbList, deleteCjwt, publishCjwt, offShelfCjwt } from '@/api/lghjft/nrgl/cjwt'
 import CjwtForm from './CjwtForm.vue'
-import { handleTree } from '@/utils/tree'
 import { dateFormatter } from '@/utils/formatTime'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/store/modules/user'
@@ -149,9 +162,11 @@ import { useUserStore } from '@/store/modules/user'
 const userStore = useUserStore()
 const loading = ref(true)
 const list = ref<any[]>([])
+const total = ref(0)
 const queryParams = ref({
+  pageNo: 1,
+  pageSize: 10,
   title: undefined,
-
   status: undefined,
   kjfw: undefined
 })
@@ -166,7 +181,8 @@ const getList = async () => {
   loading.value = true
   try {
     const data = await getCjwtfbList(queryParams.value)
-    list.value = handleTree(data)
+    list.value = data.list
+    total.value = data.total
   } finally {
     loading.value = false
   }

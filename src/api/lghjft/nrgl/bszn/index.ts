@@ -9,6 +9,10 @@ export interface BsznVO {
   sort: number
   status: number
   createTime: string
+  updateTime?: string
+  creator?: string
+  updater?: string
+  deleted?: boolean
   deptId: number
   deptName: string
   kjfw: number
@@ -25,7 +29,9 @@ export interface BsznVO {
   rank?: number
 }
 
-export interface BsznPageReqVO extends PageParam {
+export type BsznResVO = BsznVO
+
+export interface BsznReqVO extends PageParam {
   sxmc?: string
   type?: string
   status?: number
@@ -34,7 +40,7 @@ export interface BsznPageReqVO extends PageParam {
 }
 
 // 查询内容发布列表
-export const getBsznfbList = (params: BsznPageReqVO) => {
+export const getBsznfbList = (params: BsznReqVO) => {
   return request.get({ url: '/lghjft/nrgl/bszn/list-page', params })
 }
 

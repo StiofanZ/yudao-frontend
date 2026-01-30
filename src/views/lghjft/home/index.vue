@@ -26,38 +26,52 @@
 
     <el-row :gutter="20" class="mt-20px">
       <!-- 通知公告 -->
-      <el-col :span="12" :xs="24" class="mb-20px">
-        <el-card class="h-full" shadow="hover">
-          <template #header>
-            <div class="flex justify-between items-center">
-              <span class="text-16px font-bold">通知公告</span>
-              <el-link :underline="false" type="primary" @click="handleMore('/xxzx/tzgg')">
-                更多
-              </el-link>
-            </div>
-          </template>
-          <el-skeleton :loading="loading" :rows="5" animated>
-            <div v-if="tzggList.length > 0">
-              <div
-                v-for="item in tzggList"
-                :key="item.id"
-                class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
-                @click="router.push(`/xxzx/tzgg/detail?id=${item.id}`)"
+      <el-col :span="24" :xs="24" class="mb-20px">
+        <div
+          class="flex items-center px-16px py-10px border border-gray-100 rounded-8px bg-white hover:shadow-sm transition-shadow"
+        >
+          <div class="flex items-center text-16px font-bold mr-12px">
+            <Icon icon="ep:bell" class="mr-6px" />
+            通知公告
+          </div>
+          <el-divider direction="vertical" />
+          <el-skeleton :loading="loading" animated class="flex-1">
+            <template #default>
+              <el-carousel
+                v-if="tzggList.length > 0"
+                height="24px"
+                direction="vertical"
+                :autoplay="true"
+                :interval="3000"
+                indicator-position="none"
+                class="flex-1"
               >
-                <div :title="item.title" class="truncate flex-1 text-14px text-gray-700">
-                  <el-tag v-if="item.rank && item.rank <= 10" type="danger">🔥</el-tag>
-                  <el-tag v-else-if="item.rank && item.rank <= 20" type="warning">⚡</el-tag>
-                  <el-tag v-else-if="item.rank && item.rank <= 30" type="info">❄️</el-tag>
-                  {{ item.title }}
-                </div>
-                <div class="text-12px text-gray-400 ml-4 w-80px text-right">
-                  {{ formatTime(item.createTime, 'yyyy-MM-dd') }}
-                </div>
-              </div>
-            </div>
-            <el-empty v-else :image-size="60" description="暂无通知公告" />
+                <el-carousel-item v-for="item in tzggList" :key="item.id">
+                  <div
+                    class="h-24px leading-24px truncate cursor-pointer text-14px text-gray-700 hover:text-primary"
+                    :title="item.title"
+                    @click="router.push(`/xxzx/tzgg/detail?id=${item.id}`)"
+                  >
+                    <el-tag v-if="item.rank && item.rank <= 10" type="danger">🔥</el-tag>
+                    <el-tag v-else-if="item.rank && item.rank <= 20" type="warning">⚡</el-tag>
+                    <el-tag v-else-if="item.rank && item.rank <= 30" type="info">❄️</el-tag>
+                    {{ item.title }}
+                  </div>
+                </el-carousel-item>
+              </el-carousel>
+              <div v-else class="h-24px leading-24px text-14px text-gray-400">暂无通知公告</div>
+            </template>
           </el-skeleton>
-        </el-card>
+          <el-link
+            class="ml-12px"
+            :underline="false"
+            type="primary"
+            @click="handleMore('/xxzx/tzgg')"
+          >
+            更多
+            <Icon icon="ep:arrow-right" class="ml-4px" />
+          </el-link>
+        </div>
       </el-col>
 
       <!-- 政策法规 -->
@@ -165,6 +179,41 @@
           </el-skeleton>
         </el-card>
       </el-col>
+
+      <!-- 常见问题 -->
+      <el-col :span="12" :xs="24" class="mb-20px">
+        <el-card class="h-full" shadow="hover">
+          <template #header>
+            <div class="flex justify-between items-center">
+              <span class="text-16px font-bold">常见问题</span>
+              <el-link :underline="false" type="primary" @click="handleMore('/nrgl/cjwt')">
+                更多
+              </el-link>
+            </div>
+          </template>
+          <el-skeleton :loading="loading" :rows="5" animated>
+            <div v-if="cjwtList.length > 0">
+              <div
+                v-for="item in cjwtList"
+                :key="item.id"
+                class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
+                @click="router.push(`/nrgl/cjwt/detail?id=${item.id}`)"
+              >
+                <div :title="item.title" class="truncate flex-1 text-14px text-gray-700">
+                  <el-tag v-if="item.rank && item.rank <= 10" type="danger">🔥</el-tag>
+                  <el-tag v-else-if="item.rank && item.rank <= 20" type="warning">⚡</el-tag>
+                  <el-tag v-else-if="item.rank && item.rank <= 30" type="info">❄️</el-tag>
+                  {{ item.title }}
+                </div>
+                <div class="text-12px text-gray-400 ml-4 w-80px text-right">
+                  {{ formatTime(item.createTime, 'yyyy-MM-dd') }}
+                </div>
+              </div>
+            </div>
+            <el-empty v-else :image-size="60" description="暂无常见问题" />
+          </el-skeleton>
+        </el-card>
+      </el-col>
     </el-row>
   </div>
 </template>
@@ -176,9 +225,10 @@ import { useUserStore } from '@/store/modules/user'
 import { useTagsViewStore } from '@/store/modules/tagsView'
 import { useRouter } from 'vue-router'
 import { getTzggPage, TzggVO } from '@/api/lghjft/xxzx/tzgg'
-import { BsznVO, getBsznfbList } from '@/api/lghjft/nrgl/bszn'
-import { getZcjdfbList, ZcjdVO } from '@/api/lghjft/nrgl/zcjd'
-import { BbfbVO, getBbfbList } from '@/api/lghjft/nrgl/bbfb'
+import { BsznResVO, getBsznfbList } from '@/api/lghjft/nrgl/bszn'
+import { getZcjdfbList, ZcjdResVO } from '@/api/lghjft/nrgl/zcjd'
+import { BbfbResVO, getBbfbList } from '@/api/lghjft/nrgl/bbfb'
+import { CjwtResVO, getCjwtfbList } from '@/api/lghjft/nrgl/cjwt'
 
 defineOptions({ name: 'LghjftHome' })
 
@@ -192,9 +242,10 @@ const username = userStore.getUser.nickname
 
 // Data lists
 const tzggList = ref<TzggVO[]>([])
-const zcjdList = ref<ZcjdVO[]>([])
-const bsznList = ref<BsznVO[]>([])
-const bbfbList = ref<BbfbVO[]>([])
+const zcjdList = ref<ZcjdResVO[]>([])
+const bsznList = ref<BsznResVO[]>([])
+const bbfbList = ref<BbfbResVO[]>([])
+const cjwtList = ref<CjwtResVO[]>([])
 
 const getTzgg = async () => {
   try {
@@ -250,9 +301,18 @@ const getBbfb = async () => {
   }
 }
 
+const getCjwt = async () => {
+  try {
+    const res = await getCjwtfbList({ pageNo: 1, pageSize: 6 })
+    cjwtList.value = res.list
+  } catch (e) {
+    console.error('Failed to fetch cjwt', e)
+  }
+}
+
 const getAllApi = async () => {
   loading.value = true
-  await Promise.all([getTzgg(), getZcjd(), getBszn(), getBbfb()])
+  await Promise.all([getTzgg(), getZcjd(), getBszn(), getBbfb(), getCjwt()])
   loading.value = false
 }
 

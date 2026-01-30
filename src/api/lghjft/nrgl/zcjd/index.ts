@@ -9,10 +9,16 @@ export interface ZcjdVO {
   sort: number
   status: number
   createTime: string
+  updateTime?: string
+  creator?: string
+  updater?: string
+  deleted?: boolean
   deptId: number
   deptName: string
   kjfw: number
   fjlj?: string
+  fbbm?: number
+  xjyy?: string
   jdbm?: string
   fbrq?: string
   glzcId?: number
@@ -20,7 +26,9 @@ export interface ZcjdVO {
   rank?: number
 }
 
-export interface ZcjdPageReqVO extends PageParam {
+export type ZcjdResVO = ZcjdVO
+
+export interface ZcjdReqVO extends PageParam {
   title?: string
   type?: string
   status?: number
@@ -28,7 +36,7 @@ export interface ZcjdPageReqVO extends PageParam {
 }
 
 // 查询内容发布列表
-export const getZcjdfbList = (params: ZcjdPageReqVO) => {
+export const getZcjdfbList = (params: ZcjdReqVO) => {
   return request.get({ url: '/lghjft/nrgl/zcjd/list-page', params })
 }
 
