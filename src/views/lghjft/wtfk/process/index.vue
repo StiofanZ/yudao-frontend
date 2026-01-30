@@ -34,10 +34,9 @@
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
         <template #default="scope">
-          <el-tag v-if="scope.row.status === 1 || scope.row.status === 0" type="info">待处理</el-tag>
-          <el-tag v-else-if="scope.row.status === 2" type="warning">跟进中</el-tag>
-          <el-tag v-else-if="scope.row.status === 3" type="success">已处理</el-tag>
-          <span v-else>{{ scope.row.status }}</span>
+          <el-tag v-if="[0, 1].includes(Number(scope.row.status))" type="info">待处理</el-tag>
+          <el-tag v-else-if="scope.row.status == 2" type="warning">跟进中</el-tag>
+          <el-tag v-else-if="[3, 5, 6].includes(Number(scope.row.status))" type="success">已处理</el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -51,7 +50,7 @@
         <template #default="scope">
           <el-button link type="primary" @click="openForm(scope.row.id)"> 处理 </el-button>
           <el-button
-            v-if="scope.row.status === 3"
+            v-if="scope.row.status === 3 || scope.row.status === 5"
             link
             type="danger"
             @click="handleDelete(scope.row.id)"
@@ -94,26 +93,17 @@ const queryParams = reactive({
 })
 const handleDelete = async (id: number) => {
   try {
-    // 强制等待用户点击“确定”
     await message.confirm('确定要删除这条记录吗？')
-
-    // 执行到这里说明用户点的是“确定”
-    loading.value = true // 开始加载状态
-    await WtfkApi.deleteWtfk(id) // 调用接口
-
+    loading.value = true
+    // 明确传 true，进入“管理员删除”逻辑
+    await WtfkApi.deleteWtfk(id, true)
     message.success('删除成功')
-    await getList() // 刷新列表
-  } catch (e) {
-    // 只有用户点“取消”或者接口报错才会进这里
-    if (e === 'cancel') {
-      console.log('用户点击了取消')
-    } else {
-      console.error('删除过程发生错误：', e)
-    }
+    await getList()
   } finally {
     loading.value = false
   }
 }
+
 
 /** 获取列表数据 */
 const getList = async () => {

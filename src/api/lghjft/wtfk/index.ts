@@ -32,9 +32,14 @@ export const WtfkApi = {
   },
 
   // ''删除''接口
-  deleteWtfk: (id: number) => {
-    // 使用 request.delete 并将 id 拼接到 url 中
-    return request.delete({ url: '/lghjft/wtfk/delete?id=' + id })
+  deleteWtfk: (id: number, isAdminView = false) => {
+    return request.delete({
+      url: '/lghjft/wtfk/delete',
+      params: {
+        id,
+        isAdminView
+      }
+    })
   },
 
   // 问题反馈详情

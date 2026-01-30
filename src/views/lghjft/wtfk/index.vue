@@ -134,15 +134,16 @@
           <span v-else>-</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" fixed="right" width="150px">
+      <el-table-column label="操作" align="center" fixed="right" width="180px">
         <template #default="scope">
+          <el-button link type="primary" @click="handleDetail(scope.row.id)">详情</el-button>
+
           <el-button
+            v-if="scope.row.status === 3 || scope.row.status === 4"
             link
-            type="primary"
-            @click="handleDetail(scope.row.id)"
-          >
-            详情
-          </el-button>
+            type="danger"
+            @click="handleDelete(scope.row.id)"
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -266,6 +267,19 @@ const handleExport = async () => {
   } catch {
   } finally {
     exportLoading.value = false
+  }
+}
+const handleDelete = async (id: number) => {
+  try {
+    await message.confirm('确定要删除这条反馈记录吗？')
+    loading.value = true
+    // 传参增加 isAdminView: false，告诉后端这是用户侧的隐藏操作
+    await WtfkApi.deleteWtfk(id, false)
+    message.success('删除成功')
+    await getList()
+  } catch {
+  } finally {
+    loading.value = false
   }
 }
 
