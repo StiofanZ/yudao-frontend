@@ -5,9 +5,17 @@
 
     <!-- 搜索地址 -->
     <div class="drawer_search">
-      <el-autocomplete v-model="searchKeyword" placeholder="请输入地点名称" style="width: 200px;"
+      <el-autocomplete v-model="searchKeyword" placeholder="请输入地点名称或地址" style="width: 200px;"
         :fetch-suggestions="querySearch" :trigger-on-focus="false" @select="handleSelect"
-        @keyup.enter.prevent="searchLocation" class="map-page-autocomplete" />
+        @keyup.enter.prevent="searchLocation" class="map-page-autocomplete">
+        <!-- 自定义下拉项：显示名称 + 完整地址 -->
+        <template #default="{ item }">
+          <div class="autocomplete-item">
+            <div class="item-name">{{ item.value }}</div>
+            <div v-if="item.address" class="item-address">📍{{ item.address }}</div>
+          </div>
+        </template>
+      </el-autocomplete>
     </div>
 
     <!-- 标记点名称列表 -->
@@ -86,8 +94,8 @@
         </div>
       </el-form-item>
 
-      <el-form-item label="备注">
-        <el-input v-model="formData.remark" type="textarea" :rows="2" placeholder="请输入备注信息" />
+      <el-form-item label="行政区划代码">
+        <el-input v-model="formData.xzqhDm" placeholder="请输入行政区划代码" />
       </el-form-item>
     </el-form>
 
@@ -136,22 +144,31 @@ const markerIcon = {
 };
 
 // ========== 搜索联想功能 ==========
-const querySearch = (queryString, cb) => {
-  if (!queryString) {
+const querySearch = async (queryString, cb) => {
+  if (!queryString.trim()) {
     cb([]);
     return;
   }
 
-  // 从统一存储中获取匹配的名称
-  const matchingResults = Array.from(allMarkersData.value.values())
-    .filter(marker => marker.name && marker.name.toLowerCase().includes(queryString.toLowerCase()))
-    .map(marker => ({
-      value: marker.name,
-      id: marker.id
+  try {
+    const res = await MarkerInfoApi.getMarkerInfoPage({
+      pageNo: 1,
+      pageSize: 10,
+      searchKey: queryString.trim() // 使用 searchKey 参数
+    });
+
+    const list = res.list || res.records || [];
+    const suggestions = list.map(item => ({
+      value: item.name,
+      address: item.address,
+      id: item.id
     }));
 
-  cb(matchingResults);
-}
+    cb(suggestions);
+  } catch (error) {
+    cb([]);
+  }
+};
 
 // ========== 选中提示项 ==========
 const handleSelect = (item) => {
@@ -220,7 +237,7 @@ const formData = ref({
   address: '',
   lng: '',
   lat: '',
-  remark: '',
+  xzqhDm: '',
   jobtime: '',
   grade: '',
   isDeleted: 0
@@ -368,7 +385,7 @@ const handleEdit = async (id) => {
       address: marker.address || '',
       lng: marker.lng ? String(marker.lng) : '',
       lat: marker.lat ? String(marker.lat) : '',
-      remark: marker.remark || '',
+      xzqhDm: marker.xzqhDm || '',
       isDeleted: marker.isDeleted || 0,
       jobtime: marker.jobtime || '',
       grade: marker.grade || ''
@@ -468,7 +485,7 @@ const resetForm = () => {
     address: '',
     lng: '',
     lat: '',
-    remark: '',
+    xzqhDm: '',
     isDeleted: 0,
     jobtime: '',
     grade: ''
@@ -626,54 +643,27 @@ const resetMarkerIcon = () => {
 const searchLocation = async () => {
   const keyword = searchKeyword.value.trim();
   if (!keyword) {
-    ElMessage.warning('请输入要搜索的标注点名称！');
+    ElMessage.warning('请输入名称或地址');
     return;
   }
 
   try {
-    const response = await MarkerInfoApi.getMarkerInfoPage({
+    const res = await MarkerInfoApi.getMarkerInfoPage({
       pageNo: 1,
-      pageSize: 100,
-      name: keyword
+      pageSize: 1,
+      searchKey: keyword // 使用 searchKey 参数
     });
 
-    // 解析结果
-    let markerList = [];
-    if (response.data) {
-      if (Array.isArray(response.data)) {
-        markerList = response.data;
-      } else if (response.data.list && Array.isArray(response.data.list)) {
-        markerList = response.data.list;
-      } else if (response.data.records && Array.isArray(response.data.records)) {
-        markerList = response.data.records;
-      } else if (response.data.data && Array.isArray(response.data.data)) {
-        markerList = response.data.data;
-      }
-    } else if (Array.isArray(response)) {
-      markerList = response;
-    } else if (response.list && Array.isArray(response.list)) {
-      markerList = response.list;
+    const list = res.list || res.records || [];
+    if (list.length > 0) {
+      highlightAndShowMarker(list[0]);
+    } else {
+      ElMessage.warning('未找到相关结果');
     }
-
-    if (markerList.length === 0) {
-      ElMessage.warning(`未找到名称包含"${keyword}"的标注点！`);
-      return;
-    }
-
-    // 取第一个匹配结果
-    const matchMarker = markerList[0];
-
-    // 从统一存储中获取最新数据，如果存储中没有则使用搜索结果
-    let markerData = allMarkersData.value.get(matchMarker.id) || matchMarker;
-
-    // 高亮并显示标记
-    highlightAndShowMarker(markerData);
-
   } catch (error) {
-
-    ElMessage.error('搜索定位失败，请稍后重试！');
+    ElMessage.error('搜索失败');
   }
-}
+};
 
 // ========== 初始化地图 ==========
 onMounted(async () => {
@@ -798,6 +788,31 @@ onMounted(async () => {
 @media (max-width: 992px) {
   .marker-list {
     width: 200px;
+  }
+}
+
+.autocomplete-item {
+  padding: 8px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  border-bottom: 1px solid #eee;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .item-name {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 2px;
+  }
+
+  .item-address {
+    font-size: 12px;
+    color: #666;
+    white-space: normal;
+    /* 允许换行 */
+    word-wrap: break-word;
   }
 }
 
