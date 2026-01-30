@@ -12,163 +12,157 @@
                 <div class="text-20px">
                   {{ t('workplace.welcome') }} {{ username }} {{ t('workplace.happyDay') }}
                 </div>
-                <div class="mt-10px text-14px text-gray-500">
-                  {{ t('workplace.toady') }}，20℃ - 32℃！
-                </div>
               </div>
             </div>
           </el-col>
           <el-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
             <div class="h-70px flex items-center justify-end lt-sm:mt-10px">
-              <div class="px-8px text-right">
-                <div class="mb-16px text-14px text-gray-400">{{ t('workplace.project') }}</div>
-                <CountTo class="text-20px" :start-val="0" :end-val="totalSate.project" :duration="2600" />
-              </div>
-              <el-divider direction="vertical" />
-              <div class="px-8px text-right">
-                <div class="mb-16px text-14px text-gray-400">{{ t('workplace.toDo') }}</div>
-                <CountTo class="text-20px" :start-val="0" :end-val="totalSate.todo" :duration="2600" />
-              </div>
-              <el-divider direction="vertical" border-style="dashed" />
-              <div class="px-8px text-right">
-                <div class="mb-16px text-14px text-gray-400">{{ t('workplace.access') }}</div>
-                <CountTo class="text-20px" :start-val="0" :end-val="totalSate.access" :duration="2600" />
-              </div>
-              <el-divider direction="vertical" />
               <el-button link type="danger" @click="handleLogout">退出登录</el-button>
             </div>
           </el-col>
         </el-row>
       </el-skeleton>
     </el-card>
-  </div>
 
-  <el-row class="mt-8px" :gutter="8" justify="space-between">
-    <el-col :xl="16" :lg="16" :md="24" :sm="24" :xs="24" class="mb-8px">
-      <el-card shadow="never">
-        <template #header>
-          <div class="h-3 flex justify-between">
-            <span>{{ t('workplace.project') }}</span>
-            <el-link
-              type="primary"
-              :underline="false"
-              href="https://github.com/yudaocode"
-              target="_blank"
-            >
-              {{ t('action.more') }}
-            </el-link>
-          </div>
-        </template>
-        <el-skeleton :loading="loading" animated>
-          <el-row>
-            <el-col
-              v-for="(item, index) in projects"
-              :key="`card-${index}`"
-              :xl="8"
-              :lg="8"
-              :md="8"
-              :sm="24"
-              :xs="24"
-            >
-              <el-card shadow="hover" class="mr-5px mt-5px cursor-pointer" @click="handleProjectClick(item.message)">
-                <div class="flex items-center">
-                  <Icon :icon="item.icon" :size="25" class="mr-8px" :style="{ color: item.color }" />
-                  <span class="text-16px">{{ item.name }}</span>
+    <el-row :gutter="20" class="mt-20px">
+      <!-- 通知公告 -->
+      <el-col :span="12" :xs="24" class="mb-20px">
+        <el-card class="h-full" shadow="hover">
+          <template #header>
+            <div class="flex justify-between items-center">
+              <span class="text-16px font-bold">通知公告</span>
+              <el-link :underline="false" type="primary" @click="handleMore('/xxzx/tzgg')">
+                更多
+              </el-link>
+            </div>
+          </template>
+          <el-skeleton :loading="loading" :rows="5" animated>
+            <div v-if="tzggList.length > 0">
+              <div
+                v-for="item in tzggList"
+                :key="item.id"
+                class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
+              >
+                <div :title="item.title" class="truncate flex-1 text-14px text-gray-700">
+                  {{ item.title }}
                 </div>
-                <div class="mt-12px text-12px text-gray-400">{{ t(item.message) }}</div>
-                <div class="mt-12px flex justify-between text-12px text-gray-400">
-                  <span>{{ item.personal }}</span>
-                  <span>{{ formatTime(item.time, 'yyyy-MM-dd') }}</span>
-                </div>
-              </el-card>
-            </el-col>
-          </el-row>
-        </el-skeleton>
-      </el-card>
-
-      <el-card shadow="never" class="mt-8px">
-        <el-skeleton :loading="loading" animated>
-          <el-row :gutter="20" justify="space-between">
-            <el-col :xl="10" :lg="10" :md="24" :sm="24" :xs="24">
-              <el-card shadow="hover" class="mb-8px">
-                <el-skeleton :loading="loading" animated>
-                  <Echart :options="pieOptionsData" :height="280" />
-                </el-skeleton>
-              </el-card>
-            </el-col>
-            <el-col :xl="14" :lg="14" :md="24" :sm="24" :xs="24">
-              <el-card shadow="hover" class="mb-8px">
-                <el-skeleton :loading="loading" animated>
-                  <Echart :options="barOptionsData" :height="280" />
-                </el-skeleton>
-              </el-card>
-            </el-col>
-          </el-row>
-        </el-skeleton>
-      </el-card>
-    </el-col>
-    <el-col :xl="8" :lg="8" :md="24" :sm="24" :xs="24" class="mb-8px">
-      <el-card shadow="never">
-        <template #header>
-          <div class="h-3 flex justify-between">
-            <span>{{ t('workplace.shortcutOperation') }}</span>
-          </div>
-        </template>
-        <el-skeleton :loading="loading" animated>
-          <el-row>
-            <el-col v-for="item in shortcut" :key="`team-${item.name}`" :span="8" class="mb-8px">
-              <div class="flex items-center">
-                <Icon :icon="item.icon" class="mr-8px" :style="{ color: item.color }" />
-                <el-link type="default" :underline="false" @click="handleShortcutClick(item.url)">
-                  {{ item.name }}
-                </el-link>
-              </div>
-            </el-col>
-          </el-row>
-        </el-skeleton>
-      </el-card>
-      <el-card shadow="never" class="mt-8px">
-        <template #header>
-          <div class="h-3 flex justify-between">
-            <span>{{ t('workplace.notice') }}</span>
-            <el-link type="primary" :underline="false">{{ t('action.more') }}</el-link>
-          </div>
-        </template>
-        <el-skeleton :loading="loading" animated>
-          <div v-for="(item, index) in notice" :key="`dynamics-${index}`">
-            <div class="flex items-center">
-              <el-avatar :src="avatar" :size="35" class="mr-16px">
-                <img src="@/assets/imgs/avatar.gif" alt="" />
-              </el-avatar>
-              <div>
-                <div class="text-14px">
-                  <Highlight :keys="item.keys.map((v) => t(v))">
-                    {{ item.type }} : {{ item.title }}
-                  </Highlight>
-                </div>
-                <div class="mt-16px text-12px text-gray-400">
-                  {{ formatTime(item.date, 'yyyy-MM-dd') }}
+                <div class="text-12px text-gray-400 ml-4 w-80px text-right">
+                  {{ formatTime(item.createTime, 'yyyy-MM-dd') }}
                 </div>
               </div>
             </div>
-            <el-divider />
-          </div>
-        </el-skeleton>
-      </el-card>
-    </el-col>
-  </el-row>
+            <el-empty v-else :image-size="60" description="暂无通知公告" />
+          </el-skeleton>
+        </el-card>
+      </el-col>
+
+      <!-- 政策法规 -->
+      <el-col :span="12" :xs="24" class="mb-20px">
+        <el-card class="h-full" shadow="hover">
+          <template #header>
+            <div class="flex justify-between items-center">
+              <span class="text-16px font-bold">政策法规</span>
+              <el-link :underline="false" type="primary" @click="handleMore('/nrgl/zcjd')">
+                更多
+              </el-link>
+            </div>
+          </template>
+          <el-skeleton :loading="loading" :rows="5" animated>
+            <div v-if="zcjdList.length > 0">
+              <div
+                v-for="item in zcjdList"
+                :key="item.id"
+                class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
+              >
+                <div :title="item.title" class="truncate flex-1 text-14px text-gray-700">
+                  {{ item.title }}
+                </div>
+                <div class="text-12px text-gray-400 ml-4 w-80px text-right">
+                  {{ formatTime(item.createTime, 'yyyy-MM-dd') }}
+                </div>
+              </div>
+            </div>
+            <el-empty v-else :image-size="60" description="暂无政策法规" />
+          </el-skeleton>
+        </el-card>
+      </el-col>
+
+      <!-- 办事指南 -->
+      <el-col :span="12" :xs="24" class="mb-20px">
+        <el-card class="h-full" shadow="hover">
+          <template #header>
+            <div class="flex justify-between items-center">
+              <span class="text-16px font-bold">办事指南</span>
+              <el-link :underline="false" type="primary" @click="handleMore('/nrgl/bszn')">
+                更多
+              </el-link>
+            </div>
+          </template>
+          <el-skeleton :loading="loading" :rows="5" animated>
+            <div v-if="bsznList.length > 0">
+              <div
+                v-for="item in bsznList"
+                :key="item.id"
+                class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
+              >
+                <div :title="item.sxmc" class="truncate flex-1 text-14px text-gray-700">
+                  {{ item.sxmc }}
+                </div>
+                <div class="text-12px text-gray-400 ml-4 w-80px text-right">
+                  {{ formatTime(item.createTime, 'yyyy-MM-dd') }}
+                </div>
+              </div>
+            </div>
+            <el-empty v-else :image-size="60" description="暂无办事指南" />
+          </el-skeleton>
+        </el-card>
+      </el-col>
+
+      <!-- 版本发布 -->
+      <el-col :span="12" :xs="24" class="mb-20px">
+        <el-card class="h-full" shadow="hover">
+          <template #header>
+            <div class="flex justify-between items-center">
+              <span class="text-16px font-bold">版本发布</span>
+              <el-link :underline="false" type="primary" @click="handleMore('/nrgl/bbfb')">
+                更多
+              </el-link>
+            </div>
+          </template>
+          <el-skeleton :loading="loading" :rows="5" animated>
+            <div v-if="bbfbList.length > 0">
+              <div
+                v-for="item in bbfbList"
+                :key="item.id"
+                class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
+              >
+                <div :title="item.title" class="truncate flex-1 text-14px text-gray-700">
+                  <el-tag class="mr-2" size="small" type="primary">{{ item.version }}</el-tag>
+                  {{ item.title }}
+                </div>
+                <div class="text-12px text-gray-400 ml-4 w-80px text-right">
+                  {{ formatTime(item.fbsj || item.createTime, 'yyyy-MM-dd') }}
+                </div>
+              </div>
+            </div>
+            <el-empty v-else :image-size="60" description="暂无版本发布" />
+          </el-skeleton>
+        </el-card>
+      </el-col>
+    </el-row>
+  </div>
 </template>
+
 <script lang="ts" setup>
-import { set } from 'lodash-es'
-import { EChartsOption } from 'echarts'
 import { formatTime } from '@/utils'
 import { ElMessageBox } from 'element-plus'
-
 import { useUserStore } from '@/store/modules/user'
 import { useTagsViewStore } from '@/store/modules/tagsView'
-import type { WorkplaceTotal, Project, Notice, Shortcut } from './types'
-import { pieOptions, barOptions } from './echarts-data'
 import { useRouter } from 'vue-router'
+import { getTzggPage, TzggVO } from '@/api/lghjft/xxzx/tzgg'
+import { BsznVO, getBsznfbList } from '@/api/lghjft/nrgl/bszn'
+import { getZcjdfbList, ZcjdVO } from '@/api/lghjft/nrgl/zcjd'
+import { BbfbVO, getPublicBbfbList } from '@/api/lghjft/nrgl/bbfb'
 
 defineOptions({ name: 'LghjftHome' })
 
@@ -179,209 +173,60 @@ const tagsViewStore = useTagsViewStore()
 const loading = ref(true)
 const avatar = userStore.getUser.avatar
 const username = userStore.getUser.nickname
-const pieOptionsData = reactive<EChartsOption>(pieOptions) as EChartsOption
-let totalSate = reactive<WorkplaceTotal>({
-  project: 0,
-  access: 0,
-  todo: 0
-})
 
-const getCount = async () => {
-  const data = {
-    project: 40,
-    access: 2340,
-    todo: 10
+// Data lists
+const tzggList = ref<TzggVO[]>([])
+const zcjdList = ref<ZcjdVO[]>([])
+const bsznList = ref<BsznVO[]>([])
+const bbfbList = ref<BbfbVO[]>([])
+
+const getTzgg = async () => {
+  try {
+    const res = await getTzggPage({ pageNo: 1, pageSize: 6 })
+    tzggList.value = res.list
+  } catch (e) {
+    console.error('Failed to fetch tzgg', e)
   }
-  totalSate = Object.assign(totalSate, data)
 }
 
-let projects = reactive<Project[]>([])
-const getProject = async () => {
-  const data = [
-    {
-      name: 'ruoyi-vue-pro',
-      icon: 'simple-icons:springboot',
-      message: 'github.com/YunaiV/ruoyi-vue-pro',
-      personal: 'Spring Boot 单体架构',
-      time: new Date('2025-01-02'),
-      color: '#6DB33F'
-    },
-    {
-      name: 'yudao-ui-admin-vue3',
-      icon: 'ep:element-plus',
-      message: 'github.com/yudaocode/yudao-ui-admin-vue3',
-      personal: 'Vue3 + element-plus 管理后台',
-      time: new Date('2025-02-03'),
-      color: '#409EFF'
-    },
-    {
-      name: 'yudao-ui-mall-uniapp',
-      icon: 'icon-park-outline:mall-bag',
-      message: 'github.com/yudaocode/yudao-ui-mall-uniapp',
-      personal: 'Vue3 + uniapp 商城手机端',
-      time: new Date('2025-03-04'),
-      color: '#ff4d4f'
-    },
-    {
-      name: 'yudao-cloud',
-      icon: 'material-symbols:cloud-outline',
-      message: 'github.com/YunaiV/yudao-cloud',
-      personal: 'Spring Cloud 微服务架构',
-      time: new Date('2025-04-05'),
-      color: '#1890ff'
-    },
-    {
-      name: 'yudao-ui-admin-vben',
-      icon: 'devicon:antdesign',
-      message: 'github.com/yudaocode/yudao-ui-admin-vben',
-      personal: 'Vue3 + vben5(antd) 管理后台',
-      time: new Date('2025-05-06'),
-      color: '#e18525'
-    },
-    {
-      name: 'yudao-ui-admin-uniapp',
-      icon: 'ant-design:mobile',
-      message: 'github.com/yudaocode/yudao-ui-admin-uniapp',
-      personal: 'Vue3 + uniapp 管理手机端',
-      time: new Date('2025-06-01'),
-      color: '#2979ff'
-    }
-  ]
-  projects = Object.assign(projects, data)
+const getZcjd = async () => {
+  try {
+    const res = await getZcjdfbList({})
+    // Take top 6
+    zcjdList.value = res.slice(0, 6)
+  } catch (e) {
+    console.error('Failed to fetch zcjd', e)
+  }
 }
 
-let notice = reactive<Notice[]>([])
-const getNotice = async () => {
-  const data = [
-    {
-      title: '系统支持 JDK 8/17/21，Vue 2/3',
-      type: '技术兼容性',
-      keys: ['JDK', 'Vue'],
-      date: new Date()
-    },
-    {
-      title: '后端提供 Spring Boot 2.7/3.2 + Cloud 双架构',
-      type: '架构灵活性',
-      keys: ['Boot', 'Cloud'],
-      date: new Date()
-    },
-    {
-      title: '全部开源，个人与企业可 100% 直接使用，无需授权',
-      type: '开源免授权',
-      keys: ['无需授权'],
-      date: new Date()
-    },
-    {
-      title: '国内使用最广泛的快速开发平台，远超 10w+ 企业使用',
-      type: '广泛企业认可',
-      keys: ['最广泛', '10w+'],
-      date: new Date()
-    }
-  ]
-  notice = Object.assign(notice, data)
+const getBszn = async () => {
+  try {
+    const res = await getBsznfbList({})
+    // Take top 6
+    bsznList.value = res.slice(0, 6)
+  } catch (e) {
+    console.error('Failed to fetch bszn', e)
+  }
 }
 
-let shortcut = reactive<Shortcut[]>([])
-const getShortcut = async () => {
-  const data = [
-    {
-      name: '商城中心',
-      icon: 'svg-icon:lghjft-shop',
-      url: '/mall/home',
-      color: '#ff6b6b'
-    },
-    {
-      name: 'AI 大模型',
-      icon: 'svg-icon:lghjft-ai',
-      url: '/ai/chat',
-      color: '#7c3aed'
-    },
-    {
-      name: 'ERP 系统',
-      icon: 'svg-icon:lghjft-erp',
-      url: '/erp/home',
-      color: '#3fb27f'
-    },
-    {
-      name: 'CRM 系统',
-      icon: 'svg-icon:lghjft-crm',
-      url: '/crm/backlog',
-      color: '#4daf1bc9'
-    },
-    {
-      name: 'IoT 物联网',
-      icon: 'svg-icon:lghjft-iot',
-      url: '/iot/home',
-      color: '#1a73e8'
-    }
-  ]
-  shortcut = Object.assign(shortcut, data)
-}
-
-const getUserAccessSource = async () => {
-  const data = [
-    { value: 335, name: 'analysis.directAccess' },
-    { value: 310, name: 'analysis.mailMarketing' },
-    { value: 234, name: 'analysis.allianceAdvertising' },
-    { value: 135, name: 'analysis.videoAdvertising' },
-    { value: 1548, name: 'analysis.searchEngines' }
-  ]
-  set(
-    pieOptionsData,
-    'legend.data',
-    data.map((v) => t(v.name))
-  )
-  pieOptionsData!.series![0].data = data.map((v) => {
-    return {
-      name: t(v.name),
-      value: v.value
-    }
-  })
-}
-const barOptionsData = reactive<EChartsOption>(barOptions) as EChartsOption
-
-const getWeeklyUserActivity = async () => {
-  const data = [
-    { value: 13253, name: 'analysis.monday' },
-    { value: 34235, name: 'analysis.tuesday' },
-    { value: 26321, name: 'analysis.wednesday' },
-    { value: 12340, name: 'analysis.thursday' },
-    { value: 24643, name: 'analysis.friday' },
-    { value: 1322, name: 'analysis.saturday' },
-    { value: 1324, name: 'analysis.sunday' }
-  ]
-  set(
-    barOptionsData,
-    'xAxis.data',
-    data.map((v) => t(v.name))
-  )
-  set(barOptionsData, 'series', [
-    {
-      name: t('analysis.activeQuantity'),
-      data: data.map((v) => v.value),
-      type: 'bar'
-    }
-  ])
+const getBbfb = async () => {
+  try {
+    const res = await getPublicBbfbList()
+    // Take top 6
+    bbfbList.value = res.slice(0, 6)
+  } catch (e) {
+    console.error('Failed to fetch bbfb', e)
+  }
 }
 
 const getAllApi = async () => {
-  await Promise.all([
-    getCount(),
-    getProject(),
-    getNotice(),
-    getShortcut(),
-    getUserAccessSource(),
-    getWeeklyUserActivity()
-  ])
+  loading.value = true
+  await Promise.all([getTzgg(), getZcjd(), getBszn(), getBbfb()])
   loading.value = false
 }
 
-const handleProjectClick = (message: string) => {
-  window.open(`https://${message}`, '_blank')
-}
-
-const handleShortcutClick = (url: string) => {
-  router.push(url)
+const handleMore = (path: string) => {
+  router.push(path)
 }
 
 const handleLogout = async () => {
@@ -393,9 +238,18 @@ const handleLogout = async () => {
     })
     await userStore.loginOut()
     tagsViewStore.delAllViews()
-    router.replace('/lghjft/login?redirect=/lghjft/home')
+    router.replace('/login?redirect=/index')
   } catch {}
 }
 
 getAllApi()
 </script>
+
+<style scoped>
+.text-14px {
+  font-size: 14px;
+}
+.text-12px {
+  font-size: 12px;
+}
+</style>

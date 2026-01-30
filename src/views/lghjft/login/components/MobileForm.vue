@@ -189,7 +189,7 @@ const signIn = async () => {
     .then(async (res) => {
       setToken(res)
       if (!redirect.value) {
-        redirect.value = '/lghjft/home'
+        redirect.value = '/index'
       }
       push({ path: redirect.value || permissionStore.addRouters[0].path })
     })
@@ -215,4 +215,3 @@ const signIn = async () => {
   margin-top: 33px;
 }
 </style>
-

@@ -12,7 +12,11 @@
           <span class="text-20px font-bold">{{ underlineToHump(appStore.getTitle) }}</span>
         </div>
         <div class="h-[calc(100%-60px)] flex items-center justify-center">
-          <TransitionGroup appear enter-active-class="animate__animated animate__bounceInLeft" tag="div">
+          <TransitionGroup
+            appear
+            enter-active-class="animate__animated animate__bounceInLeft"
+            tag="div"
+          >
             <img key="1" alt="" class="w-350px" src="@/assets/svgs/login-box-bg.svg" />
             <div key="2" class="text-3xl text-white">{{ t('login.welcome') }}</div>
             <div key="3" class="mt-5 text-14px font-normal text-white">
@@ -26,15 +30,15 @@
       >
         <div
           class="flex items-center justify-between at-2xl:justify-end at-xl:justify-end"
-          style="color: var(--el-text-color-primary);"
+          style="color: var(--el-text-color-primary)"
         >
           <div class="flex items-center at-2xl:hidden at-xl:hidden">
             <img alt="" class="mr-10px h-48px w-48px" src="@/assets/imgs/logo.png" />
             <span class="text-20px font-bold">{{ underlineToHump(appStore.getTitle) }}</span>
           </div>
           <div class="flex items-center justify-end space-x-10px h-48px">
-            <ThemeSwitch />
-            <LocaleDropdown />
+            <ThemeSwitch v-if="false" />
+            <LocaleDropdown v-if="false" />
           </div>
         </div>
         <Transition appear enter-active-class="animate__animated animate__bounceInRight">
@@ -61,7 +65,14 @@ import { useAppStore } from '@/store/modules/app'
 import { ThemeSwitch } from '@/layout/components/ThemeSwitch'
 import { LocaleDropdown } from '@/layout/components/LocaleDropdown'
 
-import { LoginForm, MobileForm, QrCodeForm, RegisterForm, SSOLoginVue, ForgetPasswordForm } from './components'
+import {
+  ForgetPasswordForm,
+  LoginForm,
+  MobileForm,
+  QrCodeForm,
+  RegisterForm,
+  SSOLoginVue
+} from './components'
 
 defineOptions({ name: 'LghjftLogin' })
 
@@ -105,4 +116,3 @@ $prefix-cls: #{$namespace}-login;
   }
 }
 </style>
-

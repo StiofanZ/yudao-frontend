@@ -2,19 +2,23 @@
   <div class="flex items-center justify-center h-full bg-gray-100">
     <div class="text-center p-8 bg-white rounded-lg shadow-md w-96">
       <div v-if="loading" class="flex flex-col items-center">
-        <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <div
+          class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"
+        ></div>
         <p class="text-gray-600 text-lg">正在登录中...</p>
         <p class="text-gray-400 text-sm mt-2">请稍候，正在验证您的身份</p>
       </div>
 
       <div v-else-if="errorMsg" class="flex flex-col items-center">
-        <div class="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mb-4 text-2xl">
+        <div
+          class="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mb-4 text-2xl"
+        >
           !
         </div>
         <p class="text-red-600 text-lg mb-2">登录失败</p>
         <p class="text-gray-500 text-sm mb-6">{{ errorMsg }}</p>
-        <button 
-          @click="handleRetry" 
+        <button
+          @click="handleRetry"
           class="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
         >
           重试
@@ -39,7 +43,7 @@ const errorMsg = ref('')
 const resolveRedirect = (): string => {
   const redirect = route.query.redirect as string | undefined
   if (!redirect) {
-    return '/lghjft/home'
+    return '/index'
   }
   const decoded = (() => {
     try {
@@ -49,12 +53,12 @@ const resolveRedirect = (): string => {
     }
   })()
   if (!decoded.startsWith('/')) {
-    return '/lghjft/home'
+    return '/index'
   }
   if (decoded.startsWith('//') || decoded.includes('://')) {
-    return '/lghjft/home'
+    return '/index'
   }
-  return decoded.startsWith('/lghjft') ? decoded : '/lghjft/home'
+  return decoded.startsWith('/lghjft') ? decoded : '/index'
 }
 
 const handleAuthCodeLogin = async () => {
@@ -62,10 +66,10 @@ const handleAuthCodeLogin = async () => {
   errorMsg.value = ''
 
   if (getAccessToken()) {
-    await router.replace({ path: '/lghjft/home' })
+    await router.replace({ path: '/index' })
     return
   }
-  
+
   const authCode = route.query.authCode as string
   if (!authCode) {
     loading.value = false

@@ -15,7 +15,7 @@
           <LoginFormTitle class="w-full" />
         </el-form-item>
       </el-col>
-      <el-col :span="24" class="px-10px">
+      <el-col v-if="false" :span="24" class="px-10px">
         <el-form-item v-if="loginData.tenantEnable === 'true'" prop="tenantName">
           <el-input
             v-model="loginData.loginForm.tenantName"
@@ -55,8 +55,12 @@
                 {{ t('login.remember') }}
               </el-checkbox>
             </el-col>
-            <el-col :offset="6" :span="12" v-if="loginData.forgetEnable==='true'">
-              <el-link class="float-right" type="primary" @click="setLoginState(LoginStateEnum.RESET_PASSWORD)">
+            <el-col :offset="6" :span="12" v-if="loginData.forgetEnable === 'true'">
+              <el-link
+                class="float-right"
+                type="primary"
+                @click="setLoginState(LoginStateEnum.RESET_PASSWORD)"
+              >
                 {{ t('login.forgetPassword') }}
               </el-link>
             </el-col>
@@ -85,24 +89,42 @@
       <el-col
         :span="24"
         class="px-10px"
-        v-if="loginData.mobileLoginEnable===loginData.qrLoginEnable===loginData.registerEnable==='true'"
+        v-if="
+          ((loginData.mobileLoginEnable === loginData.qrLoginEnable) ===
+            loginData.registerEnable) ===
+          'true'
+        "
       >
         <el-form-item>
           <el-row :gutter="5" justify="space-between" style="width: 100%">
-            <el-col :span="8" v-if="loginData.mobileLoginEnable==='true'">
-              <XButton :title="t('login.btnMobile')" class="w-full" @click="setLoginState(LoginStateEnum.MOBILE)" />
+            <el-col :span="8" v-if="loginData.mobileLoginEnable === 'true'">
+              <XButton
+                :title="t('login.btnMobile')"
+                class="w-full"
+                @click="setLoginState(LoginStateEnum.MOBILE)"
+              />
             </el-col>
-            <el-col :span="8" v-if="loginData.qrLoginEnable==='true'">
-              <XButton :title="t('login.btnQRCode')" class="w-full" @click="setLoginState(LoginStateEnum.QR_CODE)" />
+            <el-col :span="8" v-if="loginData.qrLoginEnable === 'true'">
+              <XButton
+                :title="t('login.btnQRCode')"
+                class="w-full"
+                @click="setLoginState(LoginStateEnum.QR_CODE)"
+              />
             </el-col>
-            <el-col :span="8" v-if="loginData.registerEnable==='true'">
-              <XButton :title="t('login.btnRegister')" class="w-full" @click="setLoginState(LoginStateEnum.REGISTER)" />
+            <el-col :span="8" v-if="loginData.registerEnable === 'true'">
+              <XButton
+                :title="t('login.btnRegister')"
+                class="w-full"
+                @click="setLoginState(LoginStateEnum.REGISTER)"
+              />
             </el-col>
           </el-row>
         </el-form-item>
       </el-col>
-      <el-divider content-position="center" v-if="loginData.ssoLoginEnable==='true'">{{ t('login.otherLogin') }}</el-divider>
-      <el-col :span="24" class="px-10px" v-if="loginData.ssoLoginEnable==='true'">
+      <el-divider content-position="center" v-if="loginData.ssoLoginEnable === 'true'">{{
+        t('login.otherLogin')
+      }}</el-divider>
+      <el-col :span="24" class="px-10px" v-if="loginData.ssoLoginEnable === 'true'">
         <el-form-item>
           <div class="w-full flex justify-between">
             <Icon
@@ -117,14 +139,20 @@
           </div>
         </el-form-item>
       </el-col>
-      <el-divider content-position="center" v-if="loginData.readmeEnable==='true'">萌新必读</el-divider>
-      <el-col :span="24" class="px-10px" v-if="loginData.readmeEnable==='true'">
+      <el-divider content-position="center" v-if="loginData.readmeEnable === 'true'"
+        >萌新必读</el-divider
+      >
+      <el-col :span="24" class="px-10px" v-if="loginData.readmeEnable === 'true'">
         <el-form-item>
           <div class="w-full flex justify-between">
             <el-link href="https://doc.iocoder.cn/" target="_blank">📚开发指南</el-link>
             <el-link href="https://doc.iocoder.cn/video/" target="_blank">🔥视频教程</el-link>
-            <el-link href="https://www.iocoder.cn/Interview/good-collection/" target="_blank"> ⚡面试手册 </el-link>
-            <el-link href="http://static.yudao.iocoder.cn/mp/Aix9975.jpeg" target="_blank"> 🤝外包咨询 </el-link>
+            <el-link href="https://www.iocoder.cn/Interview/good-collection/" target="_blank">
+              ⚡面试手册
+            </el-link>
+            <el-link href="http://static.yudao.iocoder.cn/mp/Aix9975.jpeg" target="_blank">
+              🤝外包咨询
+            </el-link>
           </div>
         </el-form-item>
       </el-col>
@@ -141,6 +169,7 @@ import { useIcon } from '@/hooks/web/useIcon'
 import * as authUtil from '@/utils/auth'
 import { usePermissionStore } from '@/store/modules/permission'
 import * as LoginApi from '@/api/login'
+import * as AuthApi from '@/api/lghjft/auth'
 import { LoginStateEnum, useFormValid, useLoginState } from './useLogin'
 
 defineOptions({ name: 'LghjftLoginForm' })
@@ -239,7 +268,12 @@ const handleLogin = async (params: any) => {
     }
     const loginDataLoginForm = { ...loginData.loginForm }
     loginDataLoginForm.captchaVerification = params.captchaVerification
-    const res = await LoginApi.login(loginDataLoginForm)
+    const loginParams = {
+      yhzh: loginDataLoginForm.username,
+      password: loginDataLoginForm.password,
+      captchaVerification: params.captchaVerification
+    }
+    const res = await AuthApi.login(loginParams)
     if (!res) {
       return
     }
@@ -256,7 +290,7 @@ const handleLogin = async (params: any) => {
     authUtil.setToken(res)
     localStorage.setItem('APP_LAYOUT_MODE', 'lghjft')
     if (!redirect.value) {
-      redirect.value = '/lghjft/home'
+      redirect.value = '/index'
     }
     if (redirect.value.indexOf('sso') !== -1) {
       window.location.href = window.location.href.replace('/login?redirect=', '')
@@ -290,7 +324,9 @@ const doSocialLogin = async (type: number) => {
       }
     }
     const redirectUri =
-      location.origin + '/social-login?' + encodeURIComponent(`type=${type}&redirect=${redirect.value || '/lghjft/home'}`)
+      location.origin +
+      '/social-login?' +
+      encodeURIComponent(`type=${type}&redirect=${redirect.value || '/index'}`)
 
     window.location.href = await LoginApi.socialAuthRedirect(type, encodeURIComponent(redirectUri))
   }
@@ -331,4 +367,3 @@ onMounted(() => {
   }
 }
 </style>
-

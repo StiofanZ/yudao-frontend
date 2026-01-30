@@ -45,7 +45,7 @@ const loginOut = async () => {
     })
     await userStore.loginOut()
     tagsViewStore.delAllViews()
-    replace(`/lghjft/login?redirect=${route.fullPath}`)
+    replace(`/login?redirect=${route.fullPath}`)
   } catch {}
 }
 const toProfile = async () => {

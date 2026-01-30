@@ -104,7 +104,7 @@ import { useIcon } from '@/hooks/web/useIcon'
 import * as authUtil from '@/utils/auth'
 import { usePermissionStore } from '@/store/modules/permission'
 import * as LoginApi from '@/api/login'
-import { LoginStateEnum, useLoginState, useFormValid } from './useLogin'
+import { LoginStateEnum, useFormValid, useLoginState } from './useLogin'
 
 defineOptions({ name: 'LghjftRegisterForm' })
 
@@ -203,7 +203,7 @@ const handleRegister = async (params: any) => {
 
     authUtil.setToken(res)
     if (!redirect.value) {
-      redirect.value = '/lghjft/home'
+      redirect.value = '/index'
     }
     if (redirect.value.indexOf('sso') !== -1) {
       window.location.href = window.location.href.replace('/login?redirect=', '')
@@ -277,4 +277,3 @@ onMounted(() => {
   }
 }
 </style>
-

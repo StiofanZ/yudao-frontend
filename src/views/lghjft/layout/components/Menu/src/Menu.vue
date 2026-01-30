@@ -55,10 +55,10 @@ export default defineComponent({
       if (meta.activeMenu) {
         return meta.activeMenu as string
       }
-      if (path === '/lghjft/internal-link' && query.url) {
+      if (path === '/internal-link' && query.url) {
         return query.url as string
       }
-      if (path === '/lghjft/home') {
+      if (path === '/index') {
         return '/index'
       }
       return path
@@ -72,15 +72,18 @@ export default defineComponent({
       if (isUrl(index)) {
         const item = findMenu(unref(routers), index)
         const title = item?.meta?.title || 'Link'
-        push({ path: '/lghjft/internal-link', query: { url: index, title } })
+        push({ path: '/internal-link', query: { url: index, title } })
       } else if (index === '/index' || index === '/') {
-        push('/lghjft/home')
+        push('/index')
       } else {
         push(index)
       }
     }
 
-    const findMenu = (routers: AppRouteRecordRaw[], path: string): AppRouteRecordRaw | undefined => {
+    const findMenu = (
+      routers: AppRouteRecordRaw[],
+      path: string
+    ): AppRouteRecordRaw | undefined => {
       for (const v of routers) {
         if (v.path === path) {
           return v

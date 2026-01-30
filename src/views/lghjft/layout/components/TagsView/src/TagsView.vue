@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref, unref, watch } from 'vue'
+import { computed, nextTick, ref, unref, watch } from 'vue'
 import type { RouteLocationNormalizedLoaded, RouterLinkProps } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { usePermissionStore } from '@/store/modules/permission'
@@ -65,10 +65,10 @@ const addTags = () => {
   const { name } = unref(currentRoute)
   if (name) {
     setSelectTag(unref(currentRoute))
-    // 针对 /lghjft/home 做去重处理
-    if (unref(currentRoute).path === '/lghjft/home') {
+    // 针对 /index 做去重处理
+    if (unref(currentRoute).path === '/index') {
       const visitedViews = tagsViewStore.getVisitedViews
-      const existView = visitedViews.find((v) => v.path === '/lghjft/home')
+      const existView = visitedViews.find((v) => v.path === '/index')
       if (existView && existView.fullPath !== unref(currentRoute).fullPath) {
         tagsViewStore.delVisitedView(existView)
       }

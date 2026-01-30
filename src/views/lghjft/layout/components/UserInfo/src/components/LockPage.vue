@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { resetRouter } from '@/router'
 import { deleteUserCache } from '@/hooks/web/useCache'
 import { useLockStore } from '@/store/modules/lock'
 import { useNow } from '@/hooks/web/useNow'
@@ -54,7 +53,7 @@ async function goLogin() {
   tagsViewStore.delAllViews()
   // resetRouter() // 重置静态路由表
   lockStore.resetLockInfo()
-  replace('/lghjft/login')
+  replace('/login')
 }
 
 function handleShowForm(show = false) {

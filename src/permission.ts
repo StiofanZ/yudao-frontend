@@ -64,9 +64,9 @@ router.beforeEach(async (to, from, next) => {
   loadStart()
   if (getAccessToken()) {
     if (to.path === '/login') {
-      next({ path: '/lghjft/home' })
-    } else if (to.path === '/lghjft/login' || to.path === '/lghjft/login/login-by-lgh') {
-      next({ path: '/lghjft/home' })
+      next({ path: '/index' })
+    } else if (to.path === '/lghjft/login/login-by-lgh') {
+      next({ path: '/index' })
     } else {
       const dictStore = useDictStoreWithOut()
       const userStore = useUserStoreWithOut()
@@ -96,17 +96,13 @@ router.beforeEach(async (to, from, next) => {
       }
     }
   } else {
-    if (to.path === '/login' && from.path.startsWith('/lghjft')) {
-      next('/lghjft/login?redirect=/lghjft/home')
-      return
-    }
     if (whiteList.indexOf(to.path) !== -1) {
       if (to.path === '/login') {
         localStorage.removeItem('APP_LAYOUT_MODE')
       }
       next()
     } else {
-      next(`/lghjft/login?redirect=${to.fullPath}`) // 否则全部重定向到登录页
+      next(`/login?redirect=${to.fullPath}`) // 否则全部重定向到登录页
     }
   }
 })

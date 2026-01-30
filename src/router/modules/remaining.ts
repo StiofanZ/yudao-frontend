@@ -50,15 +50,7 @@ const remainingRouter: AppRouteRecordRaw[] = [
       noTagsView: true
     }
   },
-  {
-    path: '/',
-    redirect: '/lghjft/home',
-    name: 'Home',
-    component: Layout,
-    meta: {
-      hidden: true
-    }
-  },
+
   {
     path: '/user',
     component: Layout,
@@ -164,18 +156,8 @@ const remainingRouter: AppRouteRecordRaw[] = [
     ]
   },
   {
-    path: '/lghjft/login',
-    component: () => import('@/views/lghjft/login/index.vue'),
-    name: 'LghjftLogin',
-    meta: {
-      hidden: true,
-      title: t('router.login'),
-      noTagsView: true
-    }
-  },
-  {
     path: '/login',
-    redirect: '/lghjft/login',
+    component: () => import('@/views/lghjft/login/index.vue'),
     name: 'Login',
     meta: {
       hidden: true,
@@ -194,30 +176,30 @@ const remainingRouter: AppRouteRecordRaw[] = [
     }
   },
   {
-    path: '/lghjft',
+    path: '/',
     component: () => import('@/views/lghjft/layout/Layout.vue'),
-    redirect: '/lghjft/home',
-    name: 'Lghjft',
+    redirect: '/index',
+    name: 'Home',
     meta: {
       hidden: true
     },
     children: [
       {
-        path: 'home',
+        path: 'index',
         component: () => import('@/views/lghjft/home/index.vue'),
-        name: 'LghjftHome',
+        name: 'Index',
         meta: {
           hidden: true,
           title: '首页',
           icon: 'svg-icon:lghjft-home-filled',
           noCache: false,
-          affix: false
+          affix: true
         }
       },
       {
         path: 'internal-link',
         component: () => import('@/views/lghjft/iframe/index.vue'),
-        name: 'LghjftIFrame',
+        name: 'IFrame',
         meta: {
           hidden: true,
           title: '链接',
