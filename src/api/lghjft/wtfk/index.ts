@@ -1,6 +1,13 @@
 import request from '@/config/axios'
 import type { Dayjs } from 'dayjs'
 
+/** 附件对象接口 */
+export interface FileItem {
+  fileUrl: string
+  fileName: string
+  fileOriginName?: string
+}
+
 /** 工会经费通-问题反馈信息 */
 export interface WtfkVO {
   id: number
@@ -19,10 +26,8 @@ export interface WtfkVO {
   platformName?: string
   createTime?: string
   operatorName?: string
-  fileUrls?: string[] //上传文件URL
+  files?: FileItem[]
 }
-
-/** 处理日志记录信息 */
 
 // 工会经费通-问题反馈 API
 export const WtfkApi = {
@@ -31,7 +36,7 @@ export const WtfkApi = {
     return await request.get({ url: `/lghjft/wtfk/page`, params })
   },
 
-  // ''删除''接口
+  // 删除接口
   deleteWtfk: (id: number, isAdminView = false) => {
     return request.delete({
       url: '/lghjft/wtfk/delete',
@@ -57,20 +62,15 @@ export const WtfkApi = {
     return await request.put({ url: `/lghjft/wtfk/update`, data })
   },
 
-  // 【核心】处理问题反馈（提交多次处理记录）
+  // 处理问题反馈（提交多次处理记录）
   handleProcess: async (data: { id: number; status: number; processNotes: string }) => {
     return await request.put({ url: `/lghjft/wtfk/handle-process`, data })
   },
 
-  // 【核心】查询某个反馈的所有处理日志历史
+  // 查询某个反馈的所有处理日志历史
   getWtfkLogList: async (feedbackId: number) => {
     return await request.get({ url: `/lghjft/wtfk/log/list?feedbackId=` + feedbackId })
   },
-
-
-
-
-
 
   // 导出 Excel
   exportWtfk: async (params: any) => {

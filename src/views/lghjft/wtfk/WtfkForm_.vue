@@ -47,23 +47,26 @@
         </el-col>
 
         <el-col :span="24">
-          <el-form-item label="附件上传"> <el-upload
-            v-model:file-list="fileList"
-            :action="uploadUrl"
-            :headers="uploadHeaders"
-            :data="{ tableName: 'lghjft_wtfk' }"
-            :on-success="handleUploadSuccess"
-            :on-remove="handleRemove"
-            :on-exceed="handleExceed"  :limit="3"
-            multiple
-          >
-            <el-button type="primary">
-              <Icon icon="ep:upload" class="mr-1" /> 点击上传
-            </el-button>
-            <template #tip>
-              <div class="el-upload__tip">单个文件不超过 10MB</div>
-            </template>
-          </el-upload>
+          <el-form-item label="附件上传">
+            <el-upload
+              v-model:file-list="fileList"
+              :action="uploadUrl"
+              :headers="uploadHeaders"
+              :data="{ tableName: 'lghjft_wtfk' }"
+              :on-success="handleUploadSuccess"
+              :on-remove="handleRemove"
+              :on-exceed="handleExceed"
+              :before-upload="beforeUpload"
+              :limit="3"
+              multiple
+            >
+              <el-button type="primary">
+                <Icon icon="ep:upload" class="mr-1" /> 点击上传
+              </el-button>
+              <template #tip>
+                <div class="el-upload__tip">单个文件不超过 10MB</div>
+              </template>
+            </el-upload>
           </el-form-item>
         </el-col>
       </el-row>
@@ -77,11 +80,10 @@
 </template>
 
 <script setup lang="ts">
-import { WtfkApi, type WtfkVO } from '@/api/lghjft/wtfk'
-import { getAccessToken } from '@/utils/auth' // 导入获取Token的方法
-import type { UploadUserFile, UploadProps } from 'element-plus'
+import { WtfkApi, type WtfkVO, type FileItem } from '@/api/lghjft/wtfk'
+import { getAccessToken } from '@/utils/auth'
+import type { UploadUserFile, UploadProps, UploadFile } from 'element-plus'
 
-/** 工会经费通-问题反馈 表单 */
 defineOptions({ name: 'WtfkForm' })
 
 const { t } = useI18n()
@@ -91,6 +93,7 @@ const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const formLoading = ref(false)
 const formType = ref('')
+
 const formData = ref<Partial<WtfkVO>>({
   id: undefined,
   type: undefined,
@@ -101,41 +104,46 @@ const formData = ref<Partial<WtfkVO>>({
   status: 0,
   processorId: undefined,
   processTime: undefined,
-  fileUrls: [] //上传文件的URL
+  files: []
 })
 
 // ================== 上传相关逻辑 ==================
-// 1. 上传地址 (使用框架通用的基础设施文件上传接口)
 const uploadUrl = import.meta.env.VITE_BASE_URL + '/admin-api/infra/file/upload'
-// 2. 请求头 (必须携带 Token，否则后端会报 401)
 const uploadHeaders = ref({ Authorization: 'Bearer ' + getAccessToken() })
-// 3. 文件列表
 const fileList = ref<UploadUserFile[]>([])
-// 上传成功回调
-const handleUploadSuccess = (response: any) => {
+
+const handleUploadSuccess = (response: any, uploadFile: UploadFile) => {
   if (response.code !== 0) {
     message.error('上传失败：' + response.msg)
     return
   }
-  // response.data 通常是上传成功后的文件 URL
   if (response.data) {
-    formData.value.fileUrls.push(response.data)
+    // 构造 FileItem 对象
+    const fileItem: FileItem = {
+      fileUrl: response.data,
+      fileName: uploadFile.name
+    }
+
+    if (!formData.value.files) {
+      formData.value.files = []
+    }
+    formData.value.files.push(fileItem)
     message.success('上传成功！')
   }
 }
 
-// 移除文件回调
-const handleRemove = (uploadFile: any) => {
-  const url = uploadFile.response?.data
-  if (url) {
-    const index = formData.value.fileUrls.indexOf(url)
+const handleRemove = (uploadFile: UploadFile) => {
+  // 兼容两种情况：新上传的文件(response.data) 和 回显的文件(url)
+  const fileUrl = uploadFile.response?.data || uploadFile.url
+
+  if (fileUrl && formData.value.files) {
+    const index = formData.value.files.findIndex(item => item.fileUrl === fileUrl)
     if (index > -1) {
-      formData.value.fileUrls.splice(index, 1)
+      formData.value.files.splice(index, 1)
     }
   }
 }
 
-// 上传前校验 (可选)
 const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
   if (rawFile.size / 1024 / 1024 > 10) {
     message.error('文件大小不能超过 10MB!')
@@ -143,6 +151,7 @@ const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
   }
   return true
 }
+
 const handleExceed = () => {
   message.error('最多只能上传 3 个文件！')
 }
@@ -167,11 +176,20 @@ const open = async (type: string, id?: number) => {
   dialogTitle.value = t('action.' + type)
   formType.value = type
   resetForm()
-  // 修改时，设置数据
+
   if (id) {
     formLoading.value = true
     try {
-      formData.value = await WtfkApi.getWtfk(id)
+      const data = await WtfkApi.getWtfk(id)
+      formData.value = data
+
+      // 4. Edit Mode：数据清洗，将后端 files 映射回 Element UI 的 fileList
+      if (data.files && data.files.length > 0) {
+        fileList.value = data.files.map(item => ({
+          name: item.fileName,
+          url: item.fileUrl
+        }))
+      }
     } finally {
       formLoading.value = false
     }
@@ -208,7 +226,7 @@ const submitForm = async () => {
 
 /** 重置表单 */
 const resetForm = () => {
-  fileList.value = [] // 清空文件列表
+  fileList.value = []
   formData.value = {
     id: undefined,
     userId: undefined,
@@ -222,7 +240,7 @@ const resetForm = () => {
     processTime: undefined,
     processNotes: undefined,
     platformName: '网页端',
-    fileUrls: []
+    files: [] // 重置为空数组
   }
   formRef.value?.resetFields()
 }

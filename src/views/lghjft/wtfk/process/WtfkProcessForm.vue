@@ -19,17 +19,26 @@
 
           <el-descriptions-item label="平台名称">{{ formData?.platformName || '-' }}</el-descriptions-item>
           <el-descriptions-item label="附件">
-            <div v-if="formData.fileUrls?.length" class="flex flex-wrap gap-10px">
-              <template v-for="url in formData.fileUrls" :key="url">
+            <div v-if="formData.files?.length" class="flex flex-wrap gap-10px">
+
+              <template v-for="(item, index) in formData.files" :key="index">
+
                 <el-image
-                  v-if="isImage(url)"
-                  :src="url"
-                  :preview-src-list="formData.fileUrls"
+                  v-if="isImage(item.fileUrl, item.fileName)"
+                  :src="item.fileUrl"
+                  :preview-src-list="formData.files.map(f => f.fileUrl)"
                   class="w-60px h-60px rounded border"
                   preview-teleported
                 />
-                <el-link v-else type="primary" :underline="false" @click="loadFile(url)">
-                  <Icon icon="ep:document" /> 附件查看
+
+                <el-link
+                  v-else
+                  type="primary"
+                  :underline="false"
+                  @click="loadFile(item.fileUrl)"
+                >
+                  <Icon icon="ep:document" />
+                  {{ item.fileName || '附件查看' }}
                 </el-link>
               </template>
             </div>
@@ -88,6 +97,13 @@
 import { WtfkApi } from '@/api/lghjft/wtfk' // 修正导入方式
 import { formatDate } from '@/utils/formatTime' // yudao 时间格式化工具
 
+/** 文件对象接口 (对应后端返回的 list) */
+interface FileItem {
+  fileUrl: string
+  fileName: string
+  fileOriginName?: string
+}
+
 /** 定义处理日志的接口结构 */
 
 interface WtfkDetail {
@@ -100,7 +116,7 @@ interface WtfkDetail {
   platformName: string
   content: string
   createTime?: any
-  fileUrls?: string[] //文件上传URL
+  files?: FileItem[]
 }
 interface WtfkLog {
   id?: number
@@ -125,7 +141,7 @@ const formData = ref<WtfkDetail>({
   type: '',
   platformName: '',
   createTime: undefined,
-  fileUrls: [] //文件上传URL
+  files: [] // 初始化为空数组
 })
 
 const processData = ref<{
@@ -144,8 +160,9 @@ const rules = {
   processNotes: [{ required: true, message: '必须填写处理备注', trigger: 'blur' }]
 }
 // 1. 判断是否为图片（支持主流图片格式）
-const isImage = (url: string) => {
-  return /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(url)
+const isImage = (url: string, name?: string) => {
+  const target = name || url
+  return /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(target)
 }
 
 // 2. 截取文件名（从 URL 中提取最后一段）

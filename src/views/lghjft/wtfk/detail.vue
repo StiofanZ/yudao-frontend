@@ -37,15 +37,16 @@
             <el-descriptions-item label="反馈内容" :span="2">
               <div v-html="formData.content" class="editor-content"></div>
             </el-descriptions-item>
+
             <el-descriptions-item label="附件" :span="2">
-              <div v-if="formData.fileUrls && formData.fileUrls.length > 0" class="flex flex-wrap gap-10px">
-                <template v-for="(url, index) in formData.fileUrls" :key="index">
+              <div v-if="formData.files && formData.files.length > 0" class="flex flex-wrap gap-10px">
+                <template v-for="(item, index) in formData.files" :key="index">
                   <el-image
-                    v-if="isImage(url)"
+                    v-if="isImage(item.fileUrl, item.fileName)"
                     style="width: 80px; height: 80px; border-radius: 4px; border: 1px solid #eee"
-                    :src="url"
-                    :preview-src-list="formData.fileUrls.filter(u => isImage(u))"
-                    :initial-index="formData.fileUrls.filter(u => isImage(u)).indexOf(url)"
+                    :src="item.fileUrl"
+                    :preview-src-list="formData.files.filter(f => isImage(f.fileUrl, f.fileName)).map(f => f.fileUrl)"
+                    :initial-index="formData.files.filter(f => isImage(f.fileUrl, f.fileName)).indexOf(item)"
                     fit="cover"
                     preview-teleported
                   />
@@ -54,12 +55,12 @@
                     v-else
                     type="primary"
                     :underline="false"
-                    @click="downloadFile(url)"
+                    @click="downloadFile(item.fileUrl)"
                     class="file-link-item"
                   >
                     <div class="flex items-center p-5px border-1 border-blue-200 rounded bg-blue-50">
                       <Icon icon="ep:document" class="mr-5px" />
-                      <span class="text-12px">{{ getFileName(url) }}</span>
+                      <span class="text-12px">{{ item.fileName || getFileName(item.fileUrl) }}</span>
                     </div>
                   </el-link>
                 </template>
@@ -105,18 +106,26 @@
 </template>
 
 <script setup lang="ts">
-import { WtfkApi, WtfkVO } from '@/api/lghjft/wtfk' // 确保引入了 WtfkVO
+import { WtfkApi, WtfkVO } from '@/api/lghjft/wtfk'
 import { useRoute, useRouter } from 'vue-router'
 import { formatDate } from '@/utils/formatTime'
 
 defineOptions({ name: 'WtfkDetail' })
+
 interface WtfkLog {
   id?: number
   content: string
   operatorId: number
-  operatorName?: string  // 必须加上这一行，解决“未解析”报错
+  operatorName?: string
   status: number
   createTime?: string | Date
+}
+
+// 新增文件接口
+interface FileItem {
+  fileUrl: string
+  fileName: string
+  fileOriginName?: string
 }
 
 const { query } = useRoute()
@@ -124,17 +133,17 @@ const { back } = useRouter()
 const loading = ref(false)
 const logList = ref<WtfkLog[]>([])
 
-// 并初始化所有模板用到的变量
-const formData = ref<WtfkVO>({
+// 更新 formData 类型和初始值
+const formData = ref<WtfkVO & { files?: FileItem[] }>({
   id: 0,
   feedbackId: '',
   type: '1',
   content: '',
-  fileUrls: [], //上传文件Url
+  files: [], // 初始化为空数组
   contactPhone: '',
-  platformName: '', // 初始化字段，解决“未解析”错误
+  platformName: '',
   status: 1,
-  createTime: '',   // 初始化字段
+  createTime: '',
   processNotes: '',
   processTime: '',
   contactEmail: '',
@@ -142,22 +151,19 @@ const formData = ref<WtfkVO>({
   processorName: ''
 })
 
-// 状态与进度条映射关系
 const statusMap: any = {
-  0: { label: '待处理', type: 'info', step: 1 },//兼容
+  0: { label: '待处理', type: 'info', step: 1 },
   1: { label: '待处理', type: 'info', step: 1 },
   2: { label: '跟进中', type: 'warning', step: 2 },
-  3: { label: '已处理', type: 'success', step: 4}, //3->4 暂时不实现已关闭逻辑
+  3: { label: '已处理', type: 'success', step: 4},
   4: { label: '已关闭', type: 'danger', step: 4 }
 }
 
 const activeStep = computed(() => {
-  // 显式提取 status，若为空则默认为 1
   const status = formData.value.status ?? 1
   return statusMap[status]?.step || 1
 })
 
-/** 获取详情及日志 */
 const getDetail = async () => {
   const id = Number(query.id)
   if (!id) return
@@ -167,7 +173,6 @@ const getDetail = async () => {
       WtfkApi.getWtfk(id),
       WtfkApi.getWtfkLogList(id)
     ])
-    // 强制转换类型，确保 statusMap 能读取到 Key
     if (detail) {
       detail.status = (detail.status === null || detail.status === undefined) ? 1 : Number(detail.status)
     }
@@ -177,19 +182,23 @@ const getDetail = async () => {
     loading.value = false
   }
 }
-/** 判断是否为图片 */
-const isImage = (url: string) => {
+
+/** 修改后的 isImage：优先检测 name */
+const isImage = (url: string, name?: string) => {
+  const target = name || url
+  if (!target) return false
+
   const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']
-  const ext = url.split('.').pop()?.toLowerCase() || ''
+  const cleanStr = target.split('?')[0]
+  const ext = cleanStr.split('.').pop()?.toLowerCase() || ''
+
   return imageExtensions.includes(ext)
 }
 
-/** 获取文件名 */
 const getFileName = (url: string) => {
-  return url.substring(url.lastIndexOf('/') + 1)
+  return url ? url.substring(url.lastIndexOf('/') + 1) : 'unknown'
 }
 
-/** 下载/打开文件 */
 const downloadFile = (url: string) => {
   window.open(url, '_blank')
 }
@@ -202,6 +211,7 @@ onMounted(() => {
   getDetail()
 })
 </script>
+
 <style scoped>
 .editor-content :deep(img) {
   max-width: 100%;
