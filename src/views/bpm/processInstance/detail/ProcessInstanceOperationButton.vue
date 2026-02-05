@@ -19,10 +19,11 @@
             <form-create v-model="approveForm.value" v-model:api="approveFormFApi" :option="approveForm.option"
               :rule="approveForm.rule" />
           </el-card>
-          <!-- <el-form-item :label="`${nodeTypeName}意见`" prop="reason">
+
+          <el-form-item v-if="!runningTask?.formName" :label="`${nodeTypeName}意见`" prop="reason">
             <el-input v-model="approveReasonForm.reason" :placeholder="`请输入${nodeTypeName}意见`" type="textarea"
               :rows="4" />
-          </el-form-item> -->
+          </el-form-item>
 
           <!-- 修改了逻辑加入了判断：判断是否导入自定义审批页面 -->
           <!-- <el-form-item v-if="!['WF_SQ_TDFSQ'].includes(runningTask?.processDefinitionKey)" :label="`${nodeTypeName}意见`"
