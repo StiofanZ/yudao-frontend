@@ -384,7 +384,7 @@ defineOptions({ name: 'IoTDevice' })
 
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
-const route = useRoute()
+const route = useRoute() // 路由对象
 
 const loading = ref(true) // 列表加载中
 const list = ref<DeviceVO[]>([]) // 列表的数据
