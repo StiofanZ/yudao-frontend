@@ -47,5 +47,9 @@ export const SfxxApi = {
 
   auditSfxx: async (id: number, status: number) => {
     return await request.put({ url: `/lghjft/qx/sfxx/audit`, params: { id, status } })
+  },
+
+  unbindSfxx: async (id: number, jbyy: string) => {
+    return await request.put({ url: `/lghjft/qx/sfxx/unbind`, params: { id, jbyy } })
   }
 }

@@ -60,14 +60,6 @@
           placeholder="请输入授权原因"
         />
       </el-form-item>
-      <el-form-item label="解绑原因" prop="jbyy">
-        <el-input
-          v-model="formData.jbyy"
-          type="textarea"
-          class="!w-240px"
-          placeholder="请输入解绑原因"
-        />
-      </el-form-item>
       <el-form-item label="部门编号" prop="deptId">
         <el-input
           v-model="formData.deptId"

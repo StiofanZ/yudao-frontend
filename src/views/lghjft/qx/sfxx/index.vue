@@ -81,15 +81,6 @@
         >
           <Icon class="mr-5px" icon="ep:plus" /> 新增
         </el-button>
-        <el-button
-          v-hasPermi="['lghjft:qx-sfxx:delete']"
-          :disabled="checkedIds.length === 0"
-          plain
-          type="danger"
-          @click="handleDeleteBatch"
-        >
-          <Icon class="mr-5px" icon="ep:delete" /> 批量删除
-        </el-button>
       </el-form-item>
     </el-form>
   </ContentWrap>
@@ -101,9 +92,7 @@
       :show-overflow-tooltip="true"
       :stripe="true"
       row-key="id"
-      @selection-change="handleRowCheckboxChange"
     >
-      <el-table-column type="selection" width="55" />
       <el-table-column align="center" label="ID" prop="id" width="80" />
       <el-table-column align="center" label="登录账号" prop="dlzh" min-width="150" />
       <el-table-column align="center" label="社会信用代码" prop="shxydm" min-width="180" />
@@ -156,19 +145,11 @@
             编辑
           </el-button>
           <el-button
-            v-hasPermi="['lghjft:qx-sfxx:delete']"
-            link
-            type="danger"
-            @click="handleDelete(scope.row.id)"
-          >
-            删除
-          </el-button>
-          <el-button
             v-hasPermi="['lghjft:qx-sfxx:audit']"
             :disabled="scope.row.status === 1"
             link
             type="success"
-            @click="handleAudit(scope.row.id, 1)"
+            @click="handleAudit(scope.row)"
           >
             审核
           </el-button>
@@ -177,9 +158,9 @@
             :disabled="scope.row.status === 0"
             link
             type="warning"
-            @click="handleAudit(scope.row.id, 0)"
+            @click="handleUnbind(scope.row.id)"
           >
-            反审
+            解绑
           </el-button>
         </template>
       </el-table-column>
@@ -199,6 +180,7 @@
 import { dateFormatter } from '@/utils/formatTime'
 import { type Sfxx, SfxxApi } from '@/api/lghjft/qx/sfxx'
 import SfxxForm from './SfxxForm.vue'
+import { ElMessageBox } from 'element-plus'
 
 defineOptions({ name: 'LghjftQxSfxx' })
 
@@ -219,11 +201,6 @@ const queryParams = reactive({
   status: undefined as number | undefined
 })
 const queryFormRef = ref()
-
-const checkedIds = ref<number[]>([])
-const handleRowCheckboxChange = (records: Sfxx[]) => {
-  checkedIds.value = records.map((item) => item.id!) as number[]
-}
 
 const getList = async () => {
   loading.value = true
@@ -251,30 +228,34 @@ const openForm = (type: string, id?: number) => {
   formRef.value.open(type, id)
 }
 
-const handleDelete = async (id: number) => {
+const handleAudit = async (row: Sfxx) => {
   try {
-    await message.delConfirm()
-    await SfxxApi.deleteSfxx(id)
-    message.success(t('common.delSuccess'))
-    await getList()
-  } catch {}
-}
-
-const handleDeleteBatch = async () => {
-  try {
-    await message.delConfirm()
-    await SfxxApi.deleteSfxxList(checkedIds.value)
-    checkedIds.value = []
-    message.success(t('common.delSuccess'))
-    await getList()
-  } catch {}
-}
-
-const handleAudit = async (id: number, status: number) => {
-  try {
-    await message.confirm(status === 1 ? '确认审核通过？' : '确认反审（回到待审核）？')
-    await SfxxApi.auditSfxx(id, status)
+    await ElMessageBox.confirm(
+      `<div>申请原因：${row.sqyy || '无'}</div><div style="margin-top: 10px;">确认审核通过？</div>`,
+      '审核',
+      {
+        dangerouslyUseHTMLString: true,
+        confirmButtonText: t('common.ok'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning'
+      }
+    )
+    await SfxxApi.auditSfxx(row.id!, 1)
     message.success(t('common.updateSuccess'))
+    await getList()
+  } catch {}
+}
+
+const handleUnbind = async (id: number) => {
+  try {
+    const { value } = await ElMessageBox.prompt('请输入解绑原因', '解绑', {
+      confirmButtonText: t('common.ok'),
+      cancelButtonText: t('common.cancel'),
+      inputPattern: /\S+/,
+      inputErrorMessage: '解绑原因不能为空'
+    })
+    await SfxxApi.unbindSfxx(id, value)
+    message.success('解绑成功')
     await getList()
   } catch {}
 }
