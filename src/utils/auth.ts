@@ -78,3 +78,31 @@ export const getVisitTenantId = () => {
 export const setVisitTenantId = (visitTenantId: number) => {
   wsCache.set(CACHE_KEY.VisitTenantId, visitTenantId)
 }
+
+// ========== 单位权限身份相关 ==========
+const DwQxSfKey = 'DW_QX_SF'
+const DwQxSfListKey = 'DW_QX_SF_LIST'
+
+export const getDwQxSf = () => {
+  return wsCache.get(DwQxSfKey)
+}
+
+export const setDwQxSf = (dwQxSf: any) => {
+  wsCache.set(DwQxSfKey, dwQxSf)
+}
+
+export const removeDwQxSf = () => {
+  wsCache.delete(DwQxSfKey)
+}
+
+export const getDwQxSfList = () => {
+  return wsCache.get(DwQxSfListKey)
+}
+
+export const setDwQxSfList = (dwQxSfList: any[]) => {
+  wsCache.set(DwQxSfListKey, dwQxSfList)
+}
+
+export const removeDwQxSfList = () => {
+  wsCache.delete(DwQxSfListKey)
+}

@@ -32,6 +32,17 @@
           clearable
           placeholder="请选择身份类型"
         >
+          <el-option label="法定代表人" value="01" />
+          <el-option label="财务负责人" value="02" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="工会类型" prop="ghlx">
+        <el-select
+          v-model="queryParams.ghlx"
+          class="!w-240px"
+          clearable
+          placeholder="请选择工会类型"
+        >
           <el-option label="基层工会" value="01" />
           <el-option label="缴费单位" value="02" />
           <el-option label="联合工会" value="03" />
@@ -94,18 +105,24 @@
     >
       <el-table-column type="selection" width="55" />
       <el-table-column align="center" label="ID" prop="id" width="80" />
-      <el-table-column align="center" label="账号ID" prop="dlzhId" width="100" />
-      <el-table-column align="center" label="登记序号" prop="djxh" width="160" />
+      <el-table-column align="center" label="登录账号" prop="dlzh" min-width="150" />
+      <el-table-column align="center" label="社会信用代码" prop="shxydm" min-width="180" />
       <el-table-column align="center" label="身份类型" prop="sflx" width="120">
         <template #default="scope">
-          <span v-if="scope.row.sflx === '01'">基层工会</span>
-          <span v-else-if="scope.row.sflx === '02'">缴费单位</span>
-          <span v-else-if="scope.row.sflx === '03'">联合工会</span>
-          <span v-else-if="scope.row.sflx === '04'">集团工会</span>
-          <span v-else-if="scope.row.sflx === '05'">产业系统工会</span>
-          <span v-else-if="scope.row.sflx === '06'">县区总工会</span>
-          <span v-else-if="scope.row.sflx === '07'">市总工会</span>
-          <span v-else-if="scope.row.sflx === '08'">省总工会</span>
+          <span v-if="scope.row.sflx === '01'">法定代表人</span>
+          <span v-else-if="scope.row.sflx === '02'">财务负责人</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="工会类型" prop="ghlx" width="120">
+        <template #default="scope">
+          <span v-if="scope.row.ghlx === '01'">基层工会</span>
+          <span v-else-if="scope.row.ghlx === '02'">缴费单位</span>
+          <span v-else-if="scope.row.ghlx === '03'">联合工会</span>
+          <span v-else-if="scope.row.ghlx === '04'">集团工会</span>
+          <span v-else-if="scope.row.ghlx === '05'">产业系统工会</span>
+          <span v-else-if="scope.row.ghlx === '06'">县区总工会</span>
+          <span v-else-if="scope.row.ghlx === '07'">市总工会</span>
+          <span v-else-if="scope.row.ghlx === '08'">省总工会</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="权限类型" prop="qxlx" width="100">
@@ -197,6 +214,7 @@ const queryParams = reactive({
   dlzhId: undefined as number | undefined,
   djxh: undefined as string | undefined,
   sflx: undefined as string | undefined,
+  ghlx: undefined as string | undefined,
   qxlx: undefined as string | undefined,
   status: undefined as number | undefined
 })

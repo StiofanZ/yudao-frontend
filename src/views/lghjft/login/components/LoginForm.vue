@@ -157,11 +157,17 @@
         </el-form-item>
       </el-col>
     </el-row>
+    <DwQxSfSelectDialog
+      v-model="selectDialogVisible"
+      :options="dwQxSfList"
+      @confirm="onSelectConfirm"
+    />
   </el-form>
 </template>
 <script lang="ts" setup>
 import { ElLoading } from 'element-plus'
 import LoginFormTitle from './LoginFormTitle.vue'
+import DwQxSfSelectDialog from './DwQxSfSelectDialog.vue'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 
 import { useIcon } from '@/hooks/web/useIcon'
@@ -257,33 +263,20 @@ const getTenantByWebsite = async () => {
     }
   }
 }
-const loading = ref()
-const handleLogin = async (params: any) => {
-  loginLoading.value = true
+
+const loginResponse = ref<any>(null)
+const selectDialogVisible = ref(false)
+const dwQxSfList = ref<any[]>([])
+
+const handleLoginSuccess = async (res: any) => {
+  loading.value = ElLoading.service({
+    lock: true,
+    text: '正在加载系统中...',
+    background: 'rgba(0, 0, 0, 0.7)'
+  })
   try {
-    await getTenantId()
-    const data = await validForm()
-    if (!data) {
-      return
-    }
-    const loginDataLoginForm = { ...loginData.loginForm }
-    loginDataLoginForm.captchaVerification = params.captchaVerification
-    const loginParams = {
-      yhzh: loginDataLoginForm.username,
-      password: loginDataLoginForm.password,
-      captchaVerification: params.captchaVerification
-    }
-    const res = await AuthApi.login(loginParams)
-    if (!res) {
-      return
-    }
-    loading.value = ElLoading.service({
-      lock: true,
-      text: '正在加载系统中...',
-      background: 'rgba(0, 0, 0, 0.7)'
-    })
-    if (loginDataLoginForm.rememberMe) {
-      authUtil.setLoginForm(loginDataLoginForm)
+    if (loginData.loginForm.rememberMe) {
+      authUtil.setLoginForm(loginData.loginForm)
     } else {
       authUtil.removeLoginForm()
     }
@@ -298,8 +291,81 @@ const handleLogin = async (params: any) => {
       await push({ path: redirect.value || permissionStore.addRouters[0].path })
     }
   } finally {
+    loading.value?.close()
+  }
+}
+
+const onSelectConfirm = (selectedItem: any) => {
+  authUtil.setDwQxSf(selectedItem)
+  if (loginResponse.value) {
+    handleLoginSuccess(loginResponse.value)
+  }
+}
+
+const loading = ref()
+const handleLogin = async (params: any) => {
+  loginLoading.value = true
+  try {
+    await getTenantId()
+    const data = await validForm()
+    if (!data) {
+      return
+    }
+    const loginDataLoginForm = { ...loginData.loginForm }
+    loginDataLoginForm.captchaVerification = params.captchaVerification
+    
+    // 正则判断
+    const username = loginDataLoginForm.username
+    const password = loginDataLoginForm.password
+    const captchaVerification = loginDataLoginForm.captchaVerification
+    
+    // 手机号正则
+    const phoneRegex = /^1[3-9]\d{9}$/
+    // 邮箱正则
+    const emailRegex = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
+    // 社会信用代码正则
+    const creditCodeRegex = /^([0-9A-HJ-NPQRTUWXY]{2}\d{6}[0-9A-HJ-NPQRTUWXY]{10})$/
+
+    let loginParams: any = {
+      password: password,
+      captchaVerification: captchaVerification
+    }
+
+    if (phoneRegex.test(username)) {
+      loginParams.lxdh = username
+    } else if (emailRegex.test(username)) {
+      loginParams.yhyx = username
+    } else if (creditCodeRegex.test(username)) {
+      loginParams.shxydm = username
+    } else {
+      loginParams.yhzh = username
+    }
+
+    const res = await AuthApi.login(loginParams)
+    if (!res) {
+      return
+    }
+
+    loginResponse.value = res
+    const dwList = res.dwQxSf || []
+    
+    // 保存身份列表
+    authUtil.setDwQxSfList(dwList)
+
+    if (dwList.length > 1) {
+      dwQxSfList.value = dwList
+      selectDialogVisible.value = true
+      return
+    } else if (dwList.length === 1) {
+      authUtil.setDwQxSf(dwList[0])
+    } else {
+      authUtil.removeDwQxSf()
+    }
+
+    await handleLoginSuccess(res)
+  } finally {
     loginLoading.value = false
-    loading.value.close()
+    // loading.value.close() // Moved to handleLoginSuccess
   }
 }
 

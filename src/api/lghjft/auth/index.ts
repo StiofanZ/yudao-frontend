@@ -5,7 +5,7 @@ export interface LoginAuthCodeVO {
 }
 
 export interface LoginVO {
-  yhzh: string
+  yhzh?: string
   password: string
   lxdh?: string
   yhyx?: string
@@ -15,7 +15,7 @@ export interface LoginVO {
 
 // 账号密码登录
 export const login = (data: LoginVO) => {
-  return request.post({ url: '/lghjft/lghjft/login', data })
+  return request.post({ url: '/lghjft/login', data })
 }
 
 // LGH 授权登录

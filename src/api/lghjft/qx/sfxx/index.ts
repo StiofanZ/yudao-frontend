@@ -3,11 +3,14 @@ import request from '@/config/axios'
 export interface Sfxx {
   id?: number
   dlzhId?: number
+  dlzh?: string
   djxh?: string
+  shxydm?: string
   sflx?: string
+  ghlx?: string
   qxlx?: string
-  sqyy?: number
-  jbyy?: number
+  sqyy?: string
+  jbyy?: string
   deptId?: number
   deptName?: string
   status?: number

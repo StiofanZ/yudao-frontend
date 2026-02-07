@@ -87,7 +87,6 @@ const passwordValidator = (_rule: any, value: string, callback: any) => {
 }
 
 const formRules = reactive({
-  yhzh: [{ required: true, message: '用户账号不能为空', trigger: 'blur' }],
   password: [{ validator: passwordValidator, trigger: 'blur' }]
 })
 const formRef = ref()

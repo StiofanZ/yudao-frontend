@@ -43,7 +43,7 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="社会信用代码" prop="shxydm">
+      <el-form-item label="信用代码" prop="shxydm">
         <el-input
           v-model="queryParams.shxydm"
           class="!w-240px"
@@ -118,8 +118,15 @@
         prop="createTime"
         width="180"
       />
-      <el-table-column align="center" fixed="right" label="操作" width="240">
+      <el-table-column align="center" fixed="right" label="操作" width="300">
         <template #default="scope">
+          <el-button
+            link
+            type="primary"
+            @click="handleOpenSfxx(scope.row)"
+          >
+            添加身份
+          </el-button>
           <el-button
             v-hasPermi="['lghjft:qx-dlzh:update']"
             link
@@ -156,12 +163,14 @@
   </ContentWrap>
 
   <DlzhForm ref="formRef" @success="getList" />
+  <SfxxForm ref="sfxxFormRef" />
 </template>
 
 <script lang="ts" setup>
 import { dateFormatter } from '@/utils/formatTime'
 import { type Dlzh, DlzhApi } from '@/api/lghjft/qx/dlzh'
 import DlzhForm from './DlzhForm.vue'
+import SfxxForm from '@/views/lghjft/qx/sfxx/SfxxForm.vue'
 
 defineOptions({ name: 'LghjftQxDlzh' })
 
@@ -214,6 +223,11 @@ const openForm = (type: string, id?: number) => {
   formRef.value.open(type, id)
 }
 
+const sfxxFormRef = ref()
+const handleOpenSfxx = (row: Dlzh) => {
+  sfxxFormRef.value.open('create', undefined, row.id, row)
+}
+
 const handleDelete = async (id: number) => {
   try {
     await message.delConfirm()
@@ -235,7 +249,7 @@ const handleDeleteBatch = async () => {
 
 const handleResetPwd = async (row: Dlzh) => {
   try {
-    const result = await message.prompt('请输入"' + row.yhzh + '"的新密码', t('common.reminder'))
+    const result = await message.prompt('请输入新密码', t('common.reminder'))
     const password = result.value
     await DlzhApi.resetPassword(row.id!, password)
     message.success('修改成功，新密码是：' + password)
