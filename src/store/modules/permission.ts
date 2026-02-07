@@ -55,38 +55,7 @@ export const usePermissionStore = defineStore('permission', {
           }
         ])
         // 渲染菜单的所有路由
-        const layoutMode = localStorage.getItem('APP_LAYOUT_MODE')
-        const remaining = cloneDeep(remainingRouter)
-        if (layoutMode === 'lghjft') {
-          remaining.forEach((route) => {
-            if (route.path === '/') {
-              route.children?.forEach((child) => {
-                if (child.path === 'index' && child.meta) {
-                  child.meta.affix = false
-                }
-              })
-            }
-            if (route.path === '/lghjft') {
-              route.children?.forEach((child) => {
-                if (child.path === 'home' && child.meta) {
-                  child.meta.affix = true
-                }
-              })
-            }
-          })
-        } else {
-          remaining.forEach((route) => {
-            if (route.path === '/lghjft') {
-              route.children?.forEach((child) => {
-                if (child.path === 'home' && child.meta) {
-                  child.meta.affix = false
-                }
-              })
-            }
-          })
-        }
-        
-        this.routers = remaining.concat(routerMap)
+        this.routers = cloneDeep(remainingRouter).concat(routerMap)
         resolve()
       })
     },
