@@ -1,677 +1,564 @@
 <template>
-  <div class="apply-form-container" id="print-area">
-    <div class="a4-paper" id="print-target">
-      <!-- 申请表标题 -->
-      <div class="form-title">工会经费缓缴申请表</div>
+  <div class="form-container" id="print-area">
+    <!-- 标题区域 -->
+    <el-row justify="center" align="middle" class="title-row">
+      <el-col :span="24" class="title-col">
+        <h1 class="form-title">甘肃省工会经费缓缴申请表</h1>
+      </el-col>
+      <el-col :span="24" class="fill-date-col">
+        填报日期：
+        <span v-if="!isPrintMode" class="mini-input">{{ formData.applyDate ? formData.applyDate.split('-')[0] : ''
+          }}</span>
+        <span v-else class="mini-input">{{ formData.applyDate ? formData.applyDate.split('-')[0] : '' }}</span> 年
+        <span v-if="!isPrintMode" class="mini-input">{{ formData.applyDate ? formData.applyDate.split('-')[1] : ''
+          }}</span>
+        <span v-else class="mini-input">{{ formData.applyDate ? formData.applyDate.split('-')[1] : '' }}</span> 月
+        <span v-if="!isPrintMode" class="mini-input">{{ formData.applyDate ? formData.applyDate.split('-')[2] : ''
+          }}</span>
+        <span v-else class="mini-input">{{ formData.applyDate ? formData.applyDate.split('-')[2] : '' }}</span> 日
+      </el-col>
+    </el-row>
 
-      <!-- 1. 基础信息模块 -->
-      <div class="form-module">
-        <div class="vertical-label-box" style="height:70mm;">
-          <div class="vertical-label">基础信息</div>
-        </div>
-        <div class="module-content" style="height: 70mm;">
-          <!-- 第一行：缴费单位名称 + 社会信用代码 -->
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">缴费单位名称：</span>
-              <el-input v-if="!isPrintMode" v-model="formData.nsrmc" disabled class="form-input" />
-              <span v-else class="print-text">{{ formData.nsrmc || '————————————————————' }}</span>
-            </div>
-            <div class="form-item">
-              <span class="item-label">社会信用代码：</span>
-              <el-input v-if="!isPrintMode" v-model="formData.shxydm" disabled class="form-input" />
-              <span v-else class="print-text">{{ formData.shxydm || '————————————————————' }}</span>
-            </div>
-          </div>
+    <!-- 基础信息区域：与参考样式完全一致的栅格布局 -->
+    <el-row class="form-grid-container" :gutter="0">
+      <!-- 第一行：缴费单位名称 + 社会信用代码 -->
+      <el-col :span="4" class="label-cell">缴费单位名称</el-col>
+      <el-col :span="8">
+        <input v-if="!isPrintMode" v-model="formData.nsrmc" class="form-input" disabled />
+        <span v-else class="form-input">{{ formData.nsrmc || '' }}</span>
+      </el-col>
+      <el-col :span="4" class="label-cell">社会信用代码</el-col>
+      <el-col :span="8">
+        <input v-if="!isPrintMode" v-model="formData.shxydm" class="form-input" disabled />
+        <span v-else class="form-input">{{ formData.shxydm || '' }}</span>
+      </el-col>
 
-          <!-- 第二行：联系人及电话 + 适用费率 -->
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">联系人及电话：</span>
-              <el-input v-if="!isPrintMode" v-model="formData.contactPhone" disabled class="form-input" />
-              <span v-else class="print-text">{{ formData.contactPhone || '————————————————————' }}</span>
-            </div>
-            <div class="form-item">
-              <span class="item-label">适用费率（%）：</span>
-              <el-input v-if="!isPrintMode" v-model.number="formData.applicableRate" disabled
-                class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ formData.applicableRate || '————————' }}</span>
-            </div>
-          </div>
+      <!-- 第二行：联系人及电话 + 适用费率（%） -->
+      <el-col :span="4" class="label-cell">联系人及电话</el-col>
+      <el-col :span="8">
+        <!-- 正常模式：禁用输入框展示 联系人/联系电话 组合 -->
+        <input v-if="!isPrintMode" v-model="contactAndPhone" class="form-input" disabled />
+        <!-- 打印模式：纯文本展示 联系人/联系电话 组合 -->
+        <span v-else class="form-input">{{ contactAndPhone }}</span>
+      </el-col>
+      <el-col :span="4" class="label-cell">适用费率（%） </el-col>
+      <el-col :span="8">
+        <input v-if="!isPrintMode" v-model.number="formData.applicableRate" class="form-input" type="number" min="0"
+          step="0.01" disabled />
+        <span v-else class="form-input">{{ formData.applicableRate || '' }}</span>
+      </el-col>
 
-          <!-- 第三行：职工人数 + 月工资总额 -->
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">职工人数（人）：</span>
-              <el-input v-if="!isPrintMode" v-model.number="formData.employeeCount" disabled
-                class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ formData.employeeCount || '————————' }}</span>
-            </div>
-            <div class="form-item">
-              <span class="item-label">月工资总额（元）：</span>
-              <el-input v-if="!isPrintMode" v-model.number="formData.monthlySalaryTotal" disabled class="form-input" />
-              <span v-else class="print-text">{{ formData.monthlySalaryTotal || '————————————————————' }}</span>
-            </div>
-          </div>
+      <!-- 第三行：职工人数 + 月工资总额 + 月拨缴金额 -->
+      <el-col :span="4" class="label-cell">职工人数（人）</el-col>
+      <el-col :span="4">
+        <input v-if="!isPrintMode" v-model.number="formData.employeeCount" class="form-input" type="number" min="0"
+          disabled />
+        <span v-else class="form-input">{{ formData.employeeCount || '' }}</span>
+      </el-col>
+      <el-col :span="4" class="label-cell">月工资总额（元）</el-col>
+      <el-col :span="4">
+        <input v-if="!isPrintMode" v-model.number="formData.monthlySalaryTotal" class="form-input" type="number" min="0"
+          step="0.01" disabled />
+        <span v-else class="form-input">{{ formData.monthlySalaryTotal || '' }}</span>
+      </el-col>
+      <el-col :span="4" class="label-cell">月拨缴金额（元）</el-col>
+      <el-col :span="4">
+        <input v-if="!isPrintMode" v-model.number="formData.monthlyPayAmount" class="form-input" type="number" min="0"
+          step="0.01" disabled />
+        <span v-else class="form-input">{{ formData.monthlyPayAmount || '' }}</span>
+      </el-col>
 
-          <!-- 第四行：月拨缴金额 + 累计缓缴金额 -->
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">月拨缴金额（元）：</span>
-              <el-input v-if="!isPrintMode" v-model.number="formData.monthlyPayAmount" disabled class="form-input" />
-              <span v-else class="print-text">{{ formData.monthlyPayAmount || '————————————————————' }}</span>
-            </div>
-            <div class="form-item">
-              <span class="item-label">累计缓缴金额（元）：</span>
-              <el-input v-if="!isPrintMode" v-model.number="formData.totalDeferAmount" disabled class="form-input" />
-              <span v-else class="print-text">{{ formData.totalDeferAmount || '————————————————————' }}</span>
-            </div>
-          </div>
+      <!-- 第四行：申请缓缴期限 + 累计缓缴金额 -->
+      <el-col :span="4" class="label-cell">申请缓缴期限</el-col>
+      <el-col :span="8">
+        自
+        <span v-if="!isPrintMode" class="mini-input">{{ formData.deferStartDate ? formData.deferStartDate.split('-')[0]
+          : '' }}</span>
+        <span v-else class="mini-input">{{ formData.deferStartDate ? formData.deferStartDate.split('-')[0] : ''
+          }}</span> 年
+        <span v-if="!isPrintMode" class="mini-input">{{ formData.deferStartDate ? formData.deferStartDate.split('-')[1]
+          : '' }}</span>
+        <span v-else class="mini-input">{{ formData.deferStartDate ? formData.deferStartDate.split('-')[1] : ''
+          }}</span> 月
+        至
+        <span v-if="!isPrintMode" class="mini-input">{{ formData.deferEndDate ? formData.deferEndDate.split('-')[0] : ''
+          }}</span>
+        <span v-else class="mini-input">{{ formData.deferEndDate ? formData.deferEndDate.split('-')[0] : '' }}</span> 年
+        <span v-if="!isPrintMode" class="mini-input">{{ formData.deferEndDate ? formData.deferEndDate.split('-')[1] : ''
+          }}</span>
+        <span v-else class="mini-input">{{ formData.deferEndDate ? formData.deferEndDate.split('-')[1] : '' }}</span> 月，
+        共
+        <input v-if="!isPrintMode" v-model.number="formData.deferTotalMonth" class="mini-input" type="number" min="1"
+          disabled />
+        <span v-else class="mini-input">{{ formData.deferTotalMonth || '' }}</span> 月
+      </el-col>
+      <el-col :span="6" class="label-cell">累计缓缴金额（元）</el-col>
+      <el-col :span="6">
+        <input v-if="!isPrintMode" v-model.number="formData.totalDeferAmount" class="form-input" type="number" min="0"
+          step="0.01" disabled />
+        <span v-else class="form-input">{{ formData.totalDeferAmount || '' }}</span>
+      </el-col>
 
-          <!-- 第五行：缓缴期限 -->
-          <div class="form-row single-item">
-            <span class="item-label">申请缓缴期限：</span>
-            <div class="defer-period-box">
-              <span>自</span>
-              <el-input v-if="!isPrintMode" v-model="formData.deferStartDate" disabled class="form-input month-input" />
-              <span v-else class="print-text month-text">{{ formData.deferStartDate || '____年__月' }}</span>
-              <span>至</span>
-              <el-input v-if="!isPrintMode" v-model="formData.deferEndDate" disabled class="form-input month-input" />
-              <span v-else class="print-text month-text">{{ formData.deferEndDate || '____年__月' }}</span>
-              <span>，共</span>
-              <el-input v-if="!isPrintMode" v-model.number="formData.deferTotalMonth" disabled
-                class="form-input num-input" />
-              <span v-else class="print-text num-text">{{ formData.deferTotalMonth || '__' }}</span>
-              <span>月</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- 第五行：申请缓缴情况说明 -->
+      <el-col :span="4" class="label-cell">申请缓缴情况说明</el-col>
+      <el-col :span="20">
+        <textarea v-if="!isPrintMode" v-model="formData.situationDesc" class="form-textarea" rows="5"
+          disabled></textarea>
+        <span v-else class="form-textarea">{{ formData.situationDesc || '' }}</span>
+      </el-col>
+    </el-row>
 
-      <!-- 2. 申请说明模块 -->
-      <div class="form-module">
-        <div class="vertical-label-box" style="height: 40mm;">
-          <div class="vertical-label">申请说明</div>
-        </div>
-        <div class="module-content" style="height: 40mm;">
-          <div class="form-row single-item">
-            <span class="item-label">申请缓缴情况说明：</span>
-            <el-input v-if="!isPrintMode" v-model="formData.situationDesc" type="textarea" :rows="4" disabled
-              class="form-textarea" />
-            <span v-else class="print-textarea">{{ formData.situationDesc ||
-              '————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————'
-            }}</span>
+    <!-- 缴费单位 + 基层工会意见：无标题边框，居左布局 -->
+    <el-row class="approval-grid-container" :gutter="0" style="border-top: none;">
+      <el-col :span="12" class="approval-item-col">
+        <div class="approval-label">缴费单位（章）</div><br />
+        <div class="approval-sign-wrap">
+          <div class="sign-group">
+            <div>单位负责人：<input v-if="!isPrintMode" v-model="formData.unitLeader" class="sign-input" disabled /><span
+                v-else class="sign-input">{{ formData.unitLeader || '' }}</span></div>
+            <div>经办：<input v-if="!isPrintMode" v-model="formData.handler" class="sign-input" disabled /><span v-else
+                class="sign-input">{{ formData.handler || '' }}</span></div>
           </div>
-        </div>
-      </div>
-
-      <!-- 3. 缴费单位意见 -->
-      <div class="form-module" v-if="showUnitSection">
-        <div class="vertical-label-box" style="height: 30mm;">
-          <div class="vertical-label">缴费单位</div>
-        </div>
-        <div class="module-content" style="height: 30mm;">
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">单位负责人：</span>
-              <el-input v-if="!isPrintMode" v-model="formData.unitLeader" disabled class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ formData.unitLeader || '————————' }}</span>
-            </div>
-            <div class="form-item">
-              <span class="item-label">经办：</span>
-              <el-input v-if="!isPrintMode" v-model="formData.handler" disabled class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ formData.handler || '————————' }}</span>
-            </div>
-          </div>
-          <div class="form-row date-item">
-            <span class="item-label">日期:</span>
-            <el-date-picker v-if="!isPrintMode" v-model="formData.applyDate" type="date" format="YYYY-MM-DD"
-              value-format="YYYY-MM-DD" disabled class="form-date" />
-            <span v-else class="print-text short-text">{{ formData.applyDate || '____年__月__日' }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 4. 基层工会意见 -->
-      <div class="form-module" v-if="showGrassrootsSection">
-        <div class="vertical-label-box" style="height: 50mm;">
-          <div class="vertical-label">基层工会</div>
-        </div>
-        <div class="module-content" style="height: 50mm;">
-          <div class="form-row single-item">
-            <span class="item-label ">基层工会意见(章):</span>
-            <el-input v-if="!isPrintMode" v-model="formData.grassrootsOpinion" type="textarea" :rows="2" disabled
-              class="form-textarea" />
-            <span v-else class="print-text mid-text">{{ formData.grassrootsOpinion || '————————————————————' }}</span>
-          </div>
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">工会负责人：</span>
-              <el-input v-if="!isPrintMode" v-model="formData.grassrootsLeader" disabled
-                class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ formData.grassrootsLeader || '————————' }}</span>
-            </div>
-            <div class="form-item">
-              <span class="item-label">经办：</span>
-              <el-input v-if="!isPrintMode" v-model="formData.grassrootsHandler" disabled
-                class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ formData.grassrootsHandler || '————————' }}</span>
-            </div>
-          </div>
-          <div class="form-row date-item">
-            <span class="item-label">日期：</span>
-            <el-date-picker v-if="!isPrintMode" v-model="formData.grassrootsnApproveTime" type="date"
-              format="YYYY-MM-DD" value-format="YYYY-MM-DD" disabled class="form-date" />
-            <span v-else class="print-text short-text">{{ formData.grassrootsnApproveTime || '____年__月__日' }}</span>
+          <div class="date-line">
+            <span v-if="!isPrintMode" class="mini-input">{{ formData.applyDate ? formData.applyDate.split('-')[0] : ''
+              }}</span>
+            <span v-else class="mini-input">{{ formData.applyDate ? formData.applyDate.split('-')[0] : '' }}</span> 年
+            <span v-if="!isPrintMode" class="mini-input">{{ formData.applyDate ? formData.applyDate.split('-')[1] : ''
+              }}</span>
+            <span v-else class="mini-input">{{ formData.applyDate ? formData.applyDate.split('-')[1] : '' }}</span> 月
+            <span v-if="!isPrintMode" class="mini-input">{{ formData.applyDate ? formData.applyDate.split('-')[2] : ''
+              }}</span>
+            <span v-else class="mini-input">{{ formData.applyDate ? formData.applyDate.split('-')[2] : '' }}</span> 日
           </div>
         </div>
-      </div>
+      </el-col>
+      <el-col :span="12" class="approval-item-col">
+        <div class="approval-label">基层工会意见（章）</div>
 
-      <!-- 5. 主管工会审核意见 -->
-      <div class="form-module last-module" v-if="showManagerSection">
-        <div class="vertical-label-box" style="height: 70mm;">
-          <div class="vertical-label">主管工会</div>
-        </div>
-        <div class="module-content" style="height: 70mm;">
-          <div class="form-row single-item">
-            <span class="item-label">主管工会审核意见(章):</span>
-            <el-input v-if="!isPrintMode" v-model="formData.managerOpinion" type="textarea" :rows="2" disabled
-              class="form-textarea" />
-            <span v-else class="print-approve-text">{{ formData.managerOpinion ||
-              '————————————————————————————————————————————————————————————————————————————————————————————————————'
-            }}</span>
+        <textarea v-if="!isPrintMode" v-model="formData.grassrootsOpinion" disabled class="approval-textarea"
+          rows="2"></textarea>
+        <span v-else class="approval-textarea">{{ formData.managerOpinion || '' }}</span>
+
+
+        <div class="approval-sign-wrap">
+          <div class="sign-group">
+            <div>工会负责人：<input v-if="!isPrintMode" v-model="formData.grassrootsLeader" class="sign-input"
+                disabled /><span v-else class="sign-input">{{ formData.grassrootsLeader || '' }}</span></div>
+            <div>经办：<input v-if="!isPrintMode" v-model="formData.grassrootsHandler" class="sign-input" disabled /><span
+                v-else class="sign-input">{{ formData.grassrootsHandler || '' }}</span></div>
           </div>
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">工会负责人：</span>
-              <el-input v-if="!isPrintMode" v-model="formData.managerLeaderName" disabled
-                class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ formData.managerLeaderName || '————————' }}</span>
-            </div>
-            <div class="form-item">
-              <span class="item-label">财务负责人：</span>
-              <el-input v-if="!isPrintMode" v-model="formData.managerFinanceLeader" disabled
-                class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ formData.managerFinanceLeader || '————————' }}</span>
-            </div>
-          </div>
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">经办：</span>
-              <el-input v-if="!isPrintMode" v-model="formData.managerHandlerName" disabled
-                class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ formData.managerHandlerName || '————————' }}</span>
-            </div>
-            <div class="form-item date-item">
-              <span class="item-label">日期：</span>
-              <el-date-picker v-if="!isPrintMode" v-model="formData.managerApproveTime" type="date" format="YYYY-MM-DD"
-                value-format="YYYY-MM-DD" disabled class="form-date" />
-              <span v-else class="print-text short-text">{{ formData.managerApproveTime || '____年__月__日' }}</span>
-            </div>
+          <div class="date-line">
+            <span v-if="!isPrintMode" class="mini-input">{{ formData.grassrootsApproveTime ?
+              formData.grassrootsApproveTime.split('-')[0] : '' }}</span>
+            <span v-else class="mini-input">{{ formData.grassrootsApproveTime ?
+              formData.grassrootsApproveTime.split('-')[0] : '' }}</span> 年
+            <span v-if="!isPrintMode" class="mini-input">{{ formData.grassrootsApproveTime ?
+              formData.grassrootsApproveTime.split('-')[1] : '' }}</span>
+            <span v-else class="mini-input">{{ formData.grassrootsApproveTime ?
+              formData.grassrootsApproveTime.split('-')[1] : '' }}</span> 月
+            <span v-if="!isPrintMode" class="mini-input">{{ formData.grassrootsApproveTime ?
+              formData.grassrootsApproveTime.split('-')[2] : '' }}</span>
+            <span v-else class="mini-input">{{ formData.grassrootsApproveTime ?
+              formData.grassrootsApproveTime.split('-')[2] : '' }}</span> 日
           </div>
         </div>
-      </div>
-    </div>
+      </el-col>
+    </el-row>
 
-    <!-- 打印按钮 -->
-    <div class="no-print print-btn-box">
-      <el-button type="primary" size="large" @click="handlePrint">打印申请表</el-button>
-    </div>
+    <!-- 主管工会审核意见：无标题边框，居左布局 -->
+    <el-row class="super-union-grid-container" :gutter="0" style="margin-top: -1px;">
+      <el-col :span="24" class="super-union-col">
+        <div class="approval-label">主管工会审核意见（章）</div><br />
+        <textarea v-if="!isPrintMode" v-model="formData.managerOpinion" disabled class="approval-textarea"
+          rows="2"></textarea>
+        <span v-else class="approval-textarea">{{ formData.managerOpinion || '' }}</span>
+
+        <div class="approval-section">
+          <div>工会负责人：<input v-if="!isPrintMode" v-model="formData.managerLeaderName" class="sign-input" disabled /><span
+              v-else class="sign-input">{{ formData.managerLeaderName || '' }}</span></div><br />
+          <div>财务负责人：<input v-if="!isPrintMode" v-model="formData.managerFinanceLeader" class="sign-input" disabled />
+            <span v-else class="sign-input" style="margin-left: 20px;">{{ formData.managerFinanceLeader || '' }}</span>
+            经办：<input v-if="!isPrintMode" v-model="formData.managerHandlerName" class="sign-input" disabled /><span
+              v-else class="sign-input">{{ formData.managerHandlerName || '' }}</span>
+          </div>
+
+          <div class="date-line" style="margin-top: 15px;">
+            <span v-if="!isPrintMode" class="mini-input">{{ formData.managerApproveTime ?
+              formData.managerApproveTime.split('-')[0] : '' }}</span>
+            <span v-else class="mini-input">{{ formData.managerApproveTime ? formData.managerApproveTime.split('-')[0] :
+              '' }}</span> 年
+            <span v-if="!isPrintMode" class="mini-input">{{ formData.managerApproveTime ?
+              formData.managerApproveTime.split('-')[1] : '' }}</span>
+            <span v-else class="mini-input">{{ formData.managerApproveTime ? formData.managerApproveTime.split('-')[1] :
+              '' }}</span> 月
+            <span v-if="!isPrintMode" class="mini-input">{{ formData.managerApproveTime ?
+              formData.managerApproveTime.split('-')[2] : '' }}</span>
+            <span v-else class="mini-input">{{ formData.managerApproveTime ? formData.managerApproveTime.split('-')[2] :
+              '' }}</span> 日
+          </div>
+        </div>
+      </el-col>
+    </el-row>
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElRow, ElCol, ElButton } from 'element-plus'
 import { WfJfhjSqApi } from '@/api/lghjft/workflow/wfjfhjsq'
-import type { WfJfhjSq, WfJfhjSqSubmit } from '@/api/lghjft/workflow/wfjfhjsq'
+import type { WfJfhjSq } from '@/api/lghjft/workflow/wfjfhjsq'
 
-// 接收父组件传递的ID
+// 接收父组件ID
 const props = defineProps<{ id: number }>()
 
 // 响应式数据
-const formData = ref<WfJfhjSq>({
-  id: 0,
-  shxydm: '',
-  nsrmc: '',
-  contactPhone: '',
-  applicableRate: 0,
-  employeeCount: 0,
-  monthlySalaryTotal: 0,
-  monthlyPayAmount: 0,
-  deferStartDate: '',
-  deferEndDate: '',
-  deferTotalMonth: 0,
-  totalDeferAmount: 0,
-  situationDesc: '',
-  unitLeader: '',
-  handler: '',
-  applyDate: '',
-  grassrootsOpinion: '',
-  grassrootsLeader: '',
-  grassrootsHandler: '',
-  grassrootsnApproveTime: '',
-  managerOpinion: '',
-  managerLeaderName: '',
-  managerHandlerName: '',
-  managerApproveTime: '',
-  managerFinanceLeader: '',
-  processInstanceId: ''
+const formData = ref<WfJfhjSq>({} as WfJfhjSq)
+
+const contactAndPhone = computed(() => {
+  // 从formData中获取联系人、联系电话，空值兜底为空字符串
+  const name = formData.value.contact || ''
+  const phone = formData.value.contactPhone || ''
+  // 智能拼接，无多余符号
+  if (!name && !phone) return ''
+  if (!name) return phone
+  if (!phone) return name
+  return `${name} / ${phone}`
 })
 const isPrintMode = ref(false)
 
-// 计算是否显示各审批模块（无数据则不显示）
-const showUnitSection = computed(() => !!(
-  formData.value.unitLeader || formData.value.handler || formData.value.applyDate
-))
-
-const showGrassrootsSection = computed(() => !!(
-  formData.value.grassrootsOpinion || formData.value.grassrootsLeader ||
-  formData.value.grassrootsHandler || formData.value.grassrootsnApproveTime
-))
-
-const showManagerSection = computed(() => !!(
-  formData.value.managerOpinion || formData.value.managerLeaderName ||
-  formData.value.managerFinanceLeader || formData.value.managerHandlerName ||
-  formData.value.managerApproveTime
-))
-
-// 自动计算缓缴月数
-watch([() => formData.value.deferStartDate, () => formData.value.deferEndDate], () => {
-  if (formData.value.deferStartDate && formData.value.deferEndDate) {
-    const [startYear, startMonth] = formData.value.deferStartDate.split('-').map(Number)
-    const [endYear, endMonth] = formData.value.deferEndDate.split('-').map(Number)
-    const totalMonths = (endYear - startYear) * 12 + (endMonth - startMonth)
-    formData.value.deferTotalMonth = totalMonths < 1 ? 1 : totalMonths
-
-    // 自动计算累计缓缴金额（月拨缴金额 * 缓缴月数）
-    if (formData.value.monthlyPayAmount) {
+// 自动计算缓缴月数和累计金额
+watch([() => formData.value.deferStartDate, () => formData.value.deferEndDate, () => formData.value.monthlyPayAmount], () => {
+  if (formData.value.deferStartDate && formData.value.deferEndDate && formData.value.monthlyPayAmount !== undefined) {
+    try {
+      const [startYear, startMonth] = formData.value.deferStartDate.split('-').map(Number)
+      const [endYear, endMonth] = formData.value.deferEndDate.split('-').map(Number)
+      const totalMonths = (endYear - startYear) * 12 + (endMonth - startMonth)
+      formData.value.deferTotalMonth = totalMonths < 1 ? 1 : totalMonths
       formData.value.totalDeferAmount = formData.value.monthlyPayAmount * formData.value.deferTotalMonth
+    } catch (e) {
+      console.error('计算缓缴数据失败：', e)
     }
-  } else {
-    formData.value.deferTotalMonth = 0
-    formData.value.totalDeferAmount = 0
   }
-})
+}, { deep: true })
 
-// 加载详情数据
-onMounted(async () => {
-  await loadDetail()
-
-})
-
+// 加载数据核心方法
 const loadDetail = async () => {
   try {
     const res = await WfJfhjSqApi.getWfJfhjSq(props.id)
-    // 单独处理基层审批日期
-    if (Array.isArray(res.grassrootsnApproveTime) && res.grassrootsnApproveTime.length === 3) {
-      const [y, m, d] = res.grassrootsnApproveTime
-      res.grassrootsnApproveTime = `${y}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`
+    if (!res) {
+      ElMessage.warning('未查询到数据，请检查ID是否正确')
+      return
     }
-    res.grassrootsnApproveTime = res.grassrootsnApproveTime || ''
-
-    // 单独处理主管审批日期
-    if (Array.isArray(res.managerApproveTime) && res.managerApproveTime.length === 3) {
-      const [y, m, d] = res.managerApproveTime
-      res.managerApproveTime = `${y}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`
+    // 日期格式化（兼容数组/字符串格式）
+    const formatDate = (date: any) => {
+      if (Array.isArray(date) && date.length === 3) {
+        const [y, m, d] = date
+        return `${y}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`
+      } else if (typeof date === 'string' && date) return date
+      return ''
     }
-    res.managerApproveTime = res.managerApproveTime || ''
-    formData.value = { ...res }
+    // 格式化所有日期字段
+    res.grassrootsApproveTime = formatDate(res.grassrootsApproveTime)
+    res.managerApproveTime = formatDate(res.managerApproveTime)
+    res.applyDate = formatDate(res.applyDate)
+    res.deferStartDate = formatDate(res.deferStartDate)
+    res.deferEndDate = formatDate(res.deferEndDate)
+    // 响应式赋值
+    Object.assign(formData.value, res)
   } catch (error) {
-    console.error('加载缓缴申请详情失败：', error)
+    console.error('加载数据失败：', error)
     ElMessage.error('数据加载失败，请重试')
   }
 }
 
-// 打印功能（沿用原汇总表的简洁打印方式）
-const handlePrint = () => {
-  isPrintMode.value = true
-  // 延迟执行打印，确保DOM渲染完成
-  setTimeout(() => {
-    window.print()
-    isPrintMode.value = false
-  }, 100)
-}
+// 刷新数据
+const refreshData = async () => await loadDetail()
+
+// 页面挂载加载
+onMounted(async () => await loadDetail())
+
+
+
+// 暴露刷新方法给父组件
+defineExpose({ refreshData })
 </script>
 
 <style scoped>
-/* 全局样式重置（对齐原汇总表） */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* 全局容器：与参考样式完全一致 */
+.form-container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 0 20px;
+  font-family: "SimSun", serif;
+  font-size: 17px;
 }
 
-/* 页面容器样式 */
-.apply-form-container {
-  width: 100%;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: 'SimSun', '宋体', sans-serif;
-  background-color: #f9f9f9;
-}
-
-/* A4纸张样式 */
-.a4-paper {
-  width: 210mm;
-  min-height: 297mm;
-  padding: 15mm 10mm;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  background: #fff;
-  margin-bottom: 20px;
-}
-
-/* 打印按钮样式 */
-.print-btn-box {
-  margin-top: 20px;
-}
-
-/* 表单标题样式 */
 .form-title {
   font-size: 22px;
   font-weight: bold;
+  margin: 0;
   text-align: center;
-  margin-bottom: 10mm;
-  letter-spacing: 2px;
-  color: #333;
 }
 
-/* 表单模块容器 */
-.form-module {
-  display: flex;
+.fill-date-col {
+  text-align: right;
+}
+
+/* 基础信息栅格：参考样式的边框/内边距 */
+:deep(.form-grid-container) {
   width: 100%;
-  position: relative;
-  /* margin-bottom: 3mm; */
-}
-
-/* 最后一个模块取消底部间距 */
-.last-module {
-  margin-bottom: 0;
-}
-
-/* 左侧垂直标签盒子 */
-.vertical-label-box {
-  width: 10mm;
   border: 1px solid #000;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  background-color: #f5f5f5;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
 }
 
-/* 垂直标签文字 */
-.vertical-label {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  font-size: 18px;
-  font-weight: bold;
-  letter-spacing: 4px;
-  color: #333;
+:deep(.form-grid-container .el-col) {
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  padding: 8px;
+  box-sizing: border-box;
+  vertical-align: middle;
+  line-height: 2;
+  margin: 0 !important;
 }
 
-/* 模块内容区域 */
-.module-content {
-  flex: 1;
-  border: 1px solid #000;
-  padding: 5mm;
-  background-color: #fff;
+:deep(.form-grid-container .el-col:last-child) {
+  border-right: none;
 }
 
-/* 表单行样式 */
-.form-row {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  margin-bottom: 3mm;
+:deep(.form-grid-container .el-col:nth-last-child(-n+2)) {
+  border-bottom: none;
 }
 
-/* 最后一行取消底部间距 */
-.form-row:last-child {
-  margin-bottom: 0;
+/* 标签单元格：居中对齐 */
+.label-cell {
+  text-align: center;
+  font-weight: normal;
 }
 
-/* 双列布局 */
-.double-item {
-  justify-content: space-between;
-}
-
-/* 单列布局 */
-.single-item {
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-/* 表单项样式 */
-.form-item {
-  display: flex;
-  align-items: center;
-  gap: 2mm;
-  width: 100%;
-}
-
-/* 双列表单项宽度 */
-.double-item .form-item {
-  width: 48%;
-}
-
-/* 表单项标签 */
-.item-label {
-  font-size: 14px;
-  font-weight: bold;
-  white-space: nowrap;
-  color: #333;
-}
-
-/* 表单输入框样式 */
+/* 核心修改：为所有输入/显示区域添加下划线 */
 .form-input {
-  flex: 1;
-  height: 8mm;
-  --el-input-border-color: #000;
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: center;
+  padding: 2px 0;
 }
 
-/* 短输入框样式 */
-.short-input {
-  width: 40mm;
-}
-
-/* 中等长度输入框 */
-.mid-input {
-  width: 70mm;
-}
-
-/* 月份输入框 */
-.month-input {
-  width: 45mm;
-}
-
-/* 数字输入框 */
-.num-input {
-  width: 18mm;
-}
-
-/* 文本域样式 */
 .form-textarea {
   width: 100%;
-  --el-input-border-color: #000;
-  margin-top: 2mm;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
   resize: none;
+  min-height: 100px;
+  text-align: left;
+  padding: 5px;
 }
 
-/* 短文本域 */
-.short-textarea {
-  min-height: 20mm;
+.mini-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: center;
+  width: 50px;
+  border-bottom: 1px dashed #000;
+  padding: 2px 0;
 }
 
-/* 日期选择器样式 */
-.form-date {
-  width: 40mm;
-  height: 8mm;
-  --el-input-border-color: #000;
+.sign-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  width: 120px;
+  margin-left: 5px;
+  text-align: center;
+  border-bottom: 1px solid #000;
+  padding: 2px 0;
 }
 
-/* 日期项对齐方式 */
-.date-item {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 2mm;
-}
-
-/* 缓缴期限盒子 */
-.defer-period-box {
-  display: flex;
-  align-items: center;
-  gap: 2mm;
+/* 审批区域栅格：与参考样式一致的边框/布局 */
+:deep(.approval-grid-container) {
   width: 100%;
-  margin-top: 2mm;
+  border: 1px solid #000;
+  border-bottom: none;
+  display: flex;
   flex-wrap: wrap;
 }
 
-/* 公章标签 */
-.seal-label {
-  margin-left: 3mm;
+:deep(.approval-item-col) {
+  border-right: 1px solid #000;
+  padding: 15px;
+  box-sizing: border-box;
+  margin: 0 !important;
+}
+
+:deep(.approval-item-col:last-child) {
+  border-right: none;
+}
+
+:deep(.super-union-grid-container) {
+  width: 100%;
+  border: 1px solid #000;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+:deep(.super-union-col) {
+  padding: 15px;
+  box-sizing: border-box;
+  margin: 0 !important;
+}
+
+/* 审批内部样式：居左/间距与参考一致 */
+.approval-label {
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.sign-group {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  flex-wrap: wrap;
+}
+
+.approval-sign-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.approval-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.date-line {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-end;
+}
+
+
+.approval-textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  /* font-family: inherit; */
+  font-size: 20px;
   font-weight: bold;
-  flex-shrink: 0;
-  font-size: 14px;
+  resize: none;
+  min-height: 40px;
+  margin: 10px 4dvb;
 }
 
-/* 打印模式文本样式 */
-.print-text {
-  display: inline-block;
-  border-bottom: 1px solid #000;
-  height: 8mm;
-  line-height: 8mm;
-  padding: 0 2mm;
-  width: calc(100% - 60px);
-  color: #333;
+/* 打印适配：移除固定宽高，强制自适应 */
+:deep(.el-form) {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
 }
 
-/* 短文本打印样式 */
-.print-text.short-text {
-  width: 40mm;
+/* 移除自定义表单内的固定宽度容器 */
+.form-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: unset !important;
+  /* 清除min-width，避免超出A4 */
+  height: auto !important;
+  overflow: visible !important;
 }
 
-/* 中等文本打印样式 */
-.print-text.mid-text {
-  width: 70mm;
+@page {
+  size: A4 portrait !important;
+  /* 强制纵向A4 */
+  margin: 0.5cm !important;
+  /* 极小边距，最大化内容区域 */
+  margin-top: 1cm !important;
+  /* 顶部留少量边距，避免标题顶边 */
 }
 
-/* 月份文本打印样式 */
-.print-text.month-text {
-  width: 45mm;
-}
-
-/* 数字文本打印样式 */
-.print-text.num-text {
-  width: 18mm;
-}
-
-/* 文本域打印样式 */
-.print-textarea {
-  display: block;
-  width: 100%;
-  min-height: 30mm;
-  border-bottom: 1px solid #000;
-  padding: 2mm;
-  white-space: pre-wrap;
-  line-height: 1.5;
-  color: #333;
-}
-
-/* 审批文本打印样式 */
-.print-approve-text {
-  display: block;
-  width: 100%;
-  min-height: 20mm;
-  border-bottom: 1px solid #000;
-  padding: 2mm;
-  white-space: pre-wrap;
-  line-height: 1.5;
-  color: #333;
-}
-
-/* 打印样式适配 */
+/* 打印适配核心样式（替换原有@media print内容） */
 @media print {
-  body {
-    margin: 0;
-    padding: 0;
-    background: #fff;
-    font-family: 'SimSun', '宋体', sans-serif;
-  }
 
-  .apply-form-container {
-    padding: 0;
-    background: #fff;
-  }
-
-  .a4-paper {
-    border: none;
-    box-shadow: none;
-    padding: 0;
-    min-height: 297mm;
-    margin-bottom: 0;
-  }
-
-  /* 打印时隐藏非打印元素 */
-  .no-print {
+  /* 1. 隐藏按钮和弹窗（保留原有） */
+  :deep(.el-button),
+  .btn-group,
+  :deep(.el-dialog),
+  :deep(.el-dialog__wrapper) {
     display: none !important;
   }
 
-  /* 打印时隐藏输入框/按钮等交互元素 */
-  :deep(.el-input),
-  :deep(.el-textarea),
-  :deep(.el-date-picker),
-  :deep(.el-button) {
-    display: none !important;
+  /*  2. 核心修改：强制主表/附件表容器铺满A4 */
+  .main-form-container,
+  .attachment-form-container {
+    max-width: 100% !important;
+    /* 移除宽度限制 */
+    width: 100% !important;
+    /* 强制100%宽度 */
+    margin: 0 !important;
+    /* 移除外边距 */
+    padding: 0 0.5cm !important;
+    /* 和@page边距匹配，避免内容溢出 */
+    min-width: unset !important;
+    /* 移除最小宽度限制 */
   }
 
-  /* 打印时边框颜色加深 */
-  .vertical-label-box,
-  .module-content {
-    border-color: #000;
-  }
-}
-
-/* 响应式适配 */
-@media screen and (max-width: 1200px) {
-  .a4-paper {
-    width: 100%;
-    min-height: auto;
-    border: none;
-    box-shadow: none;
-    padding: 20px;
+  /* 2. 强制分页生效（保留原有） */
+  .main-form-container {
+    page-break-after: always !important;
   }
 
-  .vertical-label-box {
-    width: 60px;
-    height: auto;
+  /*  3. 新增：打印时附件表容器也铺满 */
+  .attachment-table-scroll {
+    max-width: 100% !important;
+    overflow-x: visible !important;
+    margin: 0 !important;
   }
 
-  .form-module {
-    margin-bottom: 20px;
+  /*  4. 新增：全局元素强制适配A4 */
+  * {
+    box-sizing: border-box !important;
+    /* 盒模型统一，避免宽度计算错误 */
+    height: auto !important;
+    overflow: visible !important;
+    max-width: 100% !important;
+    /* 所有元素不超A4宽度 */
   }
 
-  .module-content {
-    height: auto;
-    min-height: 120px;
+  /*  5. 新增：表格强制铺满 */
+  .form-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    /* 边框合并，避免错位 */
   }
 
-  .vertical-label {
-    writing-mode: horizontal-tb;
-    text-orientation: mixed;
-  }
-
-  .double-item {
-    flex-wrap: wrap;
-  }
-
-  .double-item .form-item {
-    width: 100%;
-    margin-bottom: 10px;
+  /*  6. 新增：覆盖若依打印容器样式 */
+  :deep(.print-container),
+  :deep(.app-container) {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 }
 </style>

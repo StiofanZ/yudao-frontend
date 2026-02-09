@@ -22,7 +22,6 @@
         </div>
       </el-col>
     </el-row>
-
     <!-- 隐藏的文件输入 -->
     <input ref="fileInput" type="file" style="display: none" accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.doc,.docx"
       @change="handleFileChange" />
@@ -40,13 +39,13 @@ import { log } from 'node:console'
 interface AttachmentItem {
   key: string
   label: string
-  fileUrl: string       // ✅ 文件完整 URL
+  fileUrl: string
   fileName: string
   previewUrl: string    // 上传过程中的本地预览
 }
 
 const props = defineProps<{
-  modelValue: { type: string; fileUrl: string }[] // ✅ 改为 fileUrl
+  modelValue: { type: string; fileUrl: string }[]
 }>()
 const emit = defineEmits<{
   (e: 'update:modelValue', value: { type: string; fileUrl: string }[]): void
@@ -112,7 +111,7 @@ const handleFileChange = async (event: Event) => {
     const res = await updateFile(formData) // 返回 { code: 0, data: "http://..." }
     console.log(res);
 
-    // 3. ✅ 拿到文件 URL
+    // 3.拿到文件 URL
     const fileUrl = res.data // 字符串
 
     // 4. 更新对应项
@@ -184,6 +183,7 @@ function isImageUrl(url: string): boolean {
   background-color: #f0f0f0;
 }
 
+
 .preview-img {
   width: 100%;
   height: 100%;
@@ -203,6 +203,7 @@ function isImageUrl(url: string): boolean {
   color: #303133;
   margin-bottom: 4px;
 }
+
 
 .filename {
   font-size: 12px;

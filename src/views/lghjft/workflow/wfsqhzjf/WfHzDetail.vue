@@ -1,265 +1,222 @@
 <template>
-  <div class="apply-form-container" id="print-area">
-    <div class="a4-paper" id="print-target-apply">
-      <!-- 申请表标题 -->
-      <div class="form-title">工会经费汇总缴纳申请表</div>
-
-      <!-- 1. 基本信息模块 -->
-      <div class="form-module">
-        <div class="vertical-label-box" style="height: 74mm;">
-          <div class="vertical-label">基本信息</div>
-        </div>
-        <div class="module-content" style="height: 74mm;">
-          <!-- 社会信用代码 + 单位全称 -->
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">社会信用代码：</span>
-              <el-input v-if="!isPrintMode" v-model="data.xyxdm" disabled class="form-input" />
-              <span v-else class="print-text">{{ data.xyxdm || '————————————————————' }}</span>
-            </div>
-            <div class="form-item">
-              <span class="item-label">申请单位全称：</span>
-              <el-input v-if="!isPrintMode" v-model="data.dwqc" disabled class="form-input" />
-              <span v-else class="print-text">{{ data.dwqc || '————————————————————' }}</span>
-            </div>
-          </div>
-          <!-- 主管税务部门 + 单位地址 -->
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">主管税务部门：</span>
-              <el-input v-if="!isPrintMode" v-model="data.zgsbm" disabled class="form-input" />
-              <span v-else class="print-text">{{ data.zgsbm || '————————————————————' }}</span>
-            </div>
-            <div class="form-item">
-              <span class="item-label">缴费单位地址：</span>
-              <el-input v-if="!isPrintMode" v-model="data.dwdz" disabled class="form-input" />
-              <span v-else class="print-text">{{ data.dwdz || '————————————————————' }}</span>
-            </div>
-          </div>
-          <!-- 工会法人登记证号 + 工会全称 -->
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">工会法人登记证件号码：</span>
-              <el-input v-if="!isPrintMode" v-model="data.ghfrdjzjh" disabled class="form-input" />
-              <span v-else class="print-text">{{ data.ghfrdjzjh || '————————————————————' }}</span>
-            </div>
-            <div class="form-item">
-              <span class="item-label">缴费单位工会全称：</span>
-              <el-input v-if="!isPrintMode" v-model="data.ghqc" disabled class="form-input" />
-              <span v-else class="print-text">{{ data.ghqc || '————————————————————' }}</span>
-            </div>
-          </div>
-          <!-- 职工总人数 + 工会会员数 -->
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">职工总人数：</span>
-              <el-input v-if="!isPrintMode" v-model="data.zzgzs" disabled class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ data.zzgzs || '————————' }}</span>
-            </div>
-            <div class="form-item">
-              <span class="item-label">工会会员数：</span>
-              <el-input v-if="!isPrintMode" v-model="data.ghyhs" disabled class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ data.ghyhs || '————————' }}</span>
-            </div>
-          </div>
-          <!-- 工会负责人 + 联系电话 -->
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">工会负责人：</span>
-              <el-input v-if="!isPrintMode" v-model="data.ghfzr" disabled class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ data.ghfzr || '————————' }}</span>
-            </div>
-            <div class="form-item">
-              <span class="item-label">联系电话：</span>
-              <el-input v-if="!isPrintMode" v-model="data.lxdh" disabled class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ data.lxdh || '————————' }}</span>
-            </div>
-          </div>
-        </div>
+  <div class="print-wrapper">
+    <!-- 主申请表区域：打印在第一页A4 -->
+    <div class="main-form-container" id="print-area-main">
+      <div class="title-section">
+        <h1 class="form-title">甘肃省工会经费汇总缴纳申请表</h1>
       </div>
 
-      <!-- 2. 账户信息模块 -->
-      <div class="form-module">
-        <div class="vertical-label-box double-item-box" style="height: 30mm;">
-          <div class="vertical-label">账户信息</div>
-        </div>
-        <div class="module-content" style="height: 30mm;">
-          <!-- 工会账户账号 + 开户银行名称 -->
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">工会账户账号：</span>
-              <el-input v-if="!isPrintMode" v-model="data.ghzhzh" disabled class="form-input" />
-              <span v-else class="print-text">{{ data.ghzhzh || '————————————————————' }}</span>
+      <!-- 1. 基础信息表格 -->
+      <table class="form-table">
+        <tr>
+          <th>申请汇总缴费单位<br />社会信用代码</th>
+          <td>
+            <!-- 🔴 改为使用printModeFlag -->
+            <input v-if="!printModeFlag" v-model="data.xyxdm" disabled class="form-input" />
+            <span v-else class="form-input">{{ data.xyxdm || '' }}</span>
+          </td>
+          <th>申请汇总缴费<br />单位全称</th>
+          <td>
+            <input v-if="!printModeFlag" v-model="data.dwqc" disabled class="form-input" />
+            <span v-else class="form-input">{{ data.dwqc || '' }}</span>
+          </td>
+        </tr>
+        <tr>
+          <th>主管税务部门</th>
+          <td>
+            <input v-if="!printModeFlag" v-model="data.zgsbm" disabled class="form-input" />
+            <span v-else class="form-input">{{ data.zgsbm || '' }}</span>
+          </td>
+          <th>缴费单位地址</th>
+          <td>
+            <input v-if="!printModeFlag" v-model="data.dwdz" disabled class="form-input" />
+            <span v-else class="form-input">{{ data.dwdz || '' }}</span>
+          </td>
+        </tr>
+        <tr>
+          <th>工会法人<br />登记证件号码</th>
+          <td>
+            <input v-if="!printModeFlag" v-model="data.ghfrdjzjh" disabled class="form-input" />
+            <span v-else class="form-input">{{ data.ghfrdjzjh || '' }}</span>
+          </td>
+          <th>缴费单位<br />工会全称</th>
+          <td>
+            <input v-if="!printModeFlag" v-model="data.ghqc" disabled class="form-input" />
+            <span v-else class="form-input">{{ data.ghqc || '' }}</span>
+          </td>
+        </tr>
+        <tr>
+          <th>职工总人数</th>
+          <td>
+            <input v-if="!printModeFlag" v-model="data.zzgzs" disabled class="form-input" type="number" />
+            <span v-else class="form-input">{{ data.zzgzs || '' }}</span>
+          </td>
+          <th>工会会员数</th>
+          <td>
+            <input v-if="!printModeFlag" v-model="data.ghyhs" disabled class="form-input" type="number" />
+            <span v-else class="form-input">{{ data.ghyhs || '' }}</span>
+          </td>
+        </tr>
+        <tr>
+          <th>工会负责人</th>
+          <td>
+            <input v-if="!printModeFlag" v-model="data.ghfzr" disabled class="form-input" />
+            <span v-else class="form-input">{{ data.ghfzr || '' }}</span>
+          </td>
+          <th>联系电话</th>
+          <td>
+            <input v-if="!printModeFlag" v-model="data.lxdh" disabled class="form-input" />
+            <span v-else class="form-input">{{ data.lxdh || '' }}</span>
+          </td>
+        </tr>
+        <tr>
+          <th>工会账户账号</th>
+          <td>
+            <input v-if="!printModeFlag" v-model="data.ghzhzh" disabled class="form-input" />
+            <span v-else class="form-input">{{ data.ghzhzh || '' }}</span>
+          </td>
+          <th>开户银行名称</th>
+          <td>
+            <input v-if="!printModeFlag" v-model="data.khyhmc" disabled class="form-input" />
+            <span v-else class="form-input">{{ data.khyhmc || '' }}</span>
+          </td>
+        </tr>
+        <tr>
+          <th>工会账户户名</th>
+          <td>
+            <input v-if="!printModeFlag" v-model="data.ghzhhm" disabled class="form-input" />
+            <span v-else class="form-input">{{ data.ghzhhm || '' }}</span>
+          </td>
+          <th>开户银行<br />网点代码</th>
+          <td>
+            <input v-if="!printModeFlag" v-model="data.khyhwdm" disabled class="form-input" placeholder="非必填" />
+            <span v-else class="form-input">{{ data.khyhwdm || '' }}</span>
+          </td>
+        </tr>
+      </table>
+
+      <!-- 2. 汇总申报原因 -->
+      <table class="form-table">
+        <tr>
+          <th width="18%">汇总申报缴纳原因</th>
+          <td width="82%">
+            <textarea v-if="!printModeFlag" v-model="data.hzbsjygy" disabled class="form-textarea" rows="5"></textarea>
+            <span v-else class="form-textarea">{{ data.hzbsjygy || '' }}</span>
+            <div class="sign-block">
+              <div>（盖章）</div><br />
+              <div>负责人：
+                <input v-if="!printModeFlag" v-model="data.fzrxm" disabled class="sign-input" />
+                <span v-else class="sign-input">{{ data.fzrxm || '' }}</span>
+              </div><br />
+              <div>经办人及联系电话：
+                <input v-if="!printModeFlag" v-model="data.jbrxm" disabled class="sign-input" />
+                <span v-else class="sign-input">{{ data.jbrxm || '' }}</span>
+                <span v-if="data.jbrdh" style="margin-left: 10px;">/</span>
+                <input v-if="!printModeFlag && data.jbrdh" v-model="data.jbrdh" disabled class="sign-input"
+                  style="width: 100px;" />
+                <span v-else-if="data.jbrdh" class="sign-input" style="width: 100px;">{{ data.jbrdh || '' }}</span>
+              </div>
+              <div class="date-line">
+                <span class="mini-input">{{ formatDatePart(data.sqrq, 'year') }}</span> 年
+                <span class="mini-input">{{ formatDatePart(data.sqrq, 'month') }}</span> 月
+                <span class="mini-input">{{ formatDatePart(data.sqrq, 'day') }}</span> 日
+              </div>
             </div>
-            <div class="form-item">
-              <span class="item-label">开户银行名称：</span>
-              <el-input v-if="!isPrintMode" v-model="data.khyhmc" disabled class="form-input" />
-              <span v-else class="print-text">{{ data.khyhmc || '————————————————————' }}</span>
-            </div>
-          </div>
-          <!-- 工会账户户名 + 开户银行网点代码 -->
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">工会账户户名：</span>
-              <el-input v-if="!isPrintMode" v-model="data.ghzhhm" disabled class="form-input" />
-              <span v-else class="print-text">{{ data.ghzhhm || '————————————————————' }}</span>
-            </div>
-            <div class="form-item">
-              <span class="item-label">开户银行网点代码：</span>
-              <el-input v-if="!isPrintMode" v-model="data.khyhwdm" placeholder="非必填" disabled class="form-input" />
-              <span v-else class="print-text">{{ data.khyhwdm || '————————————————————' }}</span>
-            </div>
-          </div>
-        </div>
+          </td>
+        </tr>
+      </table>
+
+      <!-- 3. 附件资料说明 -->
+      <div class="attachment-note" style="text-align: center; border-top:none ;">
+        附件资料：共
+        <input v-if="!printModeFlag" v-model="data.fjgzs" disabled class="mini-input" type="number" />
+        <span v-else class="mini-input">{{ data.fjgzs || 0 }}</span>
+        户分支机构（下属企业、子公司）申请汇总缴纳工会经费。
       </div>
 
-      <!-- 3. 申请信息模块 -->
-      <div class="form-module">
-        <div class="vertical-label-box">
-          <div class="vertical-label">申请信息</div>
-        </div>
-        <div class="module-content attachment-module" style="height: 30mm;">
-          <!-- 汇总申报缴纳原因 -->
-          <div class="form-row single-item">
-            <span class="item-label">汇总申报缴纳原因：</span>
-            <el-input v-if="!isPrintMode" v-model="data.hzbsjygy" type="textarea" :rows="4" disabled
-              class="form-textarea" />
-            <span v-else class="print-textarea">{{ data.hzbsjygy ||
-              '————————————————————————————————————————————————————————————————————————————————————————————————————'
-            }}</span>
-          </div>
-          <!-- 负责人+经办人 -->
-          <div class="form-row double-item" style="margin-top: 2mm;">
-            <div class="form-item">
-              <span class="item-label">负责人：</span>
-              <el-input v-if="!isPrintMode" v-model="data.fzrxm" disabled class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ data.fzrxm || '————————' }}</span>
+      <!-- 4. 审核意见区 -->
+      <table class="form-table">
+        <tr>
+          <th width="20%">主管工会<br />审核意见</th>
+          <td width="30%">
+            <div style="text-align: center;">（盖章）</div> <br />
+            <textarea v-if="!printModeFlag" v-model="data.zgghsjy" disabled class="form-textarea" rows="2"
+              style="margin-top:20px; margin-left: 40px; font-weight: bolder; font-size: 20px;"></textarea>
+            <span v-else class="form-textarea" style="min-height: 60px;">{{ data.zgghsjy || '' }}</span>
+            <div>负责人：
+              <input v-if="!printModeFlag" v-model="data.zgghsfzr" disabled class="sign-input" />
+              <span v-else class="sign-input">{{ data.zgghsfzr || '' }}</span>
             </div>
-            <div class="form-item">
-              <span class="item-label">经办人姓名：</span>
-              <el-input v-if="!isPrintMode" v-model="data.jbrxm" disabled class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ data.jbrxm || '————————' }}</span>
+            <br />
+            <div>经办人及联系电话：
+              <input v-if="!printModeFlag" v-model="data.zgghsjbr" disabled class="sign-input" />
+              <span v-else class="sign-input">{{ data.zgghsjbr || '' }}</span>
+              <span v-if="data.zgghsjbrdh" style="margin-left: 10px;">/</span>
+              <input v-if="!printModeFlag && data.zgghsjbrdh" v-model="data.zgghsjbrdh" disabled class="sign-input"
+                style="width: 100px;" />
+              <span v-else-if="data.zgghsjbrdh" class="sign-input" style="width: 100px;">{{ data.zgghsjbrdh || ''
+                }}</span>
             </div>
-          </div>
-          <!-- 经办人电话+申请日期 -->
-          <div class="form-row double-item">
-            <div class="form-item">
-              <span class="item-label">经办人联系电话：</span>
-              <el-input v-if="!isPrintMode" v-model="data.jbrdh" disabled class="form-input short-input" />
-              <span v-else class="print-text short-text">{{ data.jbrdh || '————————' }}</span>
+            <div class="date-line">
+              <span class="mini-input">{{ formatDatePart(data.zgghsrq, 'year') }}</span> 年
+              <span class="mini-input">{{ formatDatePart(data.zgghsrq, 'month') }}</span> 月
+              <span class="mini-input">{{ formatDatePart(data.zgghsrq, 'day') }}</span> 日
             </div>
-            <div class="form-item date-item">
-              <span class="item-label">申请日期：</span>
-              <el-date-picker v-if="!isPrintMode" v-model="data.sqrq" type="date" format="YYYY-MM-DD"
-                value-format="YYYY-MM-DD" disabled class="form-date" />
-              <span v-else class="print-text short-text">{{ data.sqrq || '____年__月__日' }}</span>
+          </td>
+          <th width="20%">省总工会<br />审核意见</th>
+          <td width="30%">
+            <div style="text-align: center;">（盖章）</div><br />
+            <textarea v-if="!printModeFlag" v-model="data.sghzsjy" disabled class="form-textarea" rows="2"
+              style="margin-top:20px; margin-left: 40px; font-weight: bolder; font-size: 20px;"></textarea>
+            <span v-else class="form-textarea" style="min-height: 60px;">{{ data.sghzsjy || '' }}</span>
+            <br /> <br />
+            <div>负责人：
+              <input v-if="!printModeFlag" v-model="data.sghsfzr" disabled class="sign-input" />
+              <span v-else class="sign-input">{{ data.sghsfzr || '' }}</span>
             </div>
-          </div>
-        </div>
-      </div>
+            <br />
+            <div class="date-line">
+              <span class="mini-input">{{ formatDatePart(data.sghsrq, 'year') }}</span> 年
+              <span class="mini-input">{{ formatDatePart(data.sghsrq, 'month') }}</span> 月
+              <span class="mini-input">{{ formatDatePart(data.sghsrq, 'day') }}</span> 日
+            </div>
+          </td>
+        </tr>
+      </table>
 
-      <!-- 4. 分支机构信息模块 -->
-      <div class="form-module">
-        <div class="vertical-label-box">
-          <div class="vertical-label">分支机构</div>
-        </div>
-        <div class="module-content attachment-module" style="height: 20mm;">
-          <div class="branch-info">
-            <span>共 {{ data.fjgzs || 0 }} 户分支机构申请汇总缴纳工会经费。</span>
-            <el-button v-if="!isPrintMode" type="primary" size="small" icon="el-icon-edit" @click="openBranchDialog"
-              style="margin-left: 16px;">
-              查看分支机构明细
-            </el-button>
-          </div>
-          <!-- 附件信息 -->
-          <div class="uploaded-attachment" v-if="attachmentList.length > 0 && attachmentList[0].label !== '无'">
-            <div class="upload-title">已上传附件：</div>
-            <el-table :data="attachmentList" :show-header="false" border style="width: 100%; margin-top: 8px;">
-              <el-table-column prop="label" width="300" />
-              <el-table-column prop="name">
-                <template #default="scope">
-                  <a :href="scope.row.url" target="_blank" class="file-link">{{ scope.row.name }}</a>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-        </div>
-      </div>
-
-      <!-- 5. 受理情况模块 -->
-      <div class="form-module last-module" v-if="showHandleSection">
-        <!-- 左侧标签高度动态计算 -->
-        <div class="vertical-label-box vertical-button-box" :style="{ height: handleModuleHeight + 'mm' }">
-          <div class="vertical-label">受理情况</div>
-        </div>
-
-        <div class="module-content handle-module" :style="{ height: handleModuleHeight + 'mm' }">
-          <!-- 主管工会审批盒子 -->
-          <div v-if="showManagerSection" class="approve-box">
-            <div class="approve-title">主管工会审批意见：</div>
-            <el-input v-if="!isPrintMode" v-model="data.zgghsjy" type="textarea" :rows="4" disabled
-              class="approve-textarea" />
-            <span v-else class="print-approve-text">{{ data.zgghsjy ||
-              '————————————————————————————————————————————————————————————————————————————————————————————————————'
-            }}</span>
-            <div class="approve-footer">
-              <div class="footer-item">
-                <span class="footer-label">负责人：</span>
-                <el-input v-if="!isPrintMode" v-model="data.zgghsfzr" disabled class="footer-input" />
-                <span v-else class="print-footer-text">{{ data.zgghsfzr || '————————' }}</span>
-              </div>
-              <div class="footer-item">
-                <span class="footer-label">经办人：</span>
-                <el-input v-if="!isPrintMode" v-model="data.zgghsjbr" disabled class="footer-input" />
-                <span v-else class="print-footer-text">{{ data.zgghsjbr || '————————' }}</span>
-              </div>
-              <div class="footer-item">
-                <span class="footer-label">经办人电话：</span>
-                <el-input v-if="!isPrintMode" v-model="data.zgghsjbrdh" disabled class="footer-input" />
-                <span v-else class="print-footer-text">{{ data.zgghsjbrdh || '————————' }}</span>
-              </div>
-              <div class="footer-item date-footer">
-                <span class="item-label">审批日期：</span>
-                <el-date-picker v-if="!isPrintMode" v-model="data.sqrq" type="date" format="YYYY-MM-DD"
-                  value-format="YYYY-MM-DD" disabled class="form-date" />
-                <span v-else class="print-text short-text">{{ data.sqrq || '____年__月__日' }}</span>
-              </div>
-              <div class="footer-item seal-item">(盖章)</div>
-            </div>
-          </div>
-          <!-- 省总工会审批盒子 -->
-          <div v-if="showProvinceSection" class="approve-box">
-            <div class="approve-title">省总工会审核意见：</div>
-            <el-input v-if="!isPrintMode" v-model="data.sghzsjy" type="textarea" :rows="4" disabled
-              class="approve-textarea" />
-            <span v-else class="print-approve-text">{{ data.sghzsjy ||
-              '————————————————————————————————————————————————————————————————————————————————————————————————————'
-            }}</span>
-            <div class="approve-footer">
-              <div class="footer-item">
-                <span class="footer-label">负责人：</span>
-                <el-input v-if="!isPrintMode" v-model="data.sghsfzr" disabled class="footer-input" />
-                <span v-else class="print-footer-text">{{ data.sghsfzr || '————————' }}</span>
-              </div>
-              <div class="footer-item date-footer">
-                <span class="item-label">审批日期：</span>
-                <el-date-picker v-if="!isPrintMode" v-model="data.sqrq" type="date" format="YYYY-MM-DD"
-                  value-format="YYYY-MM-DD" disabled class="form-date" />
-                <span v-else class="print-text short-text">{{ data.sqrq || '____年__月__日' }}</span>
-              </div>
-              <div class="footer-item seal-item">(盖章)</div>
-            </div>
-          </div>
-        </div>
+      <!-- 按钮区 -->
+      <div v-if="!printModeFlag" class="btn-group">
+        <el-button type="success" class="print-btn " @click="openBranchDialog">查看机构明细</el-button>
       </div>
     </div>
 
-    <!-- 打印按钮 -->
-    <div class="no-print print-btn-box">
-      <el-button type="primary" size="large" @click="handlePrint">打印申请表</el-button>
+    <!-- 分支机构明细附件表：打印在第二页A4（仅打印模式显示） -->
+    <!--  改为使用printModeFlag -->
+    <div v-if="printModeFlag && branchList.length > 0" class="attachment-form-container" id="print-area-attachment">
+      <div class="title-section">
+        <h1 class="form-title">汇总缴纳分支机构（下属企业、子公司）明细表</h1>
+      </div>
+      <table class="form-table" style="width: 100%;">
+        <tr style="background: #f5f5f5;">
+          <th style="width: 8%;">序号</th>
+          <th style="width: 20%;">社会信用代码</th>
+          <th style="width: 25%;">分支机构全称</th>
+          <th style="width: 22%;">主管税务部门</th>
+          <th style="width: 10%;">职工人数</th>
+          <th style="width: 15%;">月工资总额</th>
+        </tr>
+        <tr v-for="(item, index) in branchList" :key="item.id || index">
+          <td style="text-align: center;">{{ index + 1 }}</td>
+          <td>{{ item.fjgxyxdm || '' }}</td>
+          <td>{{ item.fjgdwqc || '' }}</td>
+          <td>{{ item.fjgzgsbm || '' }}</td>
+          <td style="text-align: center;">{{ item.fjggzs || 0 }}</td>
+          <td style="text-align: center;">{{ item.fjggzze || 0 }}</td>
+        </tr>
+      </table>
     </div>
 
-    <!-- 分支机构明细弹窗（引用 mxDetail 组件） -->
+    <!-- 分支机构明细弹窗 -->
     <el-dialog v-model="branchDialogVisible" title="分支机构明细" width="80%" height="90vh" top="10px" destroy-on-close
       append-to-body>
       <mxDetail :branch-list="branchList" @close="branchDialogVisible = false" />
@@ -268,14 +225,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getHZFDetail, HzApplyDetailRespVO } from '@/api/lghjft/workflow/wfsqhzjf/index'
-// 导入分支机构明细组件（mxDetail.vue）
 import mxDetail from './mxDetail.vue'
 
-// 扩展接口类型，适配实际返回的字段结构
-interface HzApplyDetailRespVOExt extends HzApplyDetailRespVO {
+// 定义后端可能返回的日期类型（数组/字符串）
+type DateType = string | number[]
+
+// 扩展接口
+interface HzApplyDetailRespVOExt extends Omit<HzApplyDetailRespVO, 'detailList' | 'branchList'> {
   detailList?: Array<{
     fjgxyxdm: string
     fjgdwqc: string
@@ -286,19 +245,26 @@ interface HzApplyDetailRespVOExt extends HzApplyDetailRespVO {
     id?: number
   }>
   sqrq: string
-  zgghsrq: string
-  sghsrq: string
+  zgghsrq?: string
+  sghsrq?: string
+  fjgzs?: number
+  hzbsjygy: string
+  fzrxm?: string
+  jbrxm?: string
+  jbrdh?: string
+  zgghsjy?: string
+  zgghsfzr?: string
+  zgghsjbr?: string
+  zgghsjbrdh?: string
+  sghzsjy?: string
+  sghsfzr?: string
 }
 
-// 附件数据类型
-interface AttachmentItem {
-  label: string
-  name: string
-  url?: string
-}
-
-// 接收父组件传递的ID参数
-const props = defineProps<{ id: number }>()
+// 接收父组件参数（ID + 打印模式）
+const props = defineProps<{
+  id: number
+  isPrintMode?: boolean // 接收PrintDialog传递的打印模式
+}>()
 
 // 初始化表单数据
 const data = ref<HzApplyDetailRespVOExt>({
@@ -325,8 +291,7 @@ const data = ref<HzApplyDetailRespVOExt>({
   fjgzs: 0,
   gzzt: '',
   attachments: [],
-  branchList: [],
-  detailList: [], // 实际返回的分支机构明细字段
+  detailList: [],
   zgghsjy: '',
   zgghgzz: '',
   zgghsfzr: '',
@@ -339,515 +304,234 @@ const data = ref<HzApplyDetailRespVOExt>({
   sghsrq: ''
 })
 
-// 附件列表
-const attachmentList = ref<AttachmentItem[]>([])
-// 分支机构明细数据
-const branchList = ref<any[]>([])
-// 打印模式标识
-const isPrintMode = ref(false)
-// 分支机构弹窗显示状态
-const branchDialogVisible = ref(false)
+// 响应式变量
+const branchList = ref<Array<{
+  fjgxyxdm: string
+  fjgdwqc: string
+  fjgzgsbm: string
+  fjggzs: number
+  fjggzze: number
+  hzId?: number
+  id?: number
+}>>([])
 
-// 页面加载时获取详情数据
+// 🔴 核心修复：重命名内部变量，避免和props的isPrintMode冲突
+const printModeFlag = ref<boolean>(false)
+const branchDialogVisible = ref<boolean>(false)
+
+// 监听打印模式（从PrintDialog传递）
+watch(() => props.isPrintMode, (val) => {
+  printModeFlag.value = val || false // 🔴 赋值给新变量
+}, { immediate: true })
+
+// 页面挂载加载数据
 onMounted(async () => {
   await loadDetail()
 })
 
-// 加载详情数据的核心函数
+// 加载详情数据
 const loadDetail = async () => {
   try {
-    // 调用接口获取数据
     const res = await getHZFDetail(props.id)
-    const resData = res as HzApplyDetailRespVOExt
-    data.value = resData
+    console.log(res);
 
-    // 处理分支机构明细数据（核心：读取 detailList 字段）
-    if (resData.detailList && Array.isArray(resData.detailList)) {
+    const resData = res as HzApplyDetailRespVOExt
+    data.value = { ...data.value, ...resData }
+
+    // 处理分支机构明细
+    if (resData.detailList && Array.isArray(resData.detailList) && resData.detailList.length > 0) {
       branchList.value = JSON.parse(JSON.stringify(resData.detailList))
-      console.log('分支机构明细数据：', branchList.value) // 调试用日志
     } else {
       branchList.value = []
       ElMessage.info('暂无分支机构明细数据')
     }
-
-    // 处理申请日期格式（数组转字符串）
-    if (Array.isArray(resData.sqrq) && resData.sqrq.length === 3) {
-      const [year, month, day] = resData.sqrq
-      data.value.sqrq = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
-    }
-    // 新增：复用相同逻辑处理主管工会审批日期
-    if (Array.isArray(resData.zgghsrq) && resData.zgghsrq.length === 3) {
-      const [year, month, day] = resData.zgghsrq
-      resData.zgghsrq = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
-    }
-
-    // 新增：复用相同逻辑处理省总工会审核日期
-    if (Array.isArray(resData.sghsrq) && resData.sghsrq.length === 3) {
-      const [year, month, day] = resData.sghsrq
-      resData.sghsrq = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
-    }
-
-    // 处理附件数据
-    const attachments: AttachmentItem[] = []
-    if (resData.attachments && resData.attachments.length > 0) {
-      resData.attachments.forEach((item, index) => {
-        attachments.push({
-          label: `附件${index + 1}`,
-          name: item.name || `附件${index + 1}`,
-          url: item.fileId ? `/file/download?id=${item.fileId}` : ''
-        })
-      })
-    } else {
-      attachments.push({ label: '无', name: '未上传任何附件' })
-    }
-    attachmentList.value = attachments
-
   } catch (error) {
     console.error('数据加载失败：', error)
     ElMessage.error('申请表详情加载失败，请刷新重试')
   }
 }
 
-// 打开分支机构明细弹窗
+// 格式化日期字段
+const formatDatePart = (date: DateType | undefined, type: 'year' | 'month' | 'day'): string => {
+  if (!date) return ''
+  if (Array.isArray(date) && date.length === 3) {
+    const [year, month, day] = date
+    if (type === 'year') return year.toString()
+    if (type === 'month') return month.toString().padStart(2, '0')
+    if (type === 'day') return day.toString().padStart(2, '0')
+  }
+  if (typeof date === 'string' && date.includes('-')) {
+    const [year, month, day] = date.split('-')
+    if (type === 'year') return year
+    if (type === 'month') return month
+    if (type === 'day') return day
+  }
+  return ''
+}
+
+// 打开分支机构弹窗
 const openBranchDialog = () => {
   branchDialogVisible.value = true
 }
-
-// 打印申请表
-const handlePrint = () => {
-  isPrintMode.value = true
-  // 延迟执行打印，确保DOM渲染完成
-  setTimeout(() => {
-    window.print()
-    isPrintMode.value = false
-  }, 100)
-}
-// 新增：判断是否显示整个受理情况模块
-const showHandleSection = computed(() => showManagerSection.value || showProvinceSection.value)
-// 计算是否显示主管工会审批区域
-const showManagerSection = computed(() => !!(
-  data.value.zgghsjy || data.value.zgghsfzr || data.value.zgghsjbr ||
-  data.value.zgghsjbrdh || data.value.zgghsrq
-))
-
-// 计算是否显示省总工会审批区域
-const showProvinceSection = computed(() => !!(
-  data.value.sghzsjy || data.value.sghsfzr || data.value.sghsrq
-))
-
-// 动态计算受理情况模块的高度
-const handleModuleHeight = computed(() => {
-  let height = 0
-  if (showManagerSection.value) height += 65
-  if (showProvinceSection.value) height += 65
-  if (showManagerSection.value && showProvinceSection.value) height += 2
-  return height > 0 ? height : 60
-})
 </script>
 
 <style scoped>
-/* 全局样式重置 */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* 页面容器样式 */
-.apply-form-container {
+/* 打印容器总样式 */
+.print-wrapper {
   width: 100%;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: 'SimSun', '宋体', sans-serif;
-  background-color: #f9f9f9;
+  min-height: 100vh;
 }
 
-/* A4纸张样式 */
-.a4-paper {
-  width: 210mm;
-  min-height: 297mm;
-  padding: 15mm 10mm;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  background: #fff;
-  margin-bottom: 20px;
+/* 主申请表容器 */
+.main-form-container {
+  max-width: 850px;
+  margin: 30px auto;
+  padding: 0 20px;
+  font-family: "SimSun", serif;
+  font-size: 17px;
+  /* 关键：强制主表后分页，附件表单独一页 */
+  page-break-after: always;
 }
 
-/* 打印按钮样式 */
-.print-btn-box {
-  margin-top: 20px;
+/* 附件表容器（仅打印模式显示） */
+.attachment-form-container {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 0 20px;
+  font-family: "SimSun", serif;
+  font-size: 17px;
 }
 
-/* 表单标题样式 */
+.title-section {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
 .form-title {
   font-size: 22px;
   font-weight: bold;
+  margin: 0;
+  margin-bottom: 15px;
+}
+
+.form-table {
+  border-bottom: none;
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #000;
+  page-break-inside: avoid;
+}
+
+.form-table th,
+.form-table td {
+  border: 1px solid #000;
+  padding: 12px 8px;
+  vertical-align: middle;
+}
+
+.form-table th {
   text-align: center;
-  margin-bottom: 10mm;
-  letter-spacing: 2px;
-  color: #333;
+  font-weight: normal;
+  width: 20%;
+  min-width: 120px;
 }
 
-/* 表单模块容器 */
-.form-module {
-  display: flex;
-  width: 100%;
-  position: relative;
-}
-
-/* 最后一个模块取消底部间距 */
-.last-module {
-  margin-bottom: 0;
-}
-
-/* 左侧垂直标签盒子 */
-.vertical-label-box {
-  width: 10mm;
-  height: 60mm;
-  border: 1px solid #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  background-color: #f5f5f5;
-}
-
-/* 垂直标签文字 */
-.vertical-label {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  font-size: 18px;
-  font-weight: bold;
-  letter-spacing: 4px;
-  color: #333;
-}
-
-/* 模块内容区域 */
-.module-content {
-  flex: 1;
-  height: 60mm;
-  border: 1px solid #000;
-  padding: 5mm;
-  background-color: #fff;
-}
-
-/* 附件/分支机构模块高度自适应 */
-.attachment-module,
-.handle-module {
-  height: auto;
-  min-height: 60mm;
-}
-
-/* 受理情况模块样式 */
-.handle-module {
-  display: flex;
-  flex-direction: column;
-  padding: 2mm;
-  justify-content: flex-start;
-}
-
-/* 审批盒子样式 */
-.approve-box {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2mm;
-  padding: 3mm;
-  min-height: 60mm;
-}
-
-/* 审批标题样式 */
-.approve-title {
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 2mm;
-  color: #333;
-}
-
-/* 审批文本域样式 */
-.approve-textarea {
-  width: 100%;
-  --el-input-border-color: #000;
-  flex: 1;
-  resize: none;
-}
-
-/* 审批底部信息栏 */
-.approve-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: auto;
-  padding-top: 3mm;
-  border-top: 1px solid #eee;
-  flex-wrap: wrap;
-  gap: 2mm;
-}
-
-/* 底部信息项 */
-.footer-item {
-  display: flex;
-  align-items: center;
-  gap: 2mm;
-}
-
-/* 底部标签文字 */
-.footer-label {
-  font-size: 12px;
-  font-weight: bold;
-  white-space: nowrap;
-  color: #333;
-}
-
-/* 底部输入框样式 */
-.footer-input {
-  width: 30mm;
-  height: 6mm;
-  --el-input-border-color: #000;
-}
-
-/* 底部日期选择器样式 */
-.footer-date {
-  width: 40mm;
-  height: 6mm;
-  --el-input-border-color: #000;
-}
-
-/* 盖章提示文字 */
-.seal-item {
-  font-weight: bold;
-  font-size: 14px;
-  margin-left: 2mm;
-  color: #333;
-}
-
-/* 表单行样式 */
-.form-row {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  margin-bottom: 3mm;
-}
-
-/* 最后一行取消底部间距 */
-.form-row:last-child {
-  margin-bottom: 0;
-}
-
-/* 双列布局 */
-.double-item {
-  justify-content: space-between;
-}
-
-/* 单列布局 */
-.single-item {
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-/* 表单项样式 */
-.form-item {
-  display: flex;
-  align-items: center;
-  gap: 2mm;
-  width: 100%;
-}
-
-/* 双列表单项宽度 */
-.double-item .form-item {
-  width: 48%;
-}
-
-/* 表单项标签 */
-.item-label {
-  font-size: 14px;
-  font-weight: bold;
-  white-space: nowrap;
-  color: #333;
-}
-
-/* 表单输入框样式 */
-.form-input {
-  flex: 1;
-  height: 8mm;
-  --el-input-border-color: #000;
-}
-
-/* 短输入框样式 */
-.short-input {
-  width: 40mm;
-}
-
-/* 文本域样式 */
+.form-input,
 .form-textarea {
   width: 100%;
-  --el-input-border-color: #000;
-  margin-top: 2mm;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.form-textarea {
   resize: none;
+  min-height: 120px;
+  margin-bottom: 15px;
 }
 
-/* 日期选择器样式 */
-.form-date {
-  width: 40mm;
-  height: 8mm;
-  --el-input-border-color: #000;
+.mini-input {
+  width: 50px;
+  border: none;
+  border-bottom: 1px dashed #000;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: center;
 }
 
-/* 日期项对齐方式 */
-.date-item {
+.sign-block {
+  padding-left: 20px;
+}
+
+.sign-input {
+  border: none;
+  border-bottom: 1px solid #000;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  width: 120px;
+  margin-left: 5px;
+  text-align: center;
+}
+
+.date-line {
+  margin-top: 15px;
+  text-align: right;
+}
+
+.attachment-note {
+  padding: 8px;
+  border: 1px solid #000;
+  border-bottom: none;
+  margin-bottom: -1px;
+}
+
+.btn-group {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 2mm;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 30px;
 }
 
-/* 分支机构信息样式 */
-.branch-info {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 10px 0;
+.print-btn {
+  padding: 10px 20px;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  height: 40px;
+  line-height: 20px;
 }
 
-/* 附件标题样式 */
-.upload-title {
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #333;
-}
-
-/* 附件链接样式 */
-.file-link {
-  color: #0066cc;
-  text-decoration: underline;
-}
-
-/* 打印模式文本样式 */
-.print-text {
-  display: inline-block;
-  border-bottom: 1px solid #000;
-  height: 8mm;
-  line-height: 8mm;
-  padding: 0 2mm;
-  width: calc(100% - 60px);
-  color: #333;
-}
-
-/* 短文本打印样式 */
-.print-text.short-text {
-  width: 40mm;
-}
-
-/* 文本域打印样式 */
-.print-textarea {
-  display: block;
-  width: 100%;
-  min-height: 30mm;
-  border-bottom: 1px solid #000;
-  padding: 2mm;
-  white-space: pre-wrap;
-  line-height: 1.5;
-  color: #333;
-}
-
-/* 审批文本打印样式 */
-.print-approve-text {
-  display: block;
-  width: 100%;
-  min-height: 25mm;
-  border-bottom: 1px solid #000;
-  padding: 2mm;
-  white-space: pre-wrap;
-  line-height: 1.5;
-  color: #333;
-}
-
-/* 底部文本打印样式 */
-.print-footer-text {
-  display: inline-block;
-  border-bottom: 1px solid #000;
-  height: 6mm;
-  line-height: 6mm;
-  padding: 0 2mm;
-  width: 30mm;
-  color: #333;
-}
-
-/* 打印样式适配 */
+/* 打印适配核心样式 */
 @media print {
-  body {
-    margin: 0;
-    padding: 0;
-    background: #fff;
-    font-family: 'SimSun', '宋体', sans-serif;
-  }
 
-  .apply-form-container {
-    padding: 0;
-    background: #fff;
-  }
-
-  .a4-paper {
-    border: none;
-    box-shadow: none;
-    padding: 0;
-    min-height: 297mm;
-    margin-bottom: 0;
-  }
-
-  /* 打印时隐藏非打印元素 */
-  .no-print {
+  /* 隐藏按钮和弹窗 */
+  :deep(.el-button),
+  .btn-group,
+  :deep(.el-dialog),
+  :deep(.el-dialog__wrapper) {
     display: none !important;
   }
 
-  /* 打印时隐藏输入框/按钮等交互元素 */
-  :deep(.el-input),
-  :deep(.el-textarea),
-  :deep(.el-date-picker),
-  :deep(.el-radio-group),
-  :deep(.el-button) {
-    display: none !important;
+  /* 主表和附件表都适配A4宽度 */
+  .main-form-container,
+  .attachment-form-container {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 10px !important;
   }
 
-  /* 打印时边框颜色加深 */
-  .vertical-label-box,
-  .module-content,
-  .approve-box {
-    border-color: #000;
-  }
-}
-
-/* 响应式适配 */
-@media screen and (max-width: 1200px) {
-  .a4-paper {
-    width: 100%;
-    min-height: auto;
-    border: none;
-    box-shadow: none;
-    padding: 20px;
-  }
-
-  .vertical-label-box {
-    width: 60px;
-    height: auto;
-  }
-
-  .form-module {
-    margin-bottom: 20px;
-  }
-
-  .module-content {
-    height: auto;
-    min-height: 120px;
-  }
-
-  .vertical-label {
-    writing-mode: horizontal-tb;
-    text-orientation: mixed;
+  /* 强制分页生效 */
+  .main-form-container {
+    page-break-after: always !important;
   }
 }
 </style>

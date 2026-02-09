@@ -8,34 +8,40 @@
             {{ scope.$index + 1 }}
           </template>
         </el-table-column>
+        <!-- 社会信用代码：加placeholder + 18位限制 -->
         <el-table-column label="社会信用代码" prop="fjgxyxdm" min-width="200">
           <template #default="scope">
-            <el-input v-model="scope.row.fjgxyxdm" maxlength="18" size="small" show-word-limit />
+            <el-input v-model="scope.row.fjgxyxdm" maxlength="18" show-word-limit placeholder="请输入18位社会信用代码" />
           </template>
         </el-table-column>
+        <!-- 分支机构全称：加placeholder -->
         <el-table-column label="分支机构全称" prop="fjgdwqc" min-width="250">
           <template #default="scope">
-            <el-input v-model="scope.row.fjgdwqc" maxlength="255" size="small" />
+            <el-input v-model="scope.row.fjgdwqc" maxlength="255" placeholder="请输入分支机构完整全称" />
           </template>
         </el-table-column>
+        <!-- 主管税务部门：加placeholder -->
         <el-table-column label="主管税务部门" prop="fjgzgsbm" min-width="200">
           <template #default="scope">
-            <el-input v-model="scope.row.fjgzgsbm" maxlength="255" size="small" />
+            <el-input v-model="scope.row.fjgzgsbm" maxlength="255" placeholder="请输入所属主管税务部门" />
           </template>
         </el-table-column>
+        <!-- 职工人数：加placeholder + 正整数限制 -->
         <el-table-column label="职工人数" prop="fjggzs" width="120">
           <template #default="scope">
-            <el-input v-model="scope.row.fjggzs" type="number" min="0" size="small" />
+            <el-input v-model="scope.row.fjggzs" type="number" min="1" placeholder="请输入大于0的人数" />
           </template>
         </el-table-column>
+        <!-- 月工资总额：加placeholder + 正数限制 -->
         <el-table-column label="月工资总额" prop="fjggzze" width="150">
           <template #default="scope">
-            <el-input v-model="scope.row.fjggzze" type="number" min="0" step="0.01" precision="2" size="small" />
+            <el-input v-model="scope.row.fjggzze" type="number" min="0.01" step="0.01" precision="2"
+              placeholder="请输入大于0的金额" />
           </template>
         </el-table-column>
         <el-table-column label="操作" width="100">
           <template #default="scope">
-            <el-button type="danger" size="small" icon="el-icon-delete" @click="deleteBranch(scope.$index)">
+            <el-button type="danger" @click="deleteBranch(scope.$index)">
               删除
             </el-button>
           </template>
@@ -43,7 +49,7 @@
       </el-table>
 
       <!-- 操作按钮 -->
-      <el-button type="success" size="small" icon="el-icon-plus" @click="addBranch" style="margin-bottom: 16px;">
+      <el-button type="success" @click="addBranch" style="margin-bottom: 16px;">
         新增分支机构
       </el-button>
 
@@ -98,24 +104,72 @@ const addBranch = () => {
 // 删除分支机构
 const deleteBranch = (index: number) => {
   ElMessageBox.confirm(
-    '确定删除该分支机构信息？',
-    '提示',
+    '确定删除该分支机构信息？删除后不可恢复',
+    '删除确认',
     { type: 'warning' }
   ).then(() => {
     branchList.value.splice(index, 1)
     ElMessage.success('删除成功')
+  }).catch(() => {
+    ElMessage.info('已取消删除')
   })
 }
 
-// 保存数据
+// 保存数据：增强版校验（核心改造）
 const handleSave = () => {
-  // 校验必填项
-  const invalidItem = branchList.value.find(item => !item.fjgxyxdm || !item.fjgdwqc)
-  if (invalidItem) {
-    ElMessage.warning('请完善分支机构的社会信用代码和单位全称')
+  // 1. 校验是否为空列表
+  if (branchList.value.length === 0) {
+    ElMessage.warning('请至少添加一条分支机构信息')
     return
   }
-  // 向主页面发送保存事件
+
+  // 2. 遍历校验每一条数据的合法性
+  for (let i = 0; i < branchList.value.length; i++) {
+    const item = branchList.value[i]
+    const serial = i + 1 // 第N条数据，方便定位提示
+
+    // 去除首尾空格，避免纯空格提交
+    item.fjgxyxdm = item.fjgxyxdm?.trim() || ''
+    item.fjgdwqc = item.fjgdwqc?.trim() || ''
+    item.fjgzgsbm = item.fjgzgsbm?.trim() || ''
+
+    // 校验社会信用代码：必填 + 18位
+    if (!item.fjgxyxdm) {
+      ElMessage.warning(`第${serial}条：社会信用代码为必填项`)
+      return
+    }
+    if (item.fjgxyxdm.length !== 18) {
+      ElMessage.warning(`第${serial}条：社会信用代码必须为18位`)
+      return
+    }
+
+    // 校验分支机构全称：必填
+    if (!item.fjgdwqc) {
+      ElMessage.warning(`第${serial}条：分支机构全称为必填项`)
+      return
+    }
+
+    // 校验主管税务部门：必填
+    if (!item.fjgzgsbm) {
+      ElMessage.warning(`第${serial}条：主管税务部门为必填项`)
+      return
+    }
+
+    // 校验职工人数：必填 + 大于0
+    if (!item.fjggzs || item.fjggzs < 1) {
+      ElMessage.warning(`第${serial}条：职工人数请输入大于0的正整数`)
+      return
+    }
+
+    // 校验月工资总额：必填 + 大于0
+    if (!item.fjggzze || Number(item.fjggzze) < 0.01) {
+      ElMessage.warning(`第${serial}条：月工资总额请输入大于0的数值`)
+      return
+    }
+  }
+
+  // 4. 所有校验通过，向主页面发送保存事件
+  ElMessage.success('校验通过，已保存分支机构信息')
   emit('save', branchList.value)
 }
 
@@ -136,5 +190,10 @@ const handleCancel = () => {
 :deep(.el-card__body) {
   height: 100%;
   padding: 16px;
+}
+
+/* 优化输入框样式，和表格更贴合 */
+:deep(.el-input) {
+  width: 100%;
 }
 </style>

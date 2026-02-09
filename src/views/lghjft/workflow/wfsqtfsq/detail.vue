@@ -4,18 +4,8 @@
       <el-table-column align="center" label="社会信用代码" prop="shxydm" />
       <el-table-column align="center" label="纳税人名称" prop="nsrmc" />
       <el-table-column align="center" label="税票UUID" prop="spuuid" />
-      <el-table-column
-        :formatter="dateFormatter2"
-        align="center"
-        label="税款所属期起"
-        prop="skssqq"
-      />
-      <el-table-column
-        :formatter="dateFormatter2"
-        align="center"
-        label="税款所属期止"
-        prop="skssqz"
-      />
+      <el-table-column :formatter="dateFormatter2" align="center" label="税款所属期起" prop="skssqq" />
+      <el-table-column :formatter="dateFormatter2" align="center" label="税款所属期止" prop="skssqz" />
       <el-table-column align="center" label="入库金额" prop="rkje" />
       <el-table-column align="center" label="退费审批金额" prop="tfsqJe" />
     </el-table>

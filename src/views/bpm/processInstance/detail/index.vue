@@ -2,12 +2,7 @@
   <ContentWrap :bodyStyle="{ padding: '10px 20px 0' }" class="position-relative">
     <div class="processInstance-wrap-main">
       <el-scrollbar>
-        <img
-          class="position-absolute right-20px"
-          width="150"
-          :src="auditIconsMap[processInstance.status]"
-          alt=""
-        />
+        <img class="position-absolute right-20px" width="150" :src="auditIconsMap[processInstance.status]" alt="" />
         <div class="flex">
           <div class="text-#878c93 h-15px">编号：{{ id }}</div>
           <Icon icon="ep:printer" class="ml-15px cursor-pointer" @click="handlePrint" />
@@ -15,22 +10,13 @@
         <el-divider class="!my-8px" />
         <div class="flex items-center gap-5 mb-10px h-40px">
           <div class="text-26px font-bold mb-5px">{{ processInstance.name }}</div>
-          <dict-tag
-            v-if="processInstance.status"
-            :type="DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS"
-            :value="processInstance.status"
-          />
+          <dict-tag v-if="processInstance.status" :type="DICT_TYPE.BPM_PROCESS_INSTANCE_STATUS"
+            :value="processInstance.status" />
         </div>
 
         <div class="flex items-center gap-5 mb-10px text-13px h-35px">
-          <div
-            class="bg-gray-100 h-35px rounded-3xl flex items-center p-8px gap-2 dark:color-gray-600"
-          >
-            <el-avatar
-              :size="28"
-              v-if="processInstance?.startUser?.avatar"
-              :src="processInstance?.startUser?.avatar"
-            />
+          <div class="bg-gray-100 h-35px rounded-3xl flex items-center p-8px gap-2 dark:color-gray-600">
+            <el-avatar :size="28" v-if="processInstance?.startUser?.avatar" :src="processInstance?.startUser?.avatar" />
             <el-avatar :size="28" v-else-if="processInstance?.startUser?.nickname">
               {{ processInstance?.startUser?.nickname.substring(0, 1) }}
             </el-avatar>
@@ -47,21 +33,14 @@
                 <el-row>
                   <el-col :span="17" class="!flex !flex-col formCol">
                     <!-- 表单信息 -->
-                    <div
-                      v-loading="processInstanceLoading"
-                      class="form-box flex flex-col mb-30px flex-1"
-                    >
+                    <div v-loading="processInstanceLoading" class="form-box flex flex-col mb-30px flex-1">
                       <!-- 情况一：流程表单 -->
                       <el-col v-if="processDefinition?.formType === BpmModelFormType.NORMAL">
-                        <form-create
-                          v-model="detailForm.value"
-                          v-model:api="fApi"
-                          :option="detailForm.option"
-                          :rule="detailForm.rule"
-                        />
+                        <form-create v-model="detailForm.value" v-model:api="fApi" :option="detailForm.option"
+                          :rule="detailForm.rule" />
                       </el-col>
                       <!-- 情况二：业务表单 -->
-                      <div v-if="processDefinition?.formType === BpmModelFormType.CUSTOM">
+                      <div v-if="processDefinition?.formType === BpmModelFormType.CUSTOM" id="custom-business-form">
                         <BusinessFormComponent :id="processInstance.businessKey" />
                       </div>
                     </div>
@@ -78,20 +57,10 @@
           <!-- 流程图 -->
           <el-tab-pane label="流程图" name="diagram">
             <div class="form-scroll-area">
-              <ProcessInstanceSimpleViewer
-                v-show="
-                  processDefinition.modelType && processDefinition.modelType === BpmModelType.SIMPLE
-                "
-                :loading="processInstanceLoading"
-                :model-view="processModelView"
-              />
-              <ProcessInstanceBpmnViewer
-                v-show="
-                  processDefinition.modelType && processDefinition.modelType === BpmModelType.BPMN
-                "
-                :loading="processInstanceLoading"
-                :model-view="processModelView"
-              />
+              <ProcessInstanceSimpleViewer v-show="processDefinition.modelType && processDefinition.modelType === BpmModelType.SIMPLE
+                " :loading="processInstanceLoading" :model-view="processModelView" />
+              <ProcessInstanceBpmnViewer v-show="processDefinition.modelType && processDefinition.modelType === BpmModelType.BPMN
+                " :loading="processInstanceLoading" :model-view="processModelView" />
             </div>
           </el-tab-pane>
 
@@ -114,16 +83,9 @@
 
         <div class="b-t-solid border-t-1px border-[var(--el-border-color)]">
           <!-- 操作栏按钮 -->
-          <ProcessInstanceOperationButton
-            ref="operationButtonRef"
-            :process-instance="processInstance"
-            :process-definition="processDefinition"
-            :userOptions="userOptions"
-            :normal-form="detailForm"
-            :normal-form-api="fApi"
-            :writable-fields="writableFields"
-            @success="refresh"
-          />
+          <ProcessInstanceOperationButton ref="operationButtonRef" :process-instance="processInstance"
+            :process-definition="processDefinition" :userOptions="userOptions" :normal-form="detailForm"
+            :normal-form-api="fApi" :writable-fields="writableFields" @success="refresh" />
         </div>
       </el-scrollbar>
     </div>
@@ -322,24 +284,14 @@ $button-height: 51px;
 $process-header-height: 194px;
 
 .processInstance-wrap-main {
-  height: calc(
-    100vh - var(--top-tool-height) - var(--tags-view-height) - var(--app-footer-height) - 35px
-  );
-  max-height: calc(
-    100vh - var(--top-tool-height) - var(--tags-view-height) - var(--app-footer-height) - 35px
-  );
+  height: calc(100vh - var(--top-tool-height) - var(--tags-view-height) - var(--app-footer-height) - 35px);
+  max-height: calc(100vh - var(--top-tool-height) - var(--tags-view-height) - var(--app-footer-height) - 35px);
   overflow: auto;
 
   .form-scroll-area {
     display: flex;
-    height: calc(
-      100vh - var(--top-tool-height) - var(--tags-view-height) - var(--app-footer-height) - 35px -
-        $process-header-height - 40px
-    );
-    max-height: calc(
-      100vh - var(--top-tool-height) - var(--tags-view-height) - var(--app-footer-height) - 35px -
-        $process-header-height - 40px
-    );
+    height: calc(100vh - var(--top-tool-height) - var(--tags-view-height) - var(--app-footer-height) - 35px - $process-header-height - 40px);
+    max-height: calc(100vh - var(--top-tool-height) - var(--tags-view-height) - var(--app-footer-height) - 35px - $process-header-height - 40px);
     overflow: auto;
     flex-direction: column;
 

@@ -6,6 +6,7 @@ export interface WfJfhjSq {
   id: number // 主键ID
   shxydm?: string // 社会信用代码
   nsrmc?: string // 缴费单位名称
+  contact: string
   contactPhone: string // 联系人及电话
   applicableRate: number // 适用费率（%）
   employeeCount: number // 职工人数（人）
@@ -24,7 +25,7 @@ export interface WfJfhjSq {
   grassrootsOpinion: string // 基层工会意见（章）
   grassrootsLeader: string // 基层工会-工会负责人
   grassrootsHandler: string // 基层工会-经办
-  grassrootsnApproveTime: string // 基层工会-盖章日期（年/月/日）
+  grassrootsApproveTime: string // 基层工会-盖章日期（年/月/日）
 
   managerOpinion: string // 主管工会审核意见
   managerLeaderName: string // 主管工会-工会负责人
@@ -36,6 +37,7 @@ export interface WfJfhjSq {
 export interface WfJfhjSqSubmit {
   shxydm?: string // 社会信用代码
   nsrmc?: string // 缴费单位名称
+  contact: string
   contactPhone: string // 联系人及电话
   applicableRate: number // 适用费率（%）
   employeeCount: number // 职工人数（人）
@@ -46,6 +48,7 @@ export interface WfJfhjSqSubmit {
   deferTotalMonth: number // 申请缓缴期限-共（月）
   totalDeferAmount: number // 累计缓缴金额（元）
   situationDesc: string // 申请缓缴情况说明
+  handler: string
 }
 
 // 工会经费缓缴申请 API
