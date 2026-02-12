@@ -526,121 +526,91 @@ const printObj = ref({
   /* 行高适配 */
 }
 
-/* 打印专属样式：强制适配A4 */
 @media print {
 
-  /* 重置所有元素的盒模型，避免宽度溢出 */
-  * {
-    box-sizing: border-box !important;
-    max-width: 100% !important;
-  }
-
-  /* A4纸基础设置 */
+  /* 1. 基础分页配置：A4纵向，统一边距 */
   @page {
     size: A4 portrait !important;
-    /* 强制纵向A4 */
-    margin: 15mm 10mm !important;
-    /* 页边距：上下15mm，左右10mm */
+    margin: 10mm !important;
+    /* 禁用自动生成的空白页（部分浏览器的兜底） */
+    orphans: 1;
+    widows: 1;
   }
 
-  /* 移除页面滚动/固定高度，让内容自适应分页 */
+  /* 2. 核心修复：移除所有容器的固定高度/溢出/定位，确保打印引擎识别完整内容 */
   body,
   html,
   div,
   #app,
   .el-dialog,
-  .el-dialog__body {
+  .el-dialog__body,
+  .form-group,
+  .main-form,
+  .detail-table {
     height: auto !important;
+    /* 关键：高度自适应，避免截断/空白 */
     overflow: visible !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    /* 移除溢出隐藏，显示全部内容 */
+    position: static !important;
+    /* 修复弹窗定位导致的打印异常 */
+    float: none !important;
+    /* 清除浮动，避免布局错乱 */
   }
 
-  /* 强制所有元素宽度不超过打印区域 */
-  #printDivTag {
-    max-width: 100% !important;
-    /* 打印时继承@page的宽度，不再限制794px */
-    box-shadow: none !important;
-    border: none !important;
-  }
-
-  /* 自定义表单内的元素自适应 */
-  .custom-form-container :deep(*) {
-    width: 100% !important;
-    /* 所有元素宽度100%，避免固定宽度溢出 */
-    height: auto !important;
-    /* 移除固定高度 */
-    white-space: normal !important;
-    /* 强制换行，避免单行文本溢出 */
-    word-wrap: break-word !important;
-    /* 长文本（如链接/单号）自动换行 */
-    word-break: break-all !important;
-  }
-
-  /* 隐藏无关元素，只保留打印内容 */
-  .el-dialog__header,
-  .el-dialog__footer,
-  .operate-btn,
+  /* 1. 新增：隐藏按钮等非打印元素（核心修改） */
+  button,
   .el-button,
-  .edit-btn,
-  .delete-btn {
+  .btn,
+  .operate-bar,
+  .action-btn,
+  .el-dialog__header,
+  .el-dialog__footer {
     display: none !important;
   }
 
-  /* 表格适配：强制宽度100%，边框合并 */
-  table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    table-layout: fixed !important;
-    /* 表格列宽自适应 */
+  /* 3. 核心需求：仅当【主表后紧跟非空明细表】时，才在明细表前分页 */
+  /* 3.1 先给非空明细表标记（通过内容判断） */
+  .detail-table:not(:empty) {
+    --has-content: 1;
   }
 
-  td,
-  th {
-    word-wrap: break-word !important;
-    /* 表格单元格内容换行 */
-    padding: 5px !important;
-    font-size: 12px !important;
+  /* 3.2 仅主表 + 有内容的明细表 组合时分页 */
+  .main-form+.detail-table:not(:empty) {
+    page-break-before: always !important;
+    break-before: page !important;
+    /* 现代浏览器兼容 */
   }
 
-  /* 图片适配：不超过容器宽度，避免溢出 */
-  img {
-    max-width: 100% !important;
-    height: auto !important;
-    display: block !important;
-    /* 避免图片下方留白 */
+  /* 4. 防空白页核心：
+     - 内容不被拆分（避免跨页截断）
+     - 空容器直接隐藏，不占页
+  */
+  /* 4.1 主表/明细表内容不被拆分 */
+  .main-form,
+  .detail-table {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
-  /* 表单元素适配 */
-  .custom-form-container :deep(.el-form) {
-    padding: 0 !important;
+  /* 4.2 空明细表直接隐藏，杜绝空白页 */
+  .detail-table:empty {
+    display: none !important;
   }
 
-  .custom-form-container :deep(.el-form-item) {
-    margin-bottom: 8px !important;
-    /* 减小表单项间距，节省空间 */
-    padding: 0 !important;
+  /* 5. 兜底：最后一个元素永不强制分页，避免末尾空白页 */
+  .form-group:last-child,
+  .main-form:last-child,
+  .detail-table:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
   }
 
-  .custom-form-container :deep(.el-form-item__label) {
-    width: 100px !important;
-    /* 统一标签宽度，避免错乱 */
-    flex: none !important;
+  /* 6. 兼容优化：保留打印样式一致性 */
+  * {
+    box-sizing: border-box !important;
+    -webkit-print-color-adjust: exact !important;
+    /* 保留颜色 */
+    print-color-adjust: exact !important;
   }
-
-  .custom-form-container :deep(.el-form-item__content) {
-    flex: 1 !important;
-    margin-left: 10px !important;
-  }
-}
-
-/* 无数据提示样式 */
-.no-data-tip {
-  color: #909399;
-  font-size: 16px;
-  text-align: center;
-  padding: 50px 0;
 }
 </style>

@@ -23,21 +23,12 @@
           </el-col>
         </el-row>
 
-        <!-- 新增：缴费单位-经办 输入框 -->
         <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="缴费单位-经办" prop="  handler">
-              <el-input v-model="formData.handler" maxlength="50" placeholder="请输入缴费单位经办人姓名" clearable />
-            </el-form-item>
-          </el-col>
           <el-col :span="12">
             <el-form-item label="联系人" prop="contact">
               <el-input v-model="formData.contact" maxlength="50" placeholder="请输入联系人姓名" clearable />
             </el-form-item>
           </el-col>
-        </el-row>
-
-        <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="联系电话" prop="contactPhone">
               <el-input v-model="formData.contactPhone" maxlength="50" placeholder="请输入联系电话（如：13800138000）" clearable />
@@ -73,18 +64,25 @@
         </el-row>
 
         <!-- 缓缴期限：调整栅格适配900px宽度 -->
-        <el-form-item label="申请缓缴期限" class="period-form-item" prop="deferPeriod">
+        <!-- 原缓缴期限区域修改：给两个日期选择器单独加 el-form-item 并绑定 prop -->
+        <el-form-item label="申请缓缴期限" class="period-form-item">
           <el-row :gutter="16" class="period-row" style="align-items: center;">
             <el-col :span="7">
               <div class="period-item">
-                <el-date-picker v-model="formData.deferStartDate" type="month" placeholder="请选择缓缴开始年月"
-                  format="YYYY 年 MM 月" value-format="YYYY-MM" style="width: 100%;" size="default" clearable />
+                <!-- 新增：单独的 form-item 绑定 deferStartDate -->
+                <el-form-item prop="deferStartDate" class="m-0">
+                  <el-date-picker v-model="formData.deferStartDate" type="month" placeholder="请选择缓缴开始年月"
+                    format="YYYY 年 MM 月" value-format="YYYY-MM" style="width: 100%;" size="default" clearable />
+                </el-form-item>
               </div>
             </el-col>
             <el-col :span="7">
               <div class="period-item">
-                <el-date-picker v-model="formData.deferEndDate" type="month" placeholder="请选择缓缴结束年月"
-                  format="YYYY 年 MM 月" value-format="YYYY-MM" style="width: 100%;" size="default" clearable />
+                <!-- 新增：单独的 form-item 绑定 deferEndDate -->
+                <el-form-item prop="deferEndDate" class="m-0">
+                  <el-date-picker v-model="formData.deferEndDate" type="month" placeholder="请选择缓缴结束年月"
+                    format="YYYY 年 MM 月" value-format="YYYY-MM" style="width: 100%;" size="default" clearable />
+                </el-form-item>
               </div>
             </el-col>
             <el-col :span="4">
@@ -98,7 +96,7 @@
         </el-form-item>
 
         <!-- 累计缓缴金额 ：调整栅格，贴合布局 -->
-        <el-row :gutter="20" style="margin-top: -10px;">
+        <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="累计缓缴金额（元）" prop="totalDeferAmount">
               <el-input-number v-model="formData.totalDeferAmount" :precision="2" :min="0.01" :step="0.01"
@@ -110,10 +108,13 @@
         <!-- 情况说明 -->
         <el-form-item label="申请缓缴情况说明" prop="situationDesc" style="margin-top: 10px;">
           <el-input v-model="formData.situationDesc" type="textarea" :rows="6"
-            placeholder="请详细说明申请缓缴的原因（如经营困难、资金周转问题等）、目前资金状况、缓缴后还款计划等，字数不少于10字" maxlength="2000" show-word-limit
-            style="resize: vertical;" />
+            placeholder="请详细说明申请缓缴的原因（如经营困难、资金周转问题等）、目前资金状况、缓缴后还款计划等，字数不少于10字" maxlength="200" show-word-limit />
         </el-form-item>
-
+        <!-- <el-col :span="12">
+          <el-form-item label="经办人" prop="handler">
+            <el-input v-model="formData.handler" maxlength="50" placeholder="请输入缴费单位经办人姓名" clearable />
+          </el-form-item>
+        </el-col> -->
         <!-- 提交按钮：微调间距，保留原样式 -->
         <el-form-item style="text-align: center; margin-top: 24px;">
           <el-button type="primary" size="large" @click="handleSubmit" :loading="loading">
@@ -190,14 +191,31 @@ const rules = reactive<FormRules>({
     { required: true, message: '请输入月工资总额', trigger: 'change' },
     { type: 'number', min: 0.01, message: '月工资总额不能为0', trigger: 'change' }
   ],
+  // 合并后的 deferStartDate：包含必填 + 开始时间不晚于结束时间校验
   deferStartDate: [
-    { required: true, message: '请选择缓缴开始年月', trigger: 'change' }
+    { required: true, message: '请选择缓缴开始年月', trigger: 'change' },
+    {
+      validator: (rule, value, callback) => {
+        // YYYY-MM 格式字符串可直接比较，无需转 Date
+        if (value && formData.deferEndDate) {
+          if (value > formData.deferEndDate) {
+            callback(new Error('开始时间不能晚于结束时间'))
+          } else {
+            callback()
+          }
+        } else {
+          callback()
+        }
+      },
+      trigger: 'change'
+    }
   ],
+  // 完整的 deferEndDate 校验
   deferEndDate: [
     { required: true, message: '请选择缓缴结束年月', trigger: 'change' },
     {
       validator: (rule, value, callback) => {
-        if (formData.deferStartDate && value) {
+        if (value && formData.deferStartDate) {
           if (value < formData.deferStartDate) {
             callback(new Error('结束时间不能早于开始时间'))
           } else {
@@ -232,9 +250,9 @@ watch([() => formData.applicableRate, () => formData.monthlySalaryTotal], () => 
     const calculateAmount = (formData.monthlySalaryTotal * formData.applicableRate) / 100
     formData.monthlyPayAmount = Number(calculateAmount.toFixed(2))
     // 同步计算累计缓缴金额（可选：若需要自动算累计，取消下面注释）
-    // if (formData.deferTotalMonth > 0) {
-    //   formData.totalDeferAmount = Number((formData.monthlyPayAmount * formData.deferTotalMonth).toFixed(2))
-    // }
+    if (formData.deferTotalMonth > 0) {
+      formData.totalDeferAmount = Number((formData.monthlyPayAmount * formData.deferTotalMonth).toFixed(2))
+    }
   } else {
     formData.monthlyPayAmount = 0
   }
@@ -250,9 +268,9 @@ watch([() => formData.deferStartDate, () => formData.deferEndDate], () => {
     formData.deferTotalMonth = totalMonths < 1 ? 1 : (totalMonths > 24 ? 24 : totalMonths)
 
     // 可选：缓缴月数变化后，自动更新累计缓缴金额
-    // if (formData.monthlyPayAmount > 0) {
-    //   formData.totalDeferAmount = Number((formData.monthlyPayAmount * formData.deferTotalMonth).toFixed(2))
-    // }
+    if (formData.monthlyPayAmount > 0) {
+      formData.totalDeferAmount = Number((formData.monthlyPayAmount * formData.deferTotalMonth).toFixed(2))
+    }
   } else {
     formData.deferTotalMonth = 0
   }

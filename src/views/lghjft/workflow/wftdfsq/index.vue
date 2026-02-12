@@ -24,33 +24,31 @@
         </el-row>
         <!-- 情况说明 -->
         <el-form-item label="情况说明" prop="situationDesc">
-          <el-input v-model="formData.situationDesc" type="textarea" :rows="3" placeholder="请详细说明申请退还原因" clearable />
+          <el-input v-model="formData.situationDesc" type="textarea" :rows="4" placeholder="请详细说明申请退还原因" clearable
+            maxlength="200" show-word-limit />
         </el-form-item>
-        <el-row :gutter="20">
-          <el-col :span="12">
+        <!-- <el-col :span="12">
             <el-form-item label="单位负责人" prop="unitLeader">
               <el-input v-model="formData.unitLeader" maxlength="50" placeholder="请输入单位负责人" disabled />
             </el-form-item>
-          </el-col>
-          <el-col :span="12">
+          </el-col> -->
+        <!-- <el-col :span="12">
             <el-form-item label="经办人" prop="handler">
               <el-input v-model="formData.handler" maxlength="50" placeholder="请输入经办人" clearable />
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="联系电话" prop="contactPhone">
               <el-input v-model="formData.contactPhone" maxlength="20" placeholder="请输入联系电话（手机/座机）" clearable />
             </el-form-item>
-          </el-col>
-          <!-- <el-col :span="12">
+          </el-col> -->
+        <!-- <el-col :span="12">
             <el-form-item label="申请日期" prop="applyDate">
               <el-date-picker v-model="formData.applyDate" type="date" placeholder="请选择申请日期" format="YYYY-MM-DD"
                 value-format="YYYY-MM-DD" style="width: 100%;" />
             </el-form-item>
           </el-col> -->
-        </el-row>
+        <!-- </el-row> -->
         <!-- 账户信息 -->
         <h3 class="section-title">退款账户信息</h3>
         <el-row :gutter="20">
@@ -120,10 +118,10 @@ const formData = reactive({
 // 基础校验规则
 const rules = reactive({
   // 社会信用代码：必填 + 18位格式校验
-  // shxydm: [
-  //   { required: true, message: '请输入社会信用代码', trigger: 'blur' },
-  //   { pattern: /^[0-9A-Z]{18}$/, message: '社会信用代码应为18位数字/大写字母', trigger: 'blur' }
-  // ],
+  shxydm: [
+    { required: true, message: '请输入社会信用代码', trigger: 'blur' },
+    { pattern: /^[0-9A-Z]{18}$/, message: '社会信用代码应为18位数字/大写字母', trigger: 'blur' }
+  ],
   // 纳税人名称：必填 + 长度限制
   nsrmc: [
     { required: true, message: '请输入纳税人名称', trigger: 'blur' },
@@ -133,11 +131,6 @@ const rules = reactive({
   situationDesc: [
     { required: true, message: '请输入退抵费情况说明', trigger: 'blur' },
     { min: 10, message: '情况说明至少填写10个字符', trigger: 'blur' }
-  ],
-  // 单位负责人：必填
-  unitLeader: [
-    { required: true, message: '请输入单位负责人', trigger: 'blur' },
-    { min: 2, max: 50, message: '姓名长度应在2-50个字符之间', trigger: 'blur' }
   ],
   // 经办人：必填
   handler: [

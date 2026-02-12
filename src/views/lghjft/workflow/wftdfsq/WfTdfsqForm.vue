@@ -43,9 +43,8 @@
             </div>
             <div style="display: flex; align-items: center; gap: 20px;">
               联系电话：
-              <input v-if="!isPrintMode" v-model="data.contactPhone" disabled class="mini-input sign-phone"
-                type="text" />
-              <span v-else class="mini-input sign-phone">{{ data.contactPhone || '' }}</span>
+              <input v-if="!isPrintMode" v-model="data.contactPhone" disabled class=" sign-input" type="text" />
+              <span v-else class=" sign-input">{{ data.contactPhone || '' }}</span>
               <div class="date-line">
                 <span class="mini-input">{{ getDatePart(data.applyDate, 'year') }}</span> 年
                 <span class="mini-input">{{ getDatePart(data.applyDate, 'month') }}</span> 月
@@ -110,7 +109,7 @@
           <div class="approval-section">
             <div class="approval-title">主管工会审批意见：</div>
             <textarea v-if="!isPrintMode" v-model="data.managerOpinion" disabled class="approval-textarea"
-              style="margin-top:40px; margin-left: 40px;" rows="2"></textarea>
+              style="margin-top:40px; margin-left: 40px; width: 90%;" rows="2"></textarea>
             <span v-else class="approval-textarea">{{ data.managerOpinion || '' }}</span>
             <div class="approval-sign-wrap">
               <div class="sign-group">
@@ -138,7 +137,7 @@
           <div class="approval-section">
             <div class="approval-title">省总工会审核意见：</div>
             <textarea v-if="!isPrintMode" v-model="data.provinceOpinion" disabled class="approval-textarea" rows="2"
-              style="margin-top:40px; margin-left: 40px;"></textarea>
+              style="margin-top:40px; margin-left: 40px;   width: 90%;"></textarea>
             <span v-else class="approval-textarea">{{ data.provinceOpinion || '' }}</span>
 
             <!-- 退还方式：原有代码（无修改） -->
@@ -405,7 +404,7 @@ const downloadFile = (url?: string, fileName?: string) => {
   margin: 30px auto;
   padding: 0 20px;
   font-family: "SimSun", serif;
-  font-size: 17px;
+  font-size: 16px;
 }
 
 .title-section {
@@ -421,7 +420,7 @@ const downloadFile = (url?: string, fileName?: string) => {
 }
 
 .form-title {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: bold;
   margin: 0;
   margin-bottom: 15px;
@@ -485,7 +484,6 @@ const downloadFile = (url?: string, fileName?: string) => {
 
 .mini-input {
   border: none;
-  border-bottom: 1px dashed #000;
   outline: none;
   background: transparent;
   font-family: inherit;
@@ -494,9 +492,6 @@ const downloadFile = (url?: string, fileName?: string) => {
   width: 50px;
 }
 
-.sign-phone {
-  width: 120px !important;
-}
 
 .sign-input {
   border: none;
@@ -618,81 +613,5 @@ const downloadFile = (url?: string, fileName?: string) => {
 .file-btns {
   display: flex;
   gap: 8px;
-}
-
-
-
-@page {
-  size: A4 portrait !important;
-  /* 强制纵向A4 */
-  margin: 0.5cm !important;
-  /* 极小边距，最大化内容区域 */
-  margin-top: 1cm !important;
-  /* 顶部留少量边距，避免标题顶边 */
-}
-
-/* 打印适配核心样式（替换原有@media print内容） */
-@media print {
-
-  /* 1. 隐藏按钮和弹窗（保留原有） */
-  :deep(.el-button),
-  .btn-group,
-  :deep(.el-dialog),
-  :deep(.el-dialog__wrapper) {
-    display: none !important;
-  }
-
-  /*  2. 核心修改：强制主表/附件表容器铺满A4 */
-  .main-form-container,
-  .attachment-form-container {
-    max-width: 100% !important;
-    /* 移除宽度限制 */
-    width: 100% !important;
-    /* 强制100%宽度 */
-    margin: 0 !important;
-    /* 移除外边距 */
-    padding: 0 0.5cm !important;
-    /* 和@page边距匹配，避免内容溢出 */
-    min-width: unset !important;
-    /* 移除最小宽度限制 */
-  }
-
-  /* 2. 强制分页生效（保留原有） */
-  .main-form-container {
-    page-break-after: always !important;
-  }
-
-  /*  3. 新增：打印时附件表容器也铺满 */
-  .attachment-table-scroll {
-    max-width: 100% !important;
-    overflow-x: visible !important;
-    margin: 0 !important;
-  }
-
-  /*  4. 新增：全局元素强制适配A4 */
-  * {
-    box-sizing: border-box !important;
-    /* 盒模型统一，避免宽度计算错误 */
-    height: auto !important;
-    overflow: visible !important;
-    max-width: 100% !important;
-    /* 所有元素不超A4宽度 */
-  }
-
-  /*  5. 新增：表格强制铺满 */
-  .form-table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    /* 边框合并，避免错位 */
-  }
-
-  /*  6. 新增：覆盖若依打印容器样式 */
-  :deep(.print-container),
-  :deep(.app-container) {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
 }
 </style>

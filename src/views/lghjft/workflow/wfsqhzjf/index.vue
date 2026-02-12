@@ -6,8 +6,7 @@
           <span class="title">工会经费汇总缴纳申请表</span>
         </div>
       </template>
-      <!-- :rules="rules" -->
-      <el-form ref="formRef" :model="formData" label-width="180px" label-position="left" size="default">
+      <el-form ref="formRef" :rules="rules" :model="formData" label-width="180px" label-position="left" size="default">
         <!-- 1. 基本信息区域 -->
         <el-row :gutter="20">
           <el-col :span="12">
@@ -65,7 +64,7 @@
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="工会负责人" prop="ghfzr">
-              <el-input v-model="formData.ghfzr" maxlength="50" placeholder="请输入工会主席/负责人姓名" disabled />
+              <el-input v-model="formData.ghfzr" maxlength="50" placeholder="请输入工会主席/负责人姓名" clearable />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -104,16 +103,16 @@
         <!-- 3. 申请信息区域 -->
         <el-form-item label="汇总申报缴纳原因" prop="hzbsjygy">
           <el-input v-model="formData.hzbsjygy" type="textarea" :rows="4" placeholder="请详细说明汇总申报缴纳原因（如：下属分支机构较多、统一管理等）"
-            clearable />
+            clearable maxlength="200" show-word-limit />
         </el-form-item>
 
-        <el-row :gutter="20">
-          <el-col :span="12">
+        <!-- <el-row :gutter="20"> -->
+        <!-- <el-col :span="12">
             <el-form-item label="负责人" prop="fzrxm">
-              <el-input v-model="formData.fzrxm" maxlength="50" placeholder="请输入单位主要负责人姓名" clearable />
+              <el-input v-model="formData.fzrxm" maxlength="50" placeholder="请输入单位主要负责人姓名" />
             </el-form-item>
-          </el-col>
-          <el-col :span="12">
+          </el-col> -->
+        <!-- <el-col :span="12">
             <el-form-item label="经办人姓名" prop="jbrxm">
               <el-input v-model="formData.jbrxm" maxlength="50" placeholder="请输入经办人姓名" clearable />
             </el-form-item>
@@ -126,7 +125,7 @@
               <el-input v-model="formData.jbrdh" maxlength="20" placeholder="请输入经办人联系电话" />
             </el-form-item>
           </el-col>
-        </el-row>
+        </el-row> -->
 
         <!-- 4. 分支机构信息 -->
         <el-form-item label="分支机构信息">
@@ -147,8 +146,8 @@
     </el-card>
 
     <!-- 核心：分支机构明细 Dialog（直接内嵌组件，无 iframe） -->
-    <el-dialog v-model="branchDialogVisible" title="分支机构明细维护" width="95%" height="90vh" top="10px" destroy-on-close
-      append-to-body>
+    <el-dialog v-model="branchDialogVisible" title="汇总缴纳分支机构（下属企业、子公司）明细表" width="95%" height="90vh" top="10px"
+      destroy-on-close append-to-body>
       <BranchDetail :init-data="branchList" @save="handleBranchSave" @cancel="branchDialogVisible = false" />
     </el-dialog>
   </div>
@@ -204,93 +203,89 @@ watch(
 )
 
 // // 严格符合TypeScript类型规范的表单校验规则
-// const rules = reactive<Record<string, FormItemRule[]>>({
-//   // 社会信用代码：必填 + 格式校验
-//   xyxdm: [
-//     { required: true, message: '请输入申请汇总缴费单位社会信用代码', trigger: 'blur' },
-//     { pattern: /^[0-9A-Z]{18}$/, message: '社会信用代码应为18位数字/大写字母', trigger: 'blur' }
-//   ],
-//   // 单位全称：必填 + 长度校验
-//   dwqc: [
-//     { required: true, message: '请输入申请汇总缴费单位全称', trigger: 'blur' },
-//     { min: 2, max: 255, message: '单位全称长度应在2-255个字符之间', trigger: 'blur' }
-//   ],
-//   // 主管税务部门：必填
-//   zgsbm: [
-//     { required: true, message: '请输入主管税务部门', trigger: 'blur' },
-//     { min: 2, max: 255, message: '主管税务部门名称长度应在2-255个字符之间', trigger: 'blur' }
-//   ],
-//   // 缴费地址：必填
-//   dwdz: [
-//     { required: true, message: '请输入缴费单位地址', trigger: 'blur' },
-//     { min: 5, max: 500, message: '地址长度应在5-500个字符之间', trigger: 'blur' }
-//   ],
-//   // 工会法人登记证号：必填
-//   ghfrdjzjh: [
-//     { required: true, message: '请输入工会法人登记证件号码', trigger: 'blur' },
-//     { min: 1, max: 30, message: '证件号码长度应在1-30个字符之间', trigger: 'blur' }
-//   ],
-//   // 工会全称：必填
-//   ghqc: [
-//     { required: true, message: '请输入缴费单位工会全称', trigger: 'blur' },
-//     { min: 2, max: 255, message: '工会全称长度应在2-255个字符之间', trigger: 'blur' }
-//   ],
-//   // 职工总人数：必填 + 数字校验
-//   zzgzs: [
-//     { required: true, message: '请输入职工总人数', trigger: 'blur' },
-//     { type: 'number', min: 0, message: '职工总人数不能为负数', trigger: 'blur', transform: (value) => Number(value) }
-//   ],
-//   // 工会会员数：必填 + 数字校验
-//   ghyhs: [
-//     { required: true, message: '请输入工会会员数', trigger: 'blur' },
-//     { type: 'number', min: 0, message: '工会会员数不能为负数', trigger: 'blur', transform: (value) => Number(value) }
-//   ],
-//   // 工会负责人：必填
-//   ghfzr: [
-//     { required: true, message: '请输入工会负责人', trigger: 'blur' },
-//     { min: 2, max: 50, message: '姓名长度应在2-50个字符之间', trigger: 'blur' }
-//   ],
-//   // 联系电话：必填 + 格式校验
-//   lxdh: [
-//     { required: true, message: '请输入联系电话', trigger: 'blur' },
-//     { pattern: /^(0\d{2,3}-\d{7,8})|(1[3-9]\d{9})$/, message: '请输入有效的手机号或座机号', trigger: 'blur' }
-//   ],
-//   // 工会账户账号：必填 + 格式校验
-//   ghzhzh: [
-//     { required: true, message: '请输入工会账户账号', trigger: 'blur' },
-//     { pattern: /^\d{8,30}$/, message: '银行账号应为8-30位数字', trigger: 'blur' }
-//   ],
-//   // 开户行名称：必填
-//   khyhmc: [
-//     { required: true, message: '请输入开户银行名称', trigger: 'blur' },
-//     { min: 5, max: 100, message: '开户行名称长度应在5-100个字符之间', trigger: 'blur' }
-//   ],
-//   // 工会账户户名：必填
-//   ghzhhm: [
-//     { required: true, message: '请输入工会账户户名', trigger: 'blur' },
-//     { min: 2, max: 255, message: '账户户名长度应在2-255个字符之间', trigger: 'blur' }
-//   ],
-//   // 汇总原因：必填 + 长度校验
-//   hzbsjygy: [
-//     { required: true, message: '请输入汇总申报缴纳原因', trigger: 'blur' },
-//     { min: 10, message: '汇总原因至少填写10个字符，说明具体理由', trigger: 'blur' }
-//   ],
-//   // 负责人：必填
-//   fzrxm: [
-//     { required: true, message: '请输入负责人姓名', trigger: 'blur' },
-//     { min: 2, max: 50, message: '姓名长度应在2-50个字符之间', trigger: 'blur' }
-//   ],
-//   // 经办人：必填
-//   jbrxm: [
-//     { required: true, message: '请输入经办人姓名', trigger: 'blur' },
-//     { min: 2, max: 50, message: '姓名长度应在2-50个字符之间', trigger: 'blur' }
-//   ],
-//   // 经办人电话：必填 + 格式校验
-//   jbrdh: [
-//     { required: true, message: '请输入经办人联系电话', trigger: 'blur' },
-//     { pattern: /^(0\d{2,3}-\d{7,8})|(1[3-9]\d{9})$/, message: '请输入有效的手机号或座机号（座机格式：0XX-XXXXXXX）', trigger: 'blur' }
-//   ]
-// })
+const rules = reactive<Record<string, FormItemRule[]>>({
+  // 社会信用代码：必填 + 格式校验
+  xyxdm: [
+    { required: true, message: '请输入申请汇总缴费单位社会信用代码', trigger: 'blur' },
+    { pattern: /^[0-9A-Z]{18}$/, message: '社会信用代码应为18位数字/大写字母', trigger: 'blur' }
+  ],
+  // 单位全称：必填 + 长度校验
+  dwqc: [
+    { required: true, message: '请输入申请汇总缴费单位全称', trigger: 'blur' },
+    { min: 2, max: 255, message: '单位全称长度应在2-255个字符之间', trigger: 'blur' }
+  ],
+  // 主管税务部门：必填
+  zgsbm: [
+    { required: true, message: '请输入主管税务部门', trigger: 'blur' },
+    { min: 2, max: 255, message: '主管税务部门名称长度应在2-255个字符之间', trigger: 'blur' }
+  ],
+  // 缴费地址：必填
+  dwdz: [
+    { required: true, message: '请输入缴费单位地址', trigger: 'blur' },
+    { min: 5, max: 500, message: '地址长度应在5-500个字符之间', trigger: 'blur' }
+  ],
+  // 工会法人登记证号：必填
+  ghfrdjzjh: [
+    { required: true, message: '请输入工会法人登记证件号码', trigger: 'blur' },
+    { min: 1, max: 30, message: '证件号码长度应在1-30个字符之间', trigger: 'blur' }
+  ],
+  // 工会全称：必填
+  ghqc: [
+    { required: true, message: '请输入缴费单位工会全称', trigger: 'blur' },
+    { min: 2, max: 255, message: '工会全称长度应在2-255个字符之间', trigger: 'blur' }
+  ],
+  // 职工总人数：必填 + 数字校验
+  zzgzs: [
+    { required: true, message: '请输入职工总人数', trigger: 'blur' },
+    { type: 'number', min: 0, message: '职工总人数不能为负数', trigger: 'blur', transform: (value) => Number(value) }
+  ],
+  // 工会会员数：必填 + 数字校验
+  ghyhs: [
+    { required: true, message: '请输入工会会员数', trigger: 'blur' },
+    { type: 'number', min: 0, message: '工会会员数不能为负数', trigger: 'blur', transform: (value) => Number(value) }
+  ],
+  // 工会负责人：必填
+  ghfzr: [
+    { required: true, message: '请输入工会负责人', trigger: 'blur' },
+    { min: 2, max: 50, message: '姓名长度应在2-50个字符之间', trigger: 'blur' }
+  ],
+  // 联系电话：必填 + 格式校验
+  lxdh: [
+    { required: true, message: '请输入联系电话', trigger: 'blur' },
+    { pattern: /^(0\d{2,3}-\d{7,8})|(1[3-9]\d{9})$/, message: '请输入有效的手机号或座机号', trigger: 'blur' }
+  ],
+  // 工会账户账号：必填 + 格式校验
+  ghzhzh: [
+    { required: true, message: '请输入工会账户账号', trigger: 'blur' },
+    { pattern: /^\d{8,30}$/, message: '银行账号应为8-30位数字', trigger: 'blur' }
+  ],
+  // 开户行名称：必填
+  khyhmc: [
+    { required: true, message: '请输入开户银行名称', trigger: 'blur' },
+    { min: 5, max: 100, message: '开户行名称长度应在5-100个字符之间', trigger: 'blur' }
+  ],
+  // 工会账户户名：必填
+  ghzhhm: [
+    { required: true, message: '请输入工会账户户名', trigger: 'blur' },
+    { min: 2, max: 255, message: '账户户名长度应在2-255个字符之间', trigger: 'blur' }
+  ],
+  // 汇总原因：必填 + 长度校验
+  hzbsjygy: [
+    { required: true, message: '请输入汇总申报缴纳原因', trigger: 'blur' },
+    { min: 10, message: '汇总原因至少填写10个字符，说明具体理由', trigger: 'blur' }
+  ],
+
+  // 经办人：必填
+  jbrxm: [
+    { required: true, message: '请输入经办人姓名', trigger: 'blur' },
+    { min: 2, max: 50, message: '姓名长度应在2-50个字符之间', trigger: 'blur' }
+  ],
+  // 经办人电话：必填 + 格式校验
+  jbrdh: [
+    { required: true, message: '请输入经办人联系电话', trigger: 'blur' },
+    { pattern: /^(0\d{2,3}-\d{7,8})|(1[3-9]\d{9})$/, message: '请输入有效的手机号或座机号（座机格式：0XX-XXXXXXX）', trigger: 'blur' }
+  ]
+})
 
 // 打开分支机构 Dialog（无延迟）
 const openBranchDialog = () => {

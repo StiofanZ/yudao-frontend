@@ -28,7 +28,7 @@
         <span v-else class="form-input">{{ formData.nsrmc || '' }}</span>
       </el-col>
       <el-col :span="4" class="label-cell">社会信用代码</el-col>
-      <el-col :span="8">
+      <el-col style="border-right: none;" :span="8">
         <input v-if="!isPrintMode" v-model="formData.shxydm" class="form-input" disabled />
         <span v-else class="form-input">{{ formData.shxydm || '' }}</span>
       </el-col>
@@ -41,8 +41,8 @@
         <!-- 打印模式：纯文本展示 联系人/联系电话 组合 -->
         <span v-else class="form-input">{{ contactAndPhone }}</span>
       </el-col>
-      <el-col :span="4" class="label-cell">适用费率（%） </el-col>
-      <el-col :span="8">
+      <el-col :span="4" class="label-cell">适用费率(%) </el-col>
+      <el-col :span="8" style="border-right: none;">
         <input v-if="!isPrintMode" v-model.number="formData.applicableRate" class="form-input" type="number" min="0"
           step="0.01" disabled />
         <span v-else class="form-input">{{ formData.applicableRate || '' }}</span>
@@ -62,7 +62,7 @@
         <span v-else class="form-input">{{ formData.monthlySalaryTotal || '' }}</span>
       </el-col>
       <el-col :span="4" class="label-cell">月拨缴金额（元）</el-col>
-      <el-col :span="4">
+      <el-col :span="4" style="border-right: none;">
         <input v-if="!isPrintMode" v-model.number="formData.monthlyPayAmount" class="form-input" type="number" min="0"
           step="0.01" disabled />
         <span v-else class="form-input">{{ formData.monthlyPayAmount || '' }}</span>
@@ -93,7 +93,7 @@
         <span v-else class="mini-input">{{ formData.deferTotalMonth || '' }}</span> 月
       </el-col>
       <el-col :span="6" class="label-cell">累计缓缴金额（元）</el-col>
-      <el-col :span="6">
+      <el-col :span="6" style="border-right: none;">
         <input v-if="!isPrintMode" v-model.number="formData.totalDeferAmount" class="form-input" type="number" min="0"
           step="0.01" disabled />
         <span v-else class="form-input">{{ formData.totalDeferAmount || '' }}</span>
@@ -143,7 +143,8 @@
         <div class="approval-sign-wrap">
           <div class="sign-group">
             <div>工会负责人：<input v-if="!isPrintMode" v-model="formData.grassrootsLeader" class="sign-input"
-                disabled /><span v-else class="sign-input">{{ formData.grassrootsLeader || '' }}</span></div>
+                disabled /><span v-else class="sign-input">{{
+                  formData.grassrootsLeader || '' }}</span></div>
             <div>经办：<input v-if="!isPrintMode" v-model="formData.grassrootsHandler" class="sign-input" disabled /><span
                 v-else class="sign-input">{{ formData.grassrootsHandler || '' }}</span></div>
           </div>
@@ -168,10 +169,10 @@
     <!-- 主管工会审核意见：无标题边框，居左布局 -->
     <el-row class="super-union-grid-container" :gutter="0" style="margin-top: -1px;">
       <el-col :span="24" class="super-union-col">
-        <div class="approval-label">主管工会审核意见（章）</div><br />
+        <div class="approval-label">主管工会审核意见（章）</div>
         <textarea v-if="!isPrintMode" v-model="formData.managerOpinion" disabled class="approval-textarea"
           rows="2"></textarea>
-        <span v-else class="approval-textarea">{{ formData.managerOpinion || '' }}</span>
+        <span v-else class="approval-textarea">{{ formData.managerOpinion || '' }}</span> <br />
 
         <div class="approval-section">
           <div>工会负责人：<input v-if="!isPrintMode" v-model="formData.managerLeaderName" class="sign-input" disabled /><span
@@ -291,13 +292,13 @@ defineExpose({ refreshData })
   margin: 30px auto;
   padding: 0 20px;
   font-family: "SimSun", serif;
-  font-size: 17px;
+  font-size: 16px;
 }
 
 .form-title {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: bold;
-  margin: 0;
+  margin-bottom: 20px;
   text-align: center;
 }
 
@@ -372,7 +373,7 @@ defineExpose({ refreshData })
   font-size: inherit;
   text-align: center;
   width: 50px;
-  border-bottom: 1px dashed #000;
+  /* border-bottom: 1px dashed #000; */
   padding: 2px 0;
 }
 
@@ -486,79 +487,5 @@ defineExpose({ refreshData })
   /* 清除min-width，避免超出A4 */
   height: auto !important;
   overflow: visible !important;
-}
-
-@page {
-  size: A4 portrait !important;
-  /* 强制纵向A4 */
-  margin: 0.5cm !important;
-  /* 极小边距，最大化内容区域 */
-  margin-top: 1cm !important;
-  /* 顶部留少量边距，避免标题顶边 */
-}
-
-/* 打印适配核心样式（替换原有@media print内容） */
-@media print {
-
-  /* 1. 隐藏按钮和弹窗（保留原有） */
-  :deep(.el-button),
-  .btn-group,
-  :deep(.el-dialog),
-  :deep(.el-dialog__wrapper) {
-    display: none !important;
-  }
-
-  /*  2. 核心修改：强制主表/附件表容器铺满A4 */
-  .main-form-container,
-  .attachment-form-container {
-    max-width: 100% !important;
-    /* 移除宽度限制 */
-    width: 100% !important;
-    /* 强制100%宽度 */
-    margin: 0 !important;
-    /* 移除外边距 */
-    padding: 0 0.5cm !important;
-    /* 和@page边距匹配，避免内容溢出 */
-    min-width: unset !important;
-    /* 移除最小宽度限制 */
-  }
-
-  /* 2. 强制分页生效（保留原有） */
-  .main-form-container {
-    page-break-after: always !important;
-  }
-
-  /*  3. 新增：打印时附件表容器也铺满 */
-  .attachment-table-scroll {
-    max-width: 100% !important;
-    overflow-x: visible !important;
-    margin: 0 !important;
-  }
-
-  /*  4. 新增：全局元素强制适配A4 */
-  * {
-    box-sizing: border-box !important;
-    /* 盒模型统一，避免宽度计算错误 */
-    height: auto !important;
-    overflow: visible !important;
-    max-width: 100% !important;
-    /* 所有元素不超A4宽度 */
-  }
-
-  /*  5. 新增：表格强制铺满 */
-  .form-table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    /* 边框合并，避免错位 */
-  }
-
-  /*  6. 新增：覆盖若依打印容器样式 */
-  :deep(.print-container),
-  :deep(.app-container) {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
 }
 </style>
