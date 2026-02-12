@@ -10,13 +10,13 @@
       <!-- 情况说明、账户信息 原有代码（无任何修改） -->
       <tr>
         <th rowspan="3" class="vertical-text">情况说明</th>
-        <td width="25%">社会信用代码</td>
-        <td width="35%">
+        <td width="20%">社会信用代码</td>
+        <td width="26%">
           <input v-if="!isPrintMode" v-model="data.shxydm" disabled class="form-input" />
           <span v-else class="form-input">{{ data.shxydm || '' }}</span>
         </td>
         <td width="20%">纳税人名称</td>
-        <td width="20%">
+        <td width="35%">
           <input v-if="!isPrintMode" v-model="data.nsrmc" disabled class="form-input" />
           <span v-else class="form-input">{{ data.nsrmc || '' }}</span>
         </td>
