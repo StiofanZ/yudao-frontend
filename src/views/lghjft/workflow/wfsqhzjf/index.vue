@@ -95,7 +95,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="开户银行网点代码" prop="khyhwdm">
-              <el-input v-model="formData.khyhwdm" maxlength="20" placeholder="选填：请输入开户银行网点联行号/代码" clearable />
+              <el-input v-model="formData.khyhwdm" maxlength="20" placeholder="请输入开户银行网点联行号/代码" clearable />
             </el-form-item>
           </el-col>
         </el-row>

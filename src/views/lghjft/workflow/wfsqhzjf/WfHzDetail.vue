@@ -93,7 +93,6 @@
           </td>
         </tr>
       </table>
-
       <!-- 2. 汇总申报原因 → 只改这里布局风格，样式完全不变 -->
       <table class="form-table">
         <tr>
@@ -108,7 +107,8 @@
                 <input v-if="!printModeFlag" v-model="data.fzrxm" disabled class="sign-input" />
                 <span v-else class="sign-input">{{ data.fzrxm || '' }}</span>
               </div>
-              <div>经办人及联系电话：
+              <div>
+                经办人及联系电话：
                 <input v-if="!printModeFlag" v-model="data.jbrxm" disabled class="sign-input" />
                 <span v-else class="sign-input">{{ data.jbrxm || '' }}</span>
                 <span v-if="data.jbrdh" style="margin-left: 10px;">/</span>
@@ -144,11 +144,12 @@
               style="margin-top:20px;font-weight: bolder; font-size: 20px;"></textarea>
             <span v-else class="approval-textarea" style="min-height: 60px;">{{ data.zgghsjy || '' }}</span>
 
-            <div>负责人：
+            <div style="padding-left: 5px;">负责人：
               <input v-if="!printModeFlag" v-model="data.zgghsfzr" disabled class="sign-input" />
               <span v-else class="sign-input">{{ data.zgghsfzr || '' }}</span>
-            </div>
-            <div>经办人及联系电话：<br />
+            </div><br />
+
+            <div style="padding-left: 5px;">经办人及联系电话：<br />
               <input v-if="!printModeFlag" v-model="data.zgghsjbr" disabled class="sign-input" style="width:80px;" />
               <span v-else class="sign-input" style="width:60px;">{{ data.zgghsjbr || '' }}</span>
               <span v-if="data.zgghsjbrdh" style="margin-left: 10px;">/</span>
@@ -168,9 +169,9 @@
             <div style="text-align: center;">（盖章）</div>
             <textarea v-if="!printModeFlag" v-model="data.sghzsjy" disabled class="approval-textarea" rows="2"
               style="margin-top:20px; font-weight: bolder; font-size: 20px;"></textarea>
-            <span v-else class="approval-textarea" style="min-height: 60px; ">{{ data.sghzsjy || '' }}</span>
+            <span v-else class="approval-textarea">{{ data.sghzsjy || '' }}</span>
 
-            <div>负责人：
+            <div style="padding-left: 5px;">负责人：
               <input v-if="!printModeFlag" v-model="data.sghsfzr" disabled class="sign-input" />
               <span v-else class="sign-input">{{ data.sghsfzr || '' }}</span>
             </div> <br />
@@ -198,18 +199,18 @@
       <div style="transform: scale(0.97); transform-origin: top left; width: 103%;">
         <table class="form-table form-table-fb" style="width: 100%;">
           <tr style="background: #f5f5f5; ">
-            <th style="width: 8%;">序号</th>
-            <th style="width: 20%;">社会信用代码</th>
+            <th style="width: 3%;">序号</th>
+            <th style="width: 28%;">社会信用代码</th>
             <th style="width: 25%;">分支机构全称</th>
             <th style="width: 22%;">主管税务部门</th>
             <th style="width: 10%;">职工人数</th>
-            <th style="width: 15%;">月工资总额</th>
+            <th style="width: 12%;">月工资总额</th>
           </tr>
           <tr v-for="(item, index) in branchList" :key="item.id || index">
             <td style="text-align: center;">{{ index + 1 }}</td>
-            <td>{{ item.fjgxyxdm || '' }}</td>
-            <td>{{ item.fjgdwqc || '' }}</td>
-            <td>{{ item.fjgzgsbm || '' }}</td>
+            <td style="text-align: center;">{{ item.fjgxyxdm || '' }}</td>
+            <td style="text-align: center;">{{ item.fjgdwqc || '' }}</td>
+            <td style="text-align: center;">{{ item.fjgzgsbm || '' }}</td>
             <td style="text-align: center;">{{ item.fjggzs || 0 }}</td>
             <td style="text-align: center;">{{ item.fjggzze || 0 }}</td>
           </tr>
@@ -387,7 +388,7 @@ const openBranchDialog = () => {
   margin: 30px auto;
   padding: 0 20px;
   font-family: "SimSun", serif;
-  font-size: 17px;
+  font-size: 16px;
   page-break-after: always;
 }
 
@@ -397,7 +398,7 @@ const openBranchDialog = () => {
   margin: 0 auto;
   padding: 0 20px;
   font-family: "SimSun", serif;
-  font-size: 17px;
+  font-size: 16px;
 }
 
 .title-section {
@@ -406,7 +407,7 @@ const openBranchDialog = () => {
 }
 
 .form-title {
-  font-size: 22px;
+  font-size: 28px;
   font-weight: bold;
   margin: 0;
   margin-bottom: 15px;
@@ -415,8 +416,7 @@ const openBranchDialog = () => {
 .form-table {
   border-bottom: none;
   width: 100%;
-  border-collapse: collapse;
-  border: 1px solid #000;
+
   page-break-inside: avoid;
 }
 
@@ -442,6 +442,7 @@ td {
 }
 
 .form-input {
+  margin-left: 10px;
   width: 100%;
   border: none;
   outline: none;
@@ -451,6 +452,7 @@ td {
 }
 
 .form-textarea {
+
   border: none;
   width: 100%;
   outline: none;
@@ -459,7 +461,7 @@ td {
   font-size: inherit;
   resize: none;
   min-height: 80px;
-  padding: 0;
+  padding: 10px;
   margin: 0;
 }
 
@@ -469,11 +471,12 @@ td {
   outline: none;
   background: transparent;
   font-family: inherit;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: bold;
   resize: none;
   min-height: 40px;
   margin: 10px 0;
+  text-align: center;
 }
 
 .mini-input {
@@ -505,6 +508,7 @@ td {
 
 .date-line {
   margin-top: 15px;
+  margin-right: 10px;
   text-align: right;
 }
 
@@ -533,6 +537,23 @@ td {
   line-height: 20px;
 }
 
+.form-table,
+.form-table_info {
+  border-collapse: collapse;
+  /* 确保边框不会重叠 */
+  width: 100%;
+}
+
+.form-table th,
+.form-table td,
+.form-table_info th,
+.form-table_info td {
+  border: 1px solid #000;
+  /* 统一边框样式 */
+  padding: 8px 0px;
+  vertical-align: middle;
+}
+
 /* 打印适配核心样式 */
 @media print {
 
@@ -543,16 +564,13 @@ td {
     display: none !important;
   }
 
-  .form-table_info th,
+  /* .form-table_info th,
   td {
-    border: 1px solid #000;
+
     padding: 4px 0px;
     vertical-align: middle;
-  }
+  } */
 
-  .form-table-fb {
-    border: 2px solid #000;
-  }
 
   /* 强制打印高度，解决你说的不显示高度问题 */
   .form-textarea {
@@ -563,9 +581,95 @@ td {
   }
 
   .approval-textarea {
+
     min-height: 60px !important;
-    height: 60px !important;
+    font-size: 20px;
+    font-weight: bold;
     display: block !important;
+  }
+
+  /* 序号列：打印时缩小到3%（固定60px保底，避免过窄） */
+  .form-table-fb th:nth-child(1),
+  .form-table-fb td:nth-child(1) {
+    width: 3% !important;
+    min-width: 60px !important;
+    max-width: 60px !important;
+    padding-left: 10px !important;
+
+  }
+
+  /* 原有打印样式保留 */
+  :deep(.el-button),
+  .btn-group,
+  :deep(.el-dialog),
+  :deep(.el-dialog__wrapper) {
+    display: none !important;
+  }
+
+  .form-table_info th,
+  td {
+    padding: 4px 0px;
+    vertical-align: middle;
+  }
+
+
+
+  .form-textarea {
+    min-height: 120px !important;
+    height: 80px !important;
+    display: block !important;
+  }
+
+  .approval-textarea {
+    min-height: 56px !important;
+    display: block !important;
+  }
+
+  /* ========== 新增：打印时调整列宽 ========== */
+  /* 序号列：打印时缩小到3%（固定60px保底，避免过窄） */
+  .form-table-fb th:nth-child(1),
+  .form-table-fb td:nth-child(1) {
+    width: 3% !important;
+    min-width: 60px !important;
+    max-width: 60px !important;
+    padding-left: 10px !important;
+    /* 可选：内容左间距，不需要可删除 */
+  }
+
+  /* 社会信用代码列：打印时加宽到28%（最小宽度200px避免换行） */
+  .form-table-fb th:nth-child(2),
+  .form-table-fb td:nth-child(2) {
+    width: 28% !important;
+    min-width: 200px !important;
+  }
+
+  /* 其他列保持原有比例，仅适配宽度总和 */
+  .form-table-fb th:nth-child(3),
+  .form-table-fb td:nth-child(3) {
+    width: 25% !important;
+  }
+
+  .form-table-fb th:nth-child(4),
+  .form-table-fb td:nth-child(4) {
+    width: 22% !important;
+  }
+
+  .form-table-fb th:nth-child(5),
+  .form-table-fb td:nth-child(5) {
+    width: 10% !important;
+  }
+
+  .form-table-fb th:nth-child(6),
+  .form-table-fb td:nth-child(6) {
+    width: 12% !important;
+  }
+
+  /* 强制表格单元格不换行，保证列宽生效 */
+  .form-table-fb td,
+  .form-table-fb th {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 }
 </style>
