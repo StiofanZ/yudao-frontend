@@ -197,9 +197,8 @@
           <div v-else class="file-info">
             <span class="file-name">{{ item.label }}：{{ item.name }}</span>
             <div class="file-btns">
-              <el-button type="primary" size="small" @click="previewFile(item.url)" icon="el-icon-view">预览</el-button>
-              <el-button type="success" size="small" @click="downloadFile(item.url, item.name)"
-                icon="el-icon-download">下载</el-button>
+              <el-button type="primary" size="small" @click="previewFile(item.url)">预览</el-button>
+              <el-button type="success" size="small" @click="downloadFile(item.url, item.name)">下载</el-button>
             </div>
           </div>
         </div>

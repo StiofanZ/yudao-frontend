@@ -72,7 +72,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="开户行行号" prop="bankCode">
-              <el-input v-model="formData.bankCode" maxlength="20" placeholder="选填：请输入开户行行号" clearable />
+              <el-input v-model="formData.bankCode" maxlength="20" placeholder="请输入开户行行号" clearable />
             </el-form-item>
           </el-col>
         </el-row>
@@ -99,7 +99,6 @@ import AttachmentSelector from './AttachmentSelector.vue'
 // 修复：修正API导入路径，匹配实际unionRefundApply.ts文件
 import { createApply, ApplyRefundReqVO } from '@/api/lghjft/workflow/wftdfsq/index'
 import router from '@/router'
-
 const formData = reactive({
   situationDesc: '',
   shxydm: '',
