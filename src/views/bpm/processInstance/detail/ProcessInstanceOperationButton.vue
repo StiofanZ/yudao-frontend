@@ -19,6 +19,7 @@
             <form-create v-model="approveForm.value" v-model:api="approveFormFApi" :option="approveForm.option"
               :rule="approveForm.rule" />
           </el-card>
+
           <el-form-item v-if="!runningTask?.formName" :label="`${nodeTypeName}意见`" prop="reason">
             <el-input v-model="approveReasonForm.reason" :placeholder="`请输入${nodeTypeName}意见`" :rows="4"
               type="textarea" />
@@ -293,6 +294,8 @@
   <SignDialog ref="signRef" @success="handleSignFinish" />
 </template>
 <script lang="ts" setup>
+
+
 import { useUserStoreWithOut } from '@/store/modules/user'
 import { setConfAndFields2 } from '@/utils/formCreate'
 import * as TaskApi from '@/api/bpm/task'
@@ -309,9 +312,9 @@ import type { FormInstance, FormRules } from 'element-plus'
 import SignDialog from './SignDialog.vue'
 import ProcessInstanceTimeline from '../detail/ProcessInstanceTimeline.vue'
 import { isEmpty } from '@/utils/is'
-
+import { useTagsView } from '@/hooks/web/useTagsView'
 defineOptions({ name: 'ProcessInstanceBtnContainer' })
-
+const { refreshPage } = useTagsView()
 const router = useRouter() // 路由
 const message = useMessage() // 消息弹窗
 
@@ -610,7 +613,10 @@ const handleAudit = async (pass: boolean, formRef: FormInstance | undefined) => 
       if (nextAssigneesTimelineRef.value) {
         nextAssigneesTimelineRef.value.batchSetCustomApproveUsers({})
       }
+      refreshPage()
       message.success('审批通过成功')
+      // window.location.reload() // 立即刷新当前页面
+      // refreshSelectedTag() // 刷新当前页，无任何依赖！
     } else {
       // 审批不通过数据
       const data = {
