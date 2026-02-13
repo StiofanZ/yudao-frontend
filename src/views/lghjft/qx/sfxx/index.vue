@@ -64,10 +64,16 @@
           <el-option label="一般人" value="02" />
         </el-select>
       </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" class="!w-240px" clearable placeholder="请选择状态">
-          <el-option :value="0" label="待审核" />
-          <el-option :value="1" label="已审核" />
+      <el-form-item label="授权状态" prop="status">
+        <el-select
+          v-model="queryParams.status"
+          class="!w-240px"
+          clearable
+          placeholder="请选择授权状态"
+        >
+          <el-option :value="0" label="暂未授权" />
+          <el-option :value="1" label="同意授权" />
+          <el-option :value="2" label="拒绝授权" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -121,10 +127,16 @@
         </template>
       </el-table-column>
       <el-table-column align="center" label="部门" min-width="140" prop="deptName" />
-      <el-table-column align="center" label="状态" prop="status" width="100">
+      <el-table-column align="center" label="授权状态" prop="status" width="110">
         <template #default="scope">
-          <el-tag v-if="scope.row.status === 0" type="warning">待审核</el-tag>
-          <el-tag v-else-if="scope.row.status === 1" type="success">已审核</el-tag>
+          <el-tag v-if="scope.row.status === 0" type="warning">暂未授权</el-tag>
+          <el-tag v-else-if="scope.row.status === 1" type="success">同意授权</el-tag>
+          <el-tag v-else-if="scope.row.status === 2" type="danger">拒绝授权</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="拒绝原因" min-width="160" prop="jjyy">
+        <template #default="scope">
+          <span>{{ scope.row.jjyy || '-' }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -134,7 +146,7 @@
         prop="createTime"
         width="180"
       />
-      <el-table-column align="center" fixed="right" label="操作" width="240">
+      <el-table-column align="center" fixed="right" label="操作" width="300">
         <template #default="scope">
           <el-button
             v-hasPermi="['lghjft:qx-sfxx:update']"
@@ -149,13 +161,22 @@
             :disabled="scope.row.status === 1"
             link
             type="success"
-            @click="handleAudit(scope.row)"
+            @click="handleAgreeAuthorize(scope.row)"
           >
-            审核
+            同意授权
           </el-button>
           <el-button
             v-hasPermi="['lghjft:qx-sfxx:audit']"
-            :disabled="scope.row.status === 0"
+            :disabled="scope.row.status === 2"
+            link
+            type="danger"
+            @click="handleRejectAuthorize(scope.row)"
+          >
+            拒绝授权
+          </el-button>
+          <el-button
+            v-hasPermi="['lghjft:qx-sfxx:audit']"
+            :disabled="scope.row.status !== 1"
             link
             type="warning"
             @click="handleUnbind(scope.row.id)"
@@ -228,11 +249,11 @@ const openForm = (type: string, id?: number) => {
   formRef.value.open(type, id)
 }
 
-const handleAudit = async (row: Sfxx) => {
+const handleAgreeAuthorize = async (row: Sfxx) => {
   try {
     await ElMessageBox.confirm(
-      `<div>申请原因：${row.sqyy || '无'}</div><div style="margin-top: 10px;">确认审核通过？</div>`,
-      '审核',
+      `<div>申请原因：${row.sqyy || '无'}</div><div style="margin-top: 10px;">确认同意授权？</div>`,
+      '同意授权',
       {
         dangerouslyUseHTMLString: true,
         confirmButtonText: t('common.ok'),
@@ -241,6 +262,20 @@ const handleAudit = async (row: Sfxx) => {
       }
     )
     await SfxxApi.auditSfxx(row.id!, 1)
+    message.success(t('common.updateSuccess'))
+    await getList()
+  } catch {}
+}
+
+const handleRejectAuthorize = async (row: Sfxx) => {
+  try {
+    const { value } = await ElMessageBox.prompt('请输入拒绝授权原因', '拒绝授权', {
+      confirmButtonText: t('common.ok'),
+      cancelButtonText: t('common.cancel'),
+      inputPattern: /\S+/,
+      inputErrorMessage: '拒绝授权原因不能为空'
+    })
+    await SfxxApi.auditSfxx(row.id!, 2, value)
     message.success(t('common.updateSuccess'))
     await getList()
   } catch {}

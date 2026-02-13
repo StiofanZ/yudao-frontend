@@ -10,6 +10,7 @@ export interface Sfxx {
   ghlx?: string
   qxlx?: string
   sqyy?: string
+  jjyy?: string
   jbyy?: string
   deptId?: number
   deptName?: string
@@ -45,8 +46,8 @@ export const SfxxApi = {
     return await request.delete({ url: `/lghjft/qx/sfxx/delete-list?ids=${ids.join(',')}` })
   },
 
-  auditSfxx: async (id: number, status: number) => {
-    return await request.put({ url: `/lghjft/qx/sfxx/audit`, params: { id, status } })
+  auditSfxx: async (id: number, status: number, jjyy?: string) => {
+    return await request.put({ url: `/lghjft/qx/sfxx/audit`, params: { id, status, jjyy } })
   },
 
   unbindSfxx: async (id: number, jbyy: string) => {

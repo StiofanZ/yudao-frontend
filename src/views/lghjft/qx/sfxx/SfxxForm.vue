@@ -16,7 +16,11 @@
         />
       </el-form-item>
       <el-form-item label="社会信用代码">
-        <el-input v-model="searchShxydm" placeholder="请输入社会信用代码或纳税人识别号" class="!w-240px">
+        <el-input
+          v-model="searchShxydm"
+          placeholder="请输入社会信用代码或纳税人识别号"
+          class="!w-240px"
+        >
           <template #append>
             <el-button @click="handleQueryNsrxx">查询</el-button>
           </template>
@@ -112,6 +116,7 @@ const formData = ref<Sfxx>({
   ghlx: undefined,
   qxlx: undefined,
   sqyy: undefined,
+  jjyy: undefined,
   jbyy: undefined,
   deptId: undefined
 })
@@ -154,12 +159,12 @@ const handleQueryNsrxx = async () => {
 const handleSelectNsrxx = (row: NsrxxResVO) => {
   formData.value.djxh = row.djxh
   currentNsrmc.value = row.nsrmc || ''
-  
+
   // 自动填充部门编号
   if (row.deptId) {
     formData.value.deptId = row.deptId
   }
-  
+
   // 自动填充已存在的身份信息（工会类型等）
   if (row.sfxx) {
     formData.value.ghlx = row.sfxx.ghlx
@@ -169,6 +174,7 @@ const handleSelectNsrxx = (row: NsrxxResVO) => {
       formData.value.sflx = row.sfxx.sflx
       formData.value.qxlx = row.sfxx.qxlx
       formData.value.sqyy = row.sfxx.sqyy
+      formData.value.jjyy = row.sfxx.jjyy
       formData.value.jbyy = row.sfxx.jbyy
       formData.value.status = row.sfxx.status
       // 切换为更新操作
@@ -177,25 +183,25 @@ const handleSelectNsrxx = (row: NsrxxResVO) => {
       message.info('已加载该纳税人的现有身份信息')
     }
   }
-  
+
   // 自动匹配身份类型
   // 获取当前行用户的信息（姓名和手机号）
   if (currentRow.value) {
     const userName = currentRow.value.yhxm
     const userMobile = currentRow.value.lxdh
 
-    console.log(userName, userMobile,row.cwfzrxm,row.cwfzryddh)
-    
+    console.log(userName, userMobile, row.cwfzrxm, row.cwfzryddh)
+
     // 优先匹配法定代表人 (01)
     if (userName === row.fddbrxm && userMobile === row.fddbryddh) {
       formData.value.sflx = '01'
-    } 
+    }
     // 其次匹配财务负责人 (02)
     else if (userName === row.cwfzrxm && userMobile === row.cwfzryddh) {
       formData.value.sflx = '02'
     }
   }
-  
+
   nsrxxDialogVisible.value = false
   message.success('已选择纳税人：' + row.nsrmc)
 }
@@ -258,6 +264,7 @@ const resetForm = () => {
     ghlx: undefined,
     qxlx: undefined,
     sqyy: undefined,
+    jjyy: undefined,
     jbyy: undefined,
     deptId: undefined
   }
