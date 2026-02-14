@@ -225,3 +225,20 @@ defineExpose({
 </template>
 
 <style src="@wangeditor-next/editor/dist/css/style.css"></style>
+<style>
+/* 修复 dark mode 下编辑器背景和文字颜色 */
+html.dark .w-e-text-container {
+  background-color: transparent !important;
+  color: var(--el-text-color-regular) !important;
+}
+html.dark .w-e-toolbar {
+  background-color: transparent !important;
+  color: var(--el-text-color-regular) !important;
+}
+html.dark .w-e-bar-item button {
+  color: var(--el-text-color-regular) !important;
+}
+html.dark .w-e-bar-item button:hover {
+  background-color: var(--el-fill-color-light) !important;
+}
+</style>

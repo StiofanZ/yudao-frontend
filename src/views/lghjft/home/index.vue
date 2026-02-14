@@ -28,7 +28,7 @@
       <!-- 通知公告 -->
       <el-col :span="24" :xs="24" class="mb-20px">
         <div
-          class="flex items-center px-16px py-10px border border-gray-100 rounded-8px bg-white hover:shadow-sm transition-shadow"
+          class="flex items-center px-16px py-10px border border-gray-100 rounded-8px bg-white hover:shadow-sm transition-shadow dark:bg-[var(--el-bg-color-overlay)] dark:border-gray-700"
         >
           <div class="flex items-center text-16px font-bold mr-12px">
             <Icon icon="ep:bell" class="mr-6px" />
@@ -48,7 +48,7 @@
               >
                 <el-carousel-item v-for="item in tzggList" :key="item.id">
                   <div
-                    class="h-24px leading-24px truncate cursor-pointer text-14px text-gray-700 hover:text-primary"
+                    class="h-24px leading-24px truncate cursor-pointer text-14px text-gray-700 hover:text-primary dark:text-gray-300"
                     :title="item.title"
                     @click="router.push(`/xxzx/tzgg/detail?id=${item.id}`)"
                   >
@@ -90,10 +90,13 @@
               <div
                 v-for="item in zcjdList"
                 :key="item.id"
-                class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
+                class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
                 @click="router.push(`/nrgl/zcjd/detail?id=${item.id}`)"
               >
-                <div :title="item.title" class="truncate flex-1 text-14px text-gray-700">
+                <div
+                  :title="item.title"
+                  class="truncate flex-1 text-14px text-gray-700 dark:text-gray-300"
+                >
                   <el-tag v-if="item.rank && item.rank <= 10" type="danger">🔥</el-tag>
                   <el-tag v-else-if="item.rank && item.rank <= 20" type="warning">⚡</el-tag>
                   <el-tag v-else-if="item.rank && item.rank <= 30" type="info">❄️</el-tag>
@@ -125,10 +128,13 @@
               <div
                 v-for="item in bsznList"
                 :key="item.id"
-                class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
+                class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
                 @click="router.push(`/nrgl/bszn/detail?id=${item.id}`)"
               >
-                <div :title="item.sxmc" class="truncate flex-1 text-14px text-gray-700">
+                <div
+                  :title="item.sxmc"
+                  class="truncate flex-1 text-14px text-gray-700 dark:text-gray-300"
+                >
                   <el-tag v-if="item.rank && item.rank <= 10" type="danger">🔥</el-tag>
                   <el-tag v-else-if="item.rank && item.rank <= 20" type="warning">⚡</el-tag>
                   <el-tag v-else-if="item.rank && item.rank <= 30" type="info">❄️</el-tag>
@@ -160,10 +166,13 @@
               <div
                 v-for="item in bbfbList"
                 :key="item.id"
-                class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
+                class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
                 @click="router.push(`/nrgl/bbfb/detail?id=${item.id}`)"
               >
-                <div :title="item.title" class="truncate flex-1 text-14px text-gray-700">
+                <div
+                  :title="item.title"
+                  class="truncate flex-1 text-14px text-gray-700 dark:text-gray-300"
+                >
                   <el-tag v-if="item.rank && item.rank <= 10" type="danger">🔥</el-tag>
                   <el-tag v-else-if="item.rank && item.rank <= 20" type="warning">⚡</el-tag>
                   <el-tag v-else-if="item.rank && item.rank <= 30" type="info">❄️</el-tag>
@@ -196,10 +205,13 @@
               <div
                 v-for="item in cjwtList"
                 :key="item.id"
-                class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50"
+                class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
                 @click="router.push(`/nrgl/cjwt/detail?id=${item.id}`)"
               >
-                <div :title="item.title" class="truncate flex-1 text-14px text-gray-700">
+                <div
+                  :title="item.title"
+                  class="truncate flex-1 text-14px text-gray-700 dark:text-gray-300"
+                >
                   <el-tag v-if="item.rank && item.rank <= 10" type="danger">🔥</el-tag>
                   <el-tag v-else-if="item.rank && item.rank <= 20" type="warning">⚡</el-tag>
                   <el-tag v-else-if="item.rank && item.rank <= 30" type="info">❄️</el-tag>
