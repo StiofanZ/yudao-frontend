@@ -1,7 +1,8 @@
 <template>
   <ContentWrap>
     <!-- 搜索工作栏 -->
-    <nsrxx-query @success="handleNsrxxSuccess" />
+    <el-button type="primary" @click="nsrSelectVisible = true">查询纳税人</el-button>
+    <NsrxxQuery v-model="nsrSelectVisible" @confirm="handleNsrxxSuccess" />
   </ContentWrap>
 
   <!-- 可退费信息列表弹窗 -->
@@ -64,7 +65,7 @@
 import { ref } from 'vue'
 import { WfSqTfsqApi, WfSqTfsqKtfxx } from '@/api/lghjft/workflow/wfsqtfsq'
 import WfSqTfsqKtfxxDialog from './WfSqTfsqKtfxxDialog.vue'
-import NsrxxQuery from '@/components/NsrxxQuery/index.vue'
+import NsrxxQuery from '@/views/lghjft/components/NsrxxQuery/index.vue'
 import { dateFormatter2 } from '@/utils/formatTime'
 import { ElMessage } from 'element-plus'
 
@@ -74,6 +75,7 @@ defineOptions({ name: 'WfSqTfsq' })
 const message = useMessage() // 消息弹窗
 
 const ktfxxDialogRef = ref()
+const nsrSelectVisible = ref(false)
 const submitLoading = ref(false)
 const isSaved = ref(false) // 是否已保存
 // 扩展类型以包含 tfje

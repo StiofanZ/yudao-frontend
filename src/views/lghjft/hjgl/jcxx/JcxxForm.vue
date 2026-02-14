@@ -232,46 +232,8 @@
     </template>
   </Dialog>
 
-  <!-- 纳税人选择弹窗 -->
-  <Dialog v-model="nsrSelectVisible" title="纳税人信息查询" width="900px">
-    <el-form :inline="true" :model="nsrQueryParams" class="demo-form-inline">
-      <el-form-item label="搜索关键字">
-        <el-input
-          v-model="nsrQueryParams.keyword"
-          clearable
-          placeholder="纳税人识别号/名称/社会信用代码"
-        />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="handleQueryNsr">查询</el-button>
-      </el-form-item>
-    </el-form>
-    <el-table
-      v-loading="nsrLoading"
-      :data="nsrList"
-      border
-      highlight-current-row
-      style="width: 100%"
-      @current-change="handleNsrSelectionChange"
-    >
-      <el-table-column label="纳税人识别号" prop="nsrsbh" width="180" />
-      <el-table-column label="纳税人名称" min-width="200" prop="nsrmc" />
-      <el-table-column label="社会信用代码" prop="shxydm" width="180" />
-      <el-table-column label="法定代表人" prop="fddbrxm" width="120" />
-      <el-table-column label="状态" width="100">
-        <template #default="scope">
-          <span v-if="scope.row.existsInHj" style="color: red">已维护</span>
-          <span v-else style="color: green">未维护</span>
-        </template>
-      </el-table-column>
-    </el-table>
-    <template #footer>
-      <el-button @click="nsrSelectVisible = false">取 消</el-button>
-      <el-button :disabled="!selectedNsr" type="primary" @click="confirmNsrSelection"
-        >确 定</el-button
-      >
-    </template>
-  </Dialog>
+  <!-- 纳税人选择组件 -->
+  <NsrxxQuery ref="nsrxxQueryRef" v-model="nsrSelectVisible" @confirm="confirmNsrSelection" />
 </template>
 
 <script lang="ts" setup>
@@ -282,10 +244,11 @@ import {
   getTaxInfo,
   JcxxVO,
   NsrxxRespVO,
-  queryNsrxx,
   updateJcxx
 } from '@/api/lghjft/hjgl/jcxx'
 import { ElMessageBox } from 'element-plus'
+
+import NsrxxQuery from '@/views/lghjft/components/NsrxxQuery/index.vue'
 
 defineOptions({ name: 'JcxxForm' })
 
@@ -472,52 +435,52 @@ const resetForm = () => {
 
 // --- 纳税人选择逻辑 ---
 const nsrSelectVisible = ref(false)
-const nsrQueryParams = reactive({ keyword: '' })
-const nsrList = ref<NsrxxRespVO[]>([])
-const nsrLoading = ref(false)
-const selectedNsr = ref<NsrxxRespVO | null>(null)
+const nsrxxQueryRef = ref()
 
 /** 选择纳税人 */
 const handleSelectNsr = () => {
   nsrSelectVisible.value = true
-  nsrQueryParams.keyword = ''
-  nsrList.value = []
-  selectedNsr.value = null
+  // 重置组件状态
+  nextTick(() => {
+    nsrxxQueryRef.value?.reset()
+  })
 }
 
-const handleQueryNsr = async () => {
-  if (!nsrQueryParams.keyword) {
-    message.warning('请输入搜索关键字')
-    return
-  }
-  nsrLoading.value = true
-  try {
-    const data = await queryNsrxx(nsrQueryParams.keyword)
-    nsrList.value = data
-  } finally {
-    nsrLoading.value = false
-  }
-}
-
-const handleNsrSelectionChange = (val: NsrxxRespVO) => {
-  selectedNsr.value = val
-}
-
-const confirmNsrSelection = async () => {
-  if (!selectedNsr.value) return
-  if (selectedNsr.value.existsInHj) {
-    message.warning('该纳税人已被维护，请勿重复添加')
-    return
-  }
-  // 从税务接口获取完整信息并填充
-  try {
-    const fullInfo = await getTaxInfo(selectedNsr.value.djxh)
+const confirmNsrSelection = async (selectedNsr: NsrxxRespVO) => {
+  if (!selectedNsr) return
+  if (selectedNsr.existsInHj) {
+    // 1. 如果已存在，转为修改模式，加载已有户籍信息
+    await ElMessageBox.confirm(
+      '该纳税人已存在户籍信息，将切换为【修改模式】并加载已有数据。',
+      '提示',
+      {
+        type: 'info'
+      }
+    )
+    formLoading.value = true
+    try {
+      const existingData = await getJcxx(selectedNsr.djxh)
+      resetForm()
+      formData.value = existingData
+      formType.value = 'update'
+      dialogTitle.value = t('action.update')
+    } finally {
+      formLoading.value = false
+    }
+  } else {
+    // 2. 如果不存在，保持新增模式，从税务接口获取信息
+    const fullInfo = await getTaxInfo(selectedNsr.djxh)
+    resetForm()
+    // 确保 djxh 被设置（防止 getTaxInfo 返回的数据中 djxh 缺失或不一致）
+    formData.value.djxh = selectedNsr.djxh
+    // 合并税务数据
     Object.assign(formData.value, fullInfo)
-    nsrSelectVisible.value = false
-    message.success('已回填税务信息')
-  } catch (e) {
-    console.error(e)
+    // 强制为新增模式
+    formType.value = 'create'
+    dialogTitle.value = t('action.create')
   }
+  nsrSelectVisible.value = false
+  message.success(selectedNsr.existsInHj ? '已加载现有户籍信息' : '已回填税务信息')
 }
 
 /** 从税务机关获取更新户籍信息 */
