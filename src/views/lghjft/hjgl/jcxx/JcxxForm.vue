@@ -7,15 +7,6 @@
       :rules="formRules"
       label-width="140px"
     >
-      <el-row>
-        <el-col :span="24" style="text-align: right; margin-bottom: 20px">
-          <el-button type="primary" @click="handleSelectNsr">选择纳税人</el-button>
-          <el-button type="warning" @click="handleUpdateFromTax"
-            >从税务机关获取更新户籍信息</el-button
-          >
-        </el-col>
-      </el-row>
-
       <el-divider content-position="left">基础信息</el-divider>
 
       <el-row>
@@ -227,6 +218,8 @@
       </el-row>
     </el-form>
     <template #footer>
+      <el-button type="primary" @click="handleSelectNsr">选择纳税人</el-button>
+      <el-button type="warning" @click="handleUpdateFromTax">从税务机关获取更新户籍信息</el-button>
       <el-button :disabled="formLoading" type="primary" @click="submitForm">确 定</el-button>
       <el-button @click="dialogVisible = false">取 消</el-button>
     </template>
@@ -238,14 +231,7 @@
 
 <script lang="ts" setup>
 import { DICT_TYPE, getDictOptions } from '@/utils/dict'
-import {
-  createJcxx,
-  getJcxx,
-  getTaxInfo,
-  JcxxVO,
-  NsrxxRespVO,
-  updateJcxx
-} from '@/api/lghjft/hjgl/jcxx'
+import { createJcxx, getJcxx, getTaxInfo, JcxxVO, NsrxxRespVO, updateJcxx } from '@/api/lghjft/hjgl/jcxx'
 import { ElMessageBox } from 'element-plus'
 
 import NsrxxQuery from '@/views/lghjft/components/NsrxxQuery/index.vue'
